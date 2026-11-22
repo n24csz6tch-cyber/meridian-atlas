@@ -10,6 +10,7 @@ import {
   Network,
   Pause,
   Play,
+  Presentation,
   Sparkles,
 } from 'lucide-react';
 import { AtlasShell } from '../components/AtlasShell';
@@ -233,6 +234,13 @@ export function HomePage() {
               >
                 <Compass className="w-4 h-4 text-[#36EBA8]" />
                 16 Live Labs
+              </Link>
+              <Link
+                to="/presentation"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-medium bg-[#FF7A5C]/12 border border-[#FF7A5C]/45 text-[#FF7A5C] hover:bg-[#FF7A5C]/20 transition-all"
+              >
+                <Presentation className="w-4 h-4" />
+                Live Presentation
               </Link>
             </div>
 

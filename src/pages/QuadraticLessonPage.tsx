@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, Layers, Sparkles } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight, ExternalLink, Layers, Pause, Play, Sparkles } from 'lucide-react';
 import { AtlasShell } from '../components/AtlasShell';
 import { LessonNavHeader } from '../components/LessonNavHeader';
 import { MathTex } from '../components/MathTex';
@@ -167,6 +168,15 @@ export function QuadraticLessonPage() {
 
   // Layer 3 worked example state
   const [workedIdx, setWorkedIdx] = useState(0);
+  const [autoPlayWorked, setAutoPlayWorked] = useState(false);
+
+  useEffect(() => {
+    if (!autoPlayWorked) return;
+    const timer = window.setInterval(() => {
+      setWorkedIdx((prev) => (prev + 1) % WORKED_STEPS.length);
+    }, 2800);
+    return () => window.clearInterval(timer);
+  }, [autoPlayWorked]);
 
   // Layer 5 misconception probe
   const [probeX, setProbeX] = useState(3);
@@ -368,13 +378,53 @@ export function QuadraticLessonPage() {
 
         {/* LAYER 3: Guided Step-by-Step Worked Example */}
         <section id="layer-3" className="space-y-4 scroll-mt-24">
-          <div>
-            <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#E5A94C]">
-              Layer 03 · Synchronized Worked Example
-            </span>
-            <h2 className="font-serif-editorial text-2xl text-[#EDEBE4]">
-              Deconstructing <MathTex tex="f(x) = 2x^2 - 8x + 6" />
-            </h2>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#E5A94C]">
+                Layer 03 · Synchronized Worked Example
+              </span>
+              <h2 className="font-serif-editorial text-2xl text-[#EDEBE4]">
+                Deconstructing <MathTex tex="f(x) = 2x^2 - 8x + 6" />
+              </h2>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setAutoPlayWorked(false);
+                  setWorkedIdx((prev) => (prev - 1 + WORKED_STEPS.length) % WORKED_STEPS.length);
+                }}
+                aria-label="Previous worked step"
+                className="p-1.5 rounded-full border border-white/15 bg-white/[0.03] text-[#A5B4CC] hover:text-[#F4F3EE] transition-colors"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setAutoPlayWorked((p) => !p)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono-data border transition-all"
+                style={{
+                  borderColor: autoPlayWorked ? '#E5A94C' : 'rgba(255,255,255,0.16)',
+                  backgroundColor: autoPlayWorked ? 'rgba(229,169,76,0.18)' : 'rgba(255,255,255,0.03)',
+                  color: autoPlayWorked ? '#E5A94C' : '#A5B4CC',
+                }}
+              >
+                {autoPlayWorked ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                {autoPlayWorked ? 'Pause Walkthrough' : 'Auto-Play Steps'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAutoPlayWorked(false);
+                  setWorkedIdx((prev) => (prev + 1) % WORKED_STEPS.length);
+                }}
+                aria-label="Next worked step"
+                className="p-1.5 rounded-full border border-white/15 bg-white/[0.03] text-[#A5B4CC] hover:text-[#F4F3EE] transition-colors"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
@@ -385,11 +435,15 @@ export function QuadraticLessonPage() {
                   <button
                     key={st.title}
                     type="button"
-                    onClick={() => setWorkedIdx(idx)}
-                    className="w-full text-left p-4 rounded border transition-colors space-y-1.5"
+                    onClick={() => {
+                      setAutoPlayWorked(false);
+                      setWorkedIdx(idx);
+                    }}
+                    className="w-full text-left p-4 rounded border transition-all space-y-1.5"
                     style={{
                       backgroundColor: active ? '#161D29' : '#111620',
                       borderColor: active ? '#E5A94C' : 'rgba(237, 235, 228, 0.1)',
+                      boxShadow: active ? '0 0 22px -10px rgba(229,169,76,0.85)' : undefined,
                     }}
                   >
                     <p className="font-mono-data text-[11px] text-[#E5A94C]">{st.title}</p>
@@ -400,14 +454,32 @@ export function QuadraticLessonPage() {
               })}
             </div>
 
-            <div className="lg:col-span-7">
+            <div className="lg:col-span-7 space-y-3">
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={workedIdx}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                  className="instrument-panel px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 border-[#E5A94C]/30"
+                >
+                  <span className="font-mono-data text-[11px] text-[#E5A94C]">
+                    ACTIVE FEATURE · 0{workedIdx + 1} / 0{WORKED_STEPS.length}
+                  </span>
+                  <span className="text-xs text-[#EDEBE4]">
+                    {WORKED_STEPS[workedIdx].title.replace(/^Step \d+ · /, '')}
+                  </span>
+                </motion.div>
+              </AnimatePresence>
+
               <ParabolaCanvas
                 a={2}
                 h={2}
                 k={-2}
                 interactive={false}
                 highlightFeature={WORKED_STEPS[workedIdx].feature}
-                heightClass="h-[420px]"
+                heightClass="h-[400px]"
               />
             </div>
           </div>
@@ -423,7 +495,11 @@ export function QuadraticLessonPage() {
               Verify Concepts with Step-by-Step Solutions
             </h2>
           </div>
-          <PracticeEngine questions={PRACTICE_QUESTIONS} accentColor="#E5A94C" />
+          <PracticeEngine
+            questions={PRACTICE_QUESTIONS}
+            accentColor="#E5A94C"
+            visualKinds={['parabola-vertex', 'parabola-discriminant', 'area-factor', 'parabola-standard']}
+          />
         </section>
 
         {/* LAYER 5: Visualized Common Misconception */}

@@ -1,9 +1,12 @@
-import { useId } from 'react';
+import { useId, useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { RotateCcw } from 'lucide-react';
 import { EquationMiniVisual, EquationVisualKind } from './EquationMiniVisual';
 
 interface DerivationStepVisualProps {
   visualKinds: EquationVisualKind[];
   stepIndex: number;
+  totalSteps?: number;
   stepTitle: string;
   accent: string;
 }
@@ -11,39 +14,68 @@ interface DerivationStepVisualProps {
 /**
  * Synchronized visual companion for Layer 3 Guided Step-by-Step Derivations.
  * Renders the geometric/graphical visual matched to the active derivation step
- * with glowing stage telemetry and step-progress reticle.
+ * with glowing stage telemetry, animated draw-in, and step-progress reticle.
  */
 export function DerivationStepVisual({
   visualKinds,
   stepIndex,
+  totalSteps,
   stepTitle,
   accent,
 }: DerivationStepVisualProps) {
+  const reducedMotion = useReducedMotion();
   const activeKind = visualKinds[Math.min(stepIndex, visualKinds.length - 1)] ?? visualKinds[0];
+  const count = Math.max(1, totalSteps ?? visualKinds.length);
+  const progressPct = Math.min(100, Math.round(((stepIndex + 1) / count) * 100));
 
   return (
     <div className="space-y-2.5">
-      <div className="flex items-center justify-between px-1">
-        <span
-          className="font-mono-data text-[10px] uppercase tracking-widest flex items-center gap-1.5"
-          style={{ color: accent }}
-        >
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between px-1">
           <span
-            className="w-2 h-2 rounded-full inline-block"
+            className="font-mono-data text-[10px] uppercase tracking-widest flex items-center gap-1.5"
+            style={{ color: accent }}
+          >
+            <span
+              className="w-2 h-2 rounded-full inline-block"
+              style={{ backgroundColor: accent, boxShadow: `0 0 10px ${accent}` }}
+            />
+            Live Step Visual · Stage 0{stepIndex + 1} / 0{count}
+          </span>
+          <span className="font-mono-data text-[10px] text-[#6F7F99] truncate max-w-[220px]">
+            {stepTitle.replace(/^Step \d+ · /, '')}
+          </span>
+        </div>
+
+        <div className="h-1 w-full rounded-full bg-white/[0.06] overflow-hidden">
+          <motion.div
+            className="h-full rounded-full"
             style={{ backgroundColor: accent, boxShadow: `0 0 10px ${accent}` }}
+            initial={false}
+            animate={{ width: `${progressPct}%` }}
+            transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 260, damping: 28 }}
           />
-          Live Step Visual · Stage 0{stepIndex + 1}
-        </span>
-        <span className="font-mono-data text-[10px] text-[#6F7F99] truncate max-w-[220px]">
-          {stepTitle.replace(/^Step \d+ · /, '')}
-        </span>
+        </div>
       </div>
-      <EquationMiniVisual
-        kind={activeKind}
-        accent={accent}
-        heightClass="h-[195px]"
-        caption={`Synchronized Stage 0${stepIndex + 1}`}
-      />
+
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={`${activeKind}-${stepIndex}`}
+          initial={reducedMotion ? false : { opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={reducedMotion ? undefined : { opacity: 0, y: -6 }}
+          transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <EquationMiniVisual
+            kind={activeKind}
+            accent={accent}
+            replayKey={`${activeKind}-${stepIndex}`}
+            heightClass="h-[195px]"
+            caption={`Synchronized Stage 0${stepIndex + 1}`}
+            showReplay
+          />
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
@@ -119,6 +151,9 @@ export function MisconceptionVisual({
 }: MisconceptionVisualProps) {
   const uid = useId().replace(/:/g, '');
   const gridId = `mgrid-${kind}-${uid}`;
+  const clipId = `mclip-${kind}-${uid}`;
+  const reducedMotion = useReducedMotion();
+  const [localReplay, setLocalReplay] = useState(0);
   const coral = '#FF7A5C';
   const emerald = '#36EBA8';
   const gold = '#F5BC5E';
@@ -374,13 +409,21 @@ export function MisconceptionVisual({
         <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#F4F3EE]">
           Geometric Discrepancy Proof
         </span>
-        <div className="flex items-center gap-3 font-mono-data text-[10px]">
+        <div className="flex flex-wrap items-center gap-3 font-mono-data text-[10px]">
           <span className="flex items-center gap-1 text-[#FF7A5C]">
             <span className="w-2.5 h-0.5 bg-[#FF7A5C] inline-block" /> {falseLabel}
           </span>
           <span className="flex items-center gap-1 text-[#36EBA8]">
             <span className="w-2.5 h-0.5 bg-[#36EBA8] inline-block" /> {trueLabel}
           </span>
+          <button
+            type="button"
+            onClick={() => setLocalReplay((n) => n + 1)}
+            aria-label="Replay misconception proof animation"
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white/[0.05] border border-white/10 text-[#A5B4CC] hover:text-[#F4F3EE] hover:border-white/25 transition-colors"
+          >
+            <RotateCcw className="w-2.5 h-2.5" /> Replay Proof
+          </button>
         </div>
       </div>
       <svg viewBox={`0 0 ${MW} ${MH}`} className="w-full h-[155px]" role="img" aria-label="Visual misconception comparison">
@@ -388,9 +431,41 @@ export function MisconceptionVisual({
           <pattern id={gridId} width="24" height="24" patternUnits="userSpaceOnUse">
             <path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
           </pattern>
+          <clipPath id={clipId}>
+            <motion.rect
+              key={`clip-${localReplay}`}
+              x={0}
+              y={0}
+              height={MH}
+              initial={reducedMotion ? { width: MW } : { width: 0 }}
+              animate={{ width: MW }}
+              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            />
+          </clipPath>
         </defs>
         <rect x={0} y={0} width={MW} height={MH} fill={`url(#${gridId})`} />
-        {renderGraphic()}
+        <motion.g
+          key={localReplay}
+          clipPath={`url(#${clipId})`}
+          initial={reducedMotion ? false : { opacity: 0.35 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.55 }}
+        >
+          {renderGraphic()}
+        </motion.g>
+        {!reducedMotion && (
+          <motion.line
+            key={`scan-${localReplay}`}
+            y1={8}
+            y2={MH - 8}
+            stroke={gold}
+            strokeWidth={1.5}
+            strokeOpacity={0.65}
+            initial={{ x1: 0, x2: 0, opacity: 0.9 }}
+            animate={{ x1: MW, x2: MW, opacity: 0 }}
+            transition={{ duration: 0.92, ease: [0.22, 1, 0.36, 1] }}
+          />
+        )}
       </svg>
     </div>
   );

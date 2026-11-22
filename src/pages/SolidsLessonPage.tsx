@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, Layers, Sparkles } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight, ExternalLink, Layers, Pause, Play, Sparkles } from 'lucide-react';
 import { AtlasShell } from '../components/AtlasShell';
 import { LessonNavHeader } from '../components/LessonNavHeader';
 import { MathTex } from '../components/MathTex';
@@ -142,8 +143,17 @@ const LESSON_STANDARD_CODES = ['MA.912.GR.4.1', 'MA.912.GR.4.5', 'MA.912.GR.4.6'
 export function SolidsLessonPage() {
   // Layer 3 synced step + lazy mount second WebGL context only when scrolled near Layer 3
   const [stepIdx, setStepIdx] = useState(0);
+  const [autoPlaySteps, setAutoPlaySteps] = useState(false);
   const [mountWorked3D, setMountWorked3D] = useState(false);
   const worked3DRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!autoPlaySteps) return;
+    const timer = window.setInterval(() => {
+      setStepIdx((prev) => (prev + 1) % WORKED_3D_STEPS.length);
+    }, 2800);
+    return () => window.clearInterval(timer);
+  }, [autoPlaySteps]);
 
   useEffect(() => {
     const el = worked3DRef.current;
@@ -283,15 +293,55 @@ export function SolidsLessonPage() {
 
         {/* LAYER 3: Synchronized 3D Guided Worked Example */}
         <section id="layer-3" className="space-y-4 scroll-mt-24">
-          <div className="flex items-center gap-2">
-            <Layers className="w-4 h-4 text-[#38BDF8]" />
-            <div>
-              <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#38BDF8]">
-                Layer 03 · Synchronized 3D Worked Example
-              </span>
-              <h2 className="font-serif-editorial text-2xl text-[#EDEBE4]">
-                Square Pyramid (<MathTex tex="s = 6\text{ cm},\; h = 4\text{ cm}" />)
-              </h2>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Layers className="w-4 h-4 text-[#38BDF8]" />
+              <div>
+                <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#38BDF8]">
+                  Layer 03 · Synchronized 3D Worked Example
+                </span>
+                <h2 className="font-serif-editorial text-2xl text-[#EDEBE4]">
+                  Square Pyramid (<MathTex tex="s = 6\text{ cm},\; h = 4\text{ cm}" />)
+                </h2>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setAutoPlaySteps(false);
+                  setStepIdx((prev) => (prev - 1 + WORKED_3D_STEPS.length) % WORKED_3D_STEPS.length);
+                }}
+                aria-label="Previous 3D step"
+                className="p-1.5 rounded-full border border-white/15 bg-white/[0.03] text-[#A5B4CC] hover:text-[#F4F3EE] transition-colors"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setAutoPlaySteps((p) => !p)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono-data border transition-all"
+                style={{
+                  borderColor: autoPlaySteps ? '#38BDF8' : 'rgba(255,255,255,0.16)',
+                  backgroundColor: autoPlaySteps ? 'rgba(56,189,248,0.18)' : 'rgba(255,255,255,0.03)',
+                  color: autoPlaySteps ? '#38BDF8' : '#A5B4CC',
+                }}
+              >
+                {autoPlaySteps ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                {autoPlaySteps ? 'Pause 3D Unfold' : 'Auto-Play Steps'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAutoPlaySteps(false);
+                  setStepIdx((prev) => (prev + 1) % WORKED_3D_STEPS.length);
+                }}
+                aria-label="Next 3D step"
+                className="p-1.5 rounded-full border border-white/15 bg-white/[0.03] text-[#A5B4CC] hover:text-[#F4F3EE] transition-colors"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
 
@@ -303,11 +353,15 @@ export function SolidsLessonPage() {
                   <button
                     key={st.title}
                     type="button"
-                    onClick={() => setStepIdx(idx)}
-                    className="w-full text-left p-4 rounded border transition-colors space-y-1.5"
+                    onClick={() => {
+                      setAutoPlaySteps(false);
+                      setStepIdx(idx);
+                    }}
+                    className="w-full text-left p-4 rounded border transition-all space-y-1.5"
                     style={{
                       backgroundColor: active ? '#161D29' : '#111620',
                       borderColor: active ? '#38BDF8' : 'rgba(237, 235, 228, 0.1)',
+                      boxShadow: active ? '0 0 22px -10px rgba(56,189,248,0.85)' : undefined,
                     }}
                   >
                     <p className="font-mono-data text-[11px] text-[#38BDF8]">{st.title}</p>
@@ -318,7 +372,26 @@ export function SolidsLessonPage() {
               })}
             </div>
 
-            <div ref={worked3DRef} className="lg:col-span-7 instrument-frame overflow-hidden">
+            <div ref={worked3DRef} className="lg:col-span-7 space-y-3">
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={stepIdx}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                  className="instrument-panel px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 border-[#38BDF8]/30"
+                >
+                  <span className="font-mono-data text-[11px] text-[#38BDF8]">
+                    3D STAGE · 0{stepIdx + 1} / 0{WORKED_3D_STEPS.length}
+                  </span>
+                  <span className="text-xs text-[#EDEBE4]">
+                    {activeStep.unfold === 1 ? 'Unfolded 2D Planar Net' : 'Folded 3D Solid'}
+                  </span>
+                </motion.div>
+              </AnimatePresence>
+
+              <div className="instrument-frame overflow-hidden">
               {mountWorked3D ? (
                 <Suspense
                   fallback={
@@ -350,6 +423,7 @@ export function SolidsLessonPage() {
                   </button>
                 </div>
               )}
+              </div>
             </div>
           </div>
         </section>
@@ -364,7 +438,11 @@ export function SolidsLessonPage() {
               Calculate Nets, Slant Heights &amp; Cross-Sections
             </h2>
           </div>
-          <PracticeEngine questions={GEOMETRY_QUESTIONS} accentColor="#38BDF8" />
+          <PracticeEngine
+            questions={GEOMETRY_QUESTIONS}
+            accentColor="#38BDF8"
+            visualKinds={['prism-net', 'pyramid-slant', 'area-scale-k2', 'cylinder-unroll']}
+          />
         </section>
 
         {/* LAYER 5: Visualized Misconception (Altitude h vs Slant Height l) */}

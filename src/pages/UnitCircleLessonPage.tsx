@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { AlertTriangle, ExternalLink } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { AlertTriangle, ChevronLeft, ChevronRight, ExternalLink, Pause, Play } from 'lucide-react';
 import { AtlasShell } from '../components/AtlasShell';
 import { LessonNavHeader } from '../components/LessonNavHeader';
 import { MathTex } from '../components/MathTex';
@@ -95,11 +96,20 @@ const STD_CODES = ['MA.912.T.2.2', 'MA.912.T.3.1', 'MA.912.T.3.2', 'MA.912.NSO.3
 
 export function UnitCircleLessonPage() {
   const [stepIdx, setStepIdx] = useState(0);
+  const [autoPlaySteps, setAutoPlaySteps] = useState(false);
   const [freqTest, setFreqTest] = useState(2.0);
   const [windSpeed, setWindSpeed] = useState(40);
   const planeAirspeed = 180;
   const groundSpeed = Math.hypot(planeAirspeed, windSpeed);
   const driftDeg = (Math.atan2(windSpeed, planeAirspeed) * 180) / Math.PI;
+
+  useEffect(() => {
+    if (!autoPlaySteps) return;
+    const timer = window.setInterval(() => {
+      setStepIdx((prev) => (prev + 1) % TRIG_STEPS.length);
+    }, 2800);
+    return () => window.clearInterval(timer);
+  }, [autoPlaySteps]);
 
   return (
     <AtlasShell activeCourse="precalculus">
@@ -178,13 +188,53 @@ export function UnitCircleLessonPage() {
 
         {/* LAYER 3: GUIDED WORKED EXAMPLE */}
         <section id="layer-3" className="instrument-frame p-5 sm:p-6 space-y-4 scroll-mt-24">
-          <div>
-            <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#FF7A5C] block">
-              Layer 03 · Synchronized Guided Step-by-Step Analysis
-            </span>
-            <h2 className="font-serif-editorial text-2xl text-[#F4F3EE]">
-              Graphing &amp; Evaluating <MathTex tex="y = 3\sin(2x)" />
-            </h2>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#FF7A5C] block">
+                Layer 03 · Synchronized Guided Step-by-Step Analysis
+              </span>
+              <h2 className="font-serif-editorial text-2xl text-[#F4F3EE]">
+                Graphing &amp; Evaluating <MathTex tex="y = 3\sin(2x)" />
+              </h2>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setAutoPlaySteps(false);
+                  setStepIdx((prev) => (prev - 1 + TRIG_STEPS.length) % TRIG_STEPS.length);
+                }}
+                aria-label="Previous trig step"
+                className="p-1.5 rounded-full border border-white/15 bg-white/[0.03] text-[#A5B4CC] hover:text-[#F4F3EE] transition-colors"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setAutoPlaySteps((p) => !p)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono-data border transition-all"
+                style={{
+                  borderColor: autoPlaySteps ? '#FF7A5C' : 'rgba(255,255,255,0.16)',
+                  backgroundColor: autoPlaySteps ? 'rgba(255,122,92,0.18)' : 'rgba(255,255,255,0.03)',
+                  color: autoPlaySteps ? '#FF7A5C' : '#A5B4CC',
+                }}
+              >
+                {autoPlaySteps ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                {autoPlaySteps ? 'Pause Walkthrough' : 'Auto-Play Steps'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAutoPlaySteps(false);
+                  setStepIdx((prev) => (prev + 1) % TRIG_STEPS.length);
+                }}
+                aria-label="Next trig step"
+                className="p-1.5 rounded-full border border-white/15 bg-white/[0.03] text-[#A5B4CC] hover:text-[#F4F3EE] transition-colors"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
@@ -194,7 +244,10 @@ export function UnitCircleLessonPage() {
                   <button
                     key={st.title}
                     type="button"
-                    onClick={() => setStepIdx(idx)}
+                    onClick={() => {
+                      setAutoPlaySteps(false);
+                      setStepIdx(idx);
+                    }}
                     className={`p-3 rounded-xl text-left border transition-all ${
                       stepIdx === idx
                         ? 'bg-[#FF7A5C]/15 border-[#FF7A5C] text-[#F4F3EE]'
@@ -207,17 +260,29 @@ export function UnitCircleLessonPage() {
                 ))}
               </div>
 
-              <div className="instrument-panel p-5 space-y-2">
-                <p className="font-mono-data text-xs text-[#FF7A5C]">{TRIG_STEPS[stepIdx].title}</p>
-                <MathTex tex={TRIG_STEPS[stepIdx].tex} displayMode className="text-[#F4F3EE]" />
-                <p className="text-xs text-[#A5B4CC]">{TRIG_STEPS[stepIdx].note}</p>
-              </div>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={stepIdx}
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                  className="instrument-panel p-5 space-y-2"
+                >
+                  <p className="font-mono-data text-xs text-[#FF7A5C]">{TRIG_STEPS[stepIdx].title}</p>
+                  <div className="overflow-x-auto">
+                    <MathTex tex={TRIG_STEPS[stepIdx].tex} displayMode className="text-[#F4F3EE]" />
+                  </div>
+                  <p className="text-xs text-[#A5B4CC]">{TRIG_STEPS[stepIdx].note}</p>
+                </motion.div>
+              </AnimatePresence>
             </div>
 
             <div className="lg:col-span-5">
               <DerivationStepVisual
-                visualKinds={['unit-circle-proj', 'trig-pythag-id', 'unit-circle-proj', 'right-trig-ratios']}
+                visualKinds={['unit-circle-proj', 'trig-pythag-id', 'sinusoid-wave', 'right-trig-ratios']}
                 stepIndex={stepIdx}
+                totalSteps={TRIG_STEPS.length}
                 stepTitle={TRIG_STEPS[stepIdx].title}
                 accent="#FF7A5C"
               />
@@ -230,7 +295,11 @@ export function UnitCircleLessonPage() {
           <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#FF785A]">
             Layer 4 · Interactive Check &amp; Vector Norm Drills
           </span>
-          <PracticeEngine questions={TRIG_PRACTICE} accentColor="#FF785A" />
+          <PracticeEngine
+            questions={TRIG_PRACTICE}
+            accentColor="#FF785A"
+            visualKinds={['unit-circle-proj', 'sinusoid-wave', 'trig-pythag-id', 'vector-parallelogram']}
+          />
         </section>
 
         {/* LAYER 5: MISCONCEPTION VISUALIZED */}

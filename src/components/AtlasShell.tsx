@@ -1,6 +1,6 @@
 import { ReactNode, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Compass, Menu, X } from 'lucide-react';
+import { Compass, Menu, Presentation, X } from 'lucide-react';
 import { COURSES } from '../data/curriculumGraph';
 import { CourseId, FLDOE_SOURCES } from '../data/standards';
 import { AmbientNeuralBackdrop } from '../visuals/bg/AmbientNeuralBackdrop';
@@ -104,14 +104,32 @@ export function AtlasShell({ children, activeCourse }: AtlasShellProps) {
             })}
           </nav>
 
-          <button
-            type="button"
-            onClick={() => setMobileOpen((o) => !o)}
-            aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
-            className="md:hidden p-2 rounded-xl border border-white/15 text-[#F4F3EE]"
-          >
-            {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-          </button>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <Link
+              to="/presentation"
+              className="hidden sm:inline-flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-full text-[11px] font-mono-data border transition-all hover:brightness-110"
+              style={{
+                borderColor: `${accent}66`,
+                backgroundColor: `${accent}18`,
+                color: accent,
+                boxShadow: `0 0 18px -6px ${accent}`,
+              }}
+              title="Open Live Observatory Presentation (Alt+P)"
+            >
+              <Presentation className="w-3.5 h-3.5" />
+              <span className="hidden lg:inline">Presentation</span>
+              <span className="lg:hidden">Stage</span>
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => setMobileOpen((o) => !o)}
+              aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              className="md:hidden p-2 rounded-xl border border-white/15 text-[#F4F3EE]"
+            >
+              {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
 
         {mobileOpen && (
@@ -119,6 +137,19 @@ export function AtlasShell({ children, activeCourse }: AtlasShellProps) {
             aria-label="Mobile navigation"
             className="pointer-events-auto md:hidden mt-2 max-w-7xl mx-auto obsidian-glass rounded-2xl p-3 grid grid-cols-2 sm:grid-cols-3 gap-1.5"
           >
+            <Link
+              to="/presentation"
+              onClick={() => setMobileOpen(false)}
+              className="px-3 py-2 rounded-xl text-xs font-medium inline-flex items-center gap-1.5 border"
+              style={{
+                borderColor: `${accent}55`,
+                backgroundColor: `${accent}16`,
+                color: accent,
+              }}
+            >
+              <Presentation className="w-3.5 h-3.5" />
+              Presentation Mode
+            </Link>
             {NAV_ITEMS.map((item) => {
               const isActive =
                 item.to === '/'
@@ -165,6 +196,9 @@ export function AtlasShell({ children, activeCourse }: AtlasShellProps) {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-4 font-mono-data text-[11px]">
+            <Link to="/presentation" className="text-[#F5BC5E] hover:opacity-85 inline-flex items-center gap-1">
+              <Presentation className="w-3 h-3" /> Presentation Mode
+            </Link>
             <Link to="/map" className="text-[#A5B4CC] hover:text-[#F4F3EE]">
               Neural Atlas Map
             </Link>

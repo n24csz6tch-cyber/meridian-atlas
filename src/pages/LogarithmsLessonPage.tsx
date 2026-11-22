@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { AlertTriangle, CheckCircle2, ExternalLink } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { AlertTriangle, CheckCircle2, ChevronLeft, ChevronRight, ExternalLink, Pause, Play } from 'lucide-react';
 import { AtlasShell } from '../components/AtlasShell';
 import { LessonNavHeader } from '../components/LessonNavHeader';
 import { MathTex } from '../components/MathTex';
@@ -104,9 +105,18 @@ const STD_CODES = ['MA.912.AR.5.2', 'MA.912.AR.5.9'];
 
 export function LogarithmsLessonPage() {
   const [stepIdx, setStepIdx] = useState(0);
+  const [autoPlaySteps, setAutoPlaySteps] = useState(false);
   const [trapX, setTrapX] = useState(4);
   const [trapY, setTrapY] = useState(4);
   const [magDelta, setMagDelta] = useState(2.0);
+
+  useEffect(() => {
+    if (!autoPlaySteps) return;
+    const timer = window.setInterval(() => {
+      setStepIdx((prev) => (prev + 1) % LOG_WORKED_STEPS.length);
+    }, 2800);
+    return () => window.clearInterval(timer);
+  }, [autoPlaySteps]);
 
   const trueSumVal = Math.log2(trapX + trapY);
   const falseSplitVal = Math.log2(trapX) + Math.log2(trapY);
@@ -210,6 +220,44 @@ export function LogarithmsLessonPage() {
                 Solving <MathTex tex="\log_2(x) + \log_2(x - 2) = 3" />
               </h2>
             </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setAutoPlaySteps(false);
+                  setStepIdx((prev) => (prev - 1 + LOG_WORKED_STEPS.length) % LOG_WORKED_STEPS.length);
+                }}
+                aria-label="Previous logarithm step"
+                className="p-1.5 rounded-full border border-white/15 bg-white/[0.03] text-[#A5B4CC] hover:text-[#F4F3EE] transition-colors"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setAutoPlaySteps((p) => !p)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono-data border transition-all"
+                style={{
+                  borderColor: autoPlaySteps ? '#36EBA8' : 'rgba(255,255,255,0.16)',
+                  backgroundColor: autoPlaySteps ? 'rgba(54,235,168,0.18)' : 'rgba(255,255,255,0.03)',
+                  color: autoPlaySteps ? '#36EBA8' : '#A5B4CC',
+                }}
+              >
+                {autoPlaySteps ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                {autoPlaySteps ? 'Pause Walkthrough' : 'Auto-Play Steps'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAutoPlaySteps(false);
+                  setStepIdx((prev) => (prev + 1) % LOG_WORKED_STEPS.length);
+                }}
+                aria-label="Next logarithm step"
+                className="p-1.5 rounded-full border border-white/15 bg-white/[0.03] text-[#A5B4CC] hover:text-[#F4F3EE] transition-colors"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
@@ -219,7 +267,10 @@ export function LogarithmsLessonPage() {
                   <button
                     key={st.title}
                     type="button"
-                    onClick={() => setStepIdx(idx)}
+                    onClick={() => {
+                      setAutoPlaySteps(false);
+                      setStepIdx(idx);
+                    }}
                     className={`p-3 rounded-xl text-left border transition-all ${
                       stepIdx === idx
                         ? 'bg-[#36EBA8]/15 border-[#36EBA8] text-[#F4F3EE]'
@@ -234,19 +285,29 @@ export function LogarithmsLessonPage() {
                 ))}
               </div>
 
-              <div className="instrument-panel p-5 space-y-2">
-                <p className="font-mono-data text-xs text-[#36EBA8]">{LOG_WORKED_STEPS[stepIdx].title}</p>
-                <div className="py-1 overflow-x-auto">
-                  <MathTex tex={LOG_WORKED_STEPS[stepIdx].tex} displayMode className="text-[#F4F3EE]" />
-                </div>
-                <p className="text-xs text-[#A5B4CC]">{LOG_WORKED_STEPS[stepIdx].note}</p>
-              </div>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={stepIdx}
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                  className="instrument-panel p-5 space-y-2"
+                >
+                  <p className="font-mono-data text-xs text-[#36EBA8]">{LOG_WORKED_STEPS[stepIdx].title}</p>
+                  <div className="py-1 overflow-x-auto">
+                    <MathTex tex={LOG_WORKED_STEPS[stepIdx].tex} displayMode className="text-[#F4F3EE]" />
+                  </div>
+                  <p className="text-xs text-[#A5B4CC]">{LOG_WORKED_STEPS[stepIdx].note}</p>
+                </motion.div>
+              </AnimatePresence>
             </div>
 
             <div className="lg:col-span-5">
               <DerivationStepVisual
-                visualKinds={['exponent-product', 'log-reflection', 'parabola-vertex', 'radical-curve']}
+                visualKinds={['log-product', 'log-reflection', 'parabola-vertex', 'radical-curve']}
                 stepIndex={stepIdx}
+                totalSteps={LOG_WORKED_STEPS.length}
                 stepTitle={LOG_WORKED_STEPS[stepIdx].title}
                 accent="#36EBA8"
               />
@@ -259,7 +320,11 @@ export function LogarithmsLessonPage() {
           <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#34E8A5]">
             Layer 4 · Interactive Check &amp; Step Solutions
           </span>
-          <PracticeEngine questions={LOG_PRACTICE} accentColor="#34E8A5" />
+          <PracticeEngine
+            questions={LOG_PRACTICE}
+            accentColor="#34E8A5"
+            visualKinds={['log-reflection', 'log-quotient', 'log-product', 'log-power']}
+          />
         </section>
 
         {/* LAYER 5: COMMON MISCONCEPTION VISUALIZED */}

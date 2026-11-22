@@ -1,6 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { AlertTriangle, ArrowRight, ExternalLink, Pause, Play, Sparkles } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  AlertTriangle,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  Pause,
+  Play,
+  Sparkles,
+} from 'lucide-react';
 import { AtlasShell } from '../components/AtlasShell';
 import { LessonNavHeader } from '../components/LessonNavHeader';
 import { MathTex } from '../components/MathTex';
@@ -1596,19 +1606,45 @@ export function TopicLessonPage() {
               </h2>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setAutoPlaySteps((p) => !p)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono-data border transition-all"
-              style={{
-                borderColor: autoPlaySteps ? course.accent : 'rgba(255,255,255,0.16)',
-                backgroundColor: autoPlaySteps ? `${course.accent}22` : 'rgba(255,255,255,0.03)',
-                color: autoPlaySteps ? course.accent : '#A5B4CC',
-              }}
-            >
-              {autoPlaySteps ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-              {autoPlaySteps ? 'Pause Auto-Walkthrough' : 'Auto-Play Steps'}
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setAutoPlaySteps(false);
+                  setStepIdx((prev) => (prev - 1 + stepCount) % stepCount);
+                }}
+                aria-label="Previous derivation step"
+                className="p-1.5 rounded-full border border-white/15 bg-white/[0.03] text-[#A5B4CC] hover:text-[#F4F3EE] transition-colors"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setAutoPlaySteps((p) => !p)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono-data border transition-all"
+                style={{
+                  borderColor: autoPlaySteps ? course.accent : 'rgba(255,255,255,0.16)',
+                  backgroundColor: autoPlaySteps ? `${course.accent}22` : 'rgba(255,255,255,0.03)',
+                  color: autoPlaySteps ? course.accent : '#A5B4CC',
+                }}
+              >
+                {autoPlaySteps ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                {autoPlaySteps ? 'Pause Auto-Walkthrough' : 'Auto-Play Steps'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setAutoPlaySteps(false);
+                  setStepIdx((prev) => (prev + 1) % stepCount);
+                }}
+                aria-label="Next derivation step"
+                className="p-1.5 rounded-full border border-white/15 bg-white/[0.03] text-[#A5B4CC] hover:text-[#F4F3EE] transition-colors"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
@@ -1646,23 +1682,33 @@ export function TopicLessonPage() {
                 ))}
               </div>
 
-              <div className="instrument-panel p-5 space-y-2.5">
-                <p className="font-mono-data text-xs" style={{ color: course.accent }}>
-                  {spec.steps[safeStep].title}
-                </p>
-                <div className="overflow-x-auto py-1">
-                  <MathTex tex={spec.steps[safeStep].tex} displayMode className="text-[#F4F3EE]" />
-                </div>
-                <p className="text-xs sm:text-sm text-[#A5B4CC] leading-relaxed">
-                  {spec.steps[safeStep].note}
-                </p>
-              </div>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={safeStep}
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                  className="instrument-panel p-5 space-y-2.5"
+                >
+                  <p className="font-mono-data text-xs" style={{ color: course.accent }}>
+                    {spec.steps[safeStep].title}
+                  </p>
+                  <div className="overflow-x-auto py-1">
+                    <MathTex tex={spec.steps[safeStep].tex} displayMode className="text-[#F4F3EE]" />
+                  </div>
+                  <p className="text-xs sm:text-sm text-[#A5B4CC] leading-relaxed">
+                    {spec.steps[safeStep].note}
+                  </p>
+                </motion.div>
+              </AnimatePresence>
             </div>
 
             <div className="lg:col-span-5">
               <DerivationStepVisual
                 visualKinds={visualConfig.stepVisuals}
                 stepIndex={safeStep}
+                totalSteps={spec.steps.length}
                 stepTitle={spec.steps[safeStep].title}
                 accent={course.accent}
               />
@@ -1683,7 +1729,11 @@ export function TopicLessonPage() {
               Test Your Intuition With Instant Step-by-Step Feedback
             </h2>
           </div>
-          <PracticeEngine questions={mergedQuestions} accentColor={course.accent} />
+          <PracticeEngine
+            questions={mergedQuestions}
+            accentColor={course.accent}
+            visualKinds={visualConfig.stepVisuals}
+          />
         </section>
 
         {/* LAYER 5: COMMON MISCONCEPTION VISUALLY PROVEN */}

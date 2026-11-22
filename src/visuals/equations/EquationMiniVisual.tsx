@@ -1,4 +1,8 @@
-import { useId, useMemo } from 'react';
+import { createContext, useContext, useId, useMemo, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { RotateCcw } from 'lucide-react';
+
+const VisualAnimContext = createContext<boolean>(true);
 
 export type EquationVisualKind =
   // Algebra 1
@@ -167,25 +171,92 @@ function GlowCurve({
   width?: number;
   dashed?: boolean;
 }) {
+  const animated = useContext(VisualAnimContext);
+
+  if (!animated) {
+    return (
+      <>
+        <path
+          d={d}
+          fill="none"
+          stroke={color}
+          strokeWidth={width + 4.5}
+          strokeOpacity={0.18}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d={d}
+          fill="none"
+          stroke={color}
+          strokeWidth={width}
+          strokeDasharray={dashed ? '5 4' : undefined}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </>
+    );
+  }
+
+  if (dashed) {
+    return (
+      <>
+        <motion.path
+          d={d}
+          fill="none"
+          stroke={color}
+          strokeWidth={width + 4.5}
+          strokeOpacity={0.18}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+        />
+        <motion.path
+          d={d}
+          fill="none"
+          stroke={color}
+          strokeWidth={width}
+          strokeDasharray="5 4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          initial={{ opacity: 0, strokeDashoffset: 28 }}
+          animate={{ opacity: 1, strokeDashoffset: 0 }}
+          transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+        />
+      </>
+    );
+  }
+
   return (
     <>
-      <path
+      <motion.path
         d={d}
+        pathLength={1}
+        strokeDasharray="1"
         fill="none"
         stroke={color}
         strokeWidth={width + 4.5}
         strokeOpacity={0.18}
         strokeLinecap="round"
         strokeLinejoin="round"
+        initial={{ strokeDashoffset: 1, opacity: 0.25 }}
+        animate={{ strokeDashoffset: 0, opacity: 1 }}
+        transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
       />
-      <path
+      <motion.path
         d={d}
+        pathLength={1}
+        strokeDasharray="1"
         fill="none"
         stroke={color}
         strokeWidth={width}
-        strokeDasharray={dashed ? '5 4' : undefined}
         strokeLinecap="round"
         strokeLinejoin="round"
+        initial={{ strokeDashoffset: 1, opacity: 0.25 }}
+        animate={{ strokeDashoffset: 0, opacity: 1 }}
+        transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
       />
     </>
   );
@@ -206,11 +277,27 @@ function Axes({ xMin, xMax, yMin, yMax }: { xMin: number; xMax: number; yMin: nu
 }
 
 function Dot({ x, y, color, r = 3.6 }: { x: number; y: number; color: string; r?: number }) {
+  const animated = useContext(VisualAnimContext);
+
+  if (!animated) {
+    return (
+      <g>
+        <circle cx={x} cy={y} r={r + 4} fill={color} fillOpacity={0.22} />
+        <circle cx={x} cy={y} r={r} fill={color} stroke="#060A13" strokeWidth={1.2} />
+      </g>
+    );
+  }
+
   return (
-    <g>
+    <motion.g
+      initial={{ opacity: 0, scale: 0.4 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: 'spring', stiffness: 320, damping: 22, delay: 0.38 }}
+      style={{ transformOrigin: `${x}px ${y}px` }}
+    >
       <circle cx={x} cy={y} r={r + 4} fill={color} fillOpacity={0.22} />
       <circle cx={x} cy={y} r={r} fill={color} stroke="#060A13" strokeWidth={1.2} />
-    </g>
+    </motion.g>
   );
 }
 
@@ -219,6 +306,9 @@ interface EquationMiniVisualProps {
   accent?: string;
   heightClass?: string;
   caption?: string;
+  replayKey?: string | number;
+  animated?: boolean;
+  showReplay?: boolean;
 }
 
 export function EquationMiniVisual({
@@ -226,9 +316,15 @@ export function EquationMiniVisual({
   accent = '#F5BC5E',
   heightClass = 'h-[126px]',
   caption,
+  replayKey,
+  animated = true,
+  showReplay = false,
 }: EquationMiniVisualProps) {
   const uid = useId().replace(/:/g, '');
   const gridId = `grid-${kind}-${uid}`;
+  const reducedMotion = useReducedMotion();
+  const [localReplay, setLocalReplay] = useState(0);
+  const shouldAnimate = animated && !reducedMotion;
   const content = useMemo(() => {
     const cyan = '#38D9FF';
     const gold = '#F5BC5E';
@@ -1152,23 +1248,43 @@ export function EquationMiniVisual({
   }, [kind, accent]);
 
   return (
-    <div
-      className={`relative w-full ${heightClass} rounded-xl bg-[#050811] border border-white/[0.08] overflow-hidden flex items-center justify-center`}
-    >
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-full" role="img" aria-label={caption ?? kind}>
-        <defs>
-          <pattern id={gridId} width="24" height="24" patternUnits="userSpaceOnUse">
-            <path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(255,255,255,0.035)" strokeWidth="1" />
-          </pattern>
-        </defs>
-        <rect x={0} y={0} width={W} height={H} fill={`url(#${gridId})`} />
-        {content}
-      </svg>
-      {caption && (
-        <span className="pointer-events-none absolute bottom-1.5 right-2.5 font-mono-data text-[9px] uppercase tracking-wider text-[#6F7F99]">
-          {caption}
-        </span>
-      )}
-    </div>
+    <VisualAnimContext.Provider value={shouldAnimate}>
+      <div
+        className={`relative w-full ${heightClass} rounded-xl bg-[#050811] border border-white/[0.08] overflow-hidden flex items-center justify-center group`}
+      >
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-full" role="img" aria-label={caption ?? kind}>
+          <defs>
+            <pattern id={gridId} width="24" height="24" patternUnits="userSpaceOnUse">
+              <path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(255,255,255,0.035)" strokeWidth="1" />
+            </pattern>
+          </defs>
+          <rect x={0} y={0} width={W} height={H} fill={`url(#${gridId})`} />
+          <motion.g
+            key={`${kind}-${replayKey ?? 'base'}-${localReplay}`}
+            initial={shouldAnimate ? { opacity: 0.25 } : false}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {content}
+          </motion.g>
+        </svg>
+        {showReplay && (
+          <button
+            type="button"
+            onClick={() => setLocalReplay((n) => n + 1)}
+            aria-label="Replay equation drawing animation"
+            title="Replay animation"
+            className="absolute top-1.5 right-1.5 p-1 rounded-md bg-[#090F1D]/85 border border-white/10 text-[#8B9BB4] hover:text-[#F4F3EE] hover:border-white/25 transition-colors"
+          >
+            <RotateCcw className="w-3 h-3" />
+          </button>
+        )}
+        {caption && (
+          <span className="pointer-events-none absolute bottom-1.5 right-2.5 font-mono-data text-[9px] uppercase tracking-wider text-[#6F7F99]">
+            {caption}
+          </span>
+        )}
+      </div>
+    </VisualAnimContext.Provider>
   );
 }

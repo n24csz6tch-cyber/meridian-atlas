@@ -1,3 +1,4 @@
+import type { EquationVisualKind } from '../visuals/equations/EquationMiniVisual';
 import type { MapCameraTarget } from '../visuals/map/PrerequisiteMap';
 import type { ParabolaHighlightFeature } from '../visuals/parabola/ParabolaCanvas';
 import type { SolidHighlightPart } from '../visuals/solids/SolidNetScene';
@@ -53,8 +54,16 @@ export const STAGE_ACTS: StageActMeta[] = [
     durationSec: 20,
   },
   {
-    id: 'finale',
+    id: 'animated-proofs',
     number: 'ACT VI',
+    title: 'Animated Proofs & Worked Solutions',
+    subtitle: 'Watch geometric formulas draw themselves alongside synchronized step-by-step solved problems.',
+    accent: '#36EBA8',
+    durationSec: 18,
+  },
+  {
+    id: 'finale',
+    number: 'ACT VII',
     title: 'Lorenz Chaos Finale & Closing Meridian',
     subtitle: 'Two trajectories separated by 0.002 diverging across twin butterfly lobes.',
     accent: '#FF785A',
@@ -201,5 +210,57 @@ export const SOLIDS_KEYFRAMES: {
     badge: 'Phase 4 · Parallel Cross-Section (MA.912.GR.4.1)',
     tex: '\\text{Horizontal Cut} \\implies \\text{Similar Square}',
     note: 'Refolding the solid and slicing parallel to the base always produces a scaled square.',
+  },
+];
+
+export const PROOF_KEYFRAMES: {
+  atSec: number;
+  stepIdx: number;
+  eqVisual: EquationVisualKind;
+  stage: string;
+  tex: string;
+  solvedBadge: string;
+  solvedTex: string;
+  note: string;
+}[] = [
+  {
+    atSec: 0,
+    stepIdx: 0,
+    eqVisual: 'area-factor',
+    stage: 'Step 1 · Partition & Complete the Square',
+    tex: '2x^2 - 8x + 6 = 2(x^2 - 4x + 4) - 2',
+    solvedBadge: 'Worked Problem 01 · Vertex Rewrite',
+    solvedTex: 'f(x) = 2(x - 2)^2 - 2 \\implies V(2, -2)',
+    note: 'Splitting linear rectangles reveals the exact squared side length and minimum vertex coordinate.',
+  },
+  {
+    atSec: 4.5,
+    stepIdx: 1,
+    eqVisual: 'parabola-discriminant',
+    stage: 'Step 2 · Extract Real Roots Symmetrically',
+    tex: '2(x - 2)^2 = 2 \\implies x = 2 \\pm 1',
+    solvedBadge: 'Verified Roots Solution',
+    solvedTex: 'r_1 = 1,\\quad r_2 = 3,\\quad \\Delta = 16 > 0',
+    note: 'Real roots mirror symmetrically around x = 2 inside the discriminant envelope.',
+  },
+  {
+    atSec: 9,
+    stepIdx: 2,
+    eqVisual: 'pythagoras-squares',
+    stage: 'Step 3 · Visual Pythagorean Area Proof',
+    tex: '(a + b)^2 - 4\\left(\\tfrac{1}{2}ab\\right) = c^2 \\implies a^2 + b^2 = c^2',
+    solvedBadge: 'Worked Problem 02 · Slant Triple',
+    solvedTex: 'h = 3,\\; \\tfrac{s}{2} = 4 \\implies l = \\sqrt{3^2 + 4^2} = 5',
+    note: 'Sliding four congruent right triangles preserves area directly from c² into a² + b².',
+  },
+  {
+    atSec: 13.5,
+    stepIdx: 3,
+    eqVisual: 'secant-to-tangent',
+    stage: 'Step 4 · Secant-to-Tangent Calculus Limit',
+    tex: 'f\'(x) = \\lim_{h \\to 0}\\dfrac{f(x + h) - f(x)}{h}',
+    solvedBadge: 'Instantaneous Tangent Verified',
+    solvedTex: 'f(x) = 0.45x^2 - 1 \\implies f\'(1) = 0.90',
+    note: 'Collapsing interval width h → 0 snaps average secant slope onto the instantaneous tangent.',
   },
 ];
