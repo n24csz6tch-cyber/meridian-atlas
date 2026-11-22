@@ -22,11 +22,16 @@ import {
   VortexSandbox,
 } from './sandbox/SandboxRoutes';
 
+const routerBasename =
+  import.meta.env.BASE_URL === '/' ? '/' : import.meta.env.BASE_URL.replace(/\/$/, '');
+
 export default function App() {
   return (
-    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <BrowserRouter basename={routerBasename} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/presentation" element={<HomePage />} />
+        <Route path="/stage" element={<HomePage />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/neural" element={<NeuralMathPage />} />
         <Route path="/course/:courseId" element={<CoursePage />} />

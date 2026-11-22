@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+  base: mode === 'production' ? '/meridian-atlas/' : '/',
   plugins: [react()],
   build: {
     chunkSizeWarningLimit: 1000,
@@ -15,4 +16,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));
