@@ -49,7 +49,7 @@ interface TopicMeta {
 const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   'a1-expressions': {
     badge: 'Area Model Factorization · (x + p)(x + q)',
-    accent: '#F4B956',
+    accent: '#F4C46C',
     p1Label: 'Term p',
     p1Min: 1,
     p1Max: 4,
@@ -63,7 +63,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'a1-linear': {
     badge: 'Constant Slope & Secant Triangle · y = mx + b',
-    accent: '#F4B956',
+    accent: '#F4C46C',
     p1Label: 'Slope m (Δy/Δx)',
     p1Min: -2.5,
     p1Max: 2.5,
@@ -77,7 +77,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'a1-systems': {
     badge: 'Simultaneous Linear System & Gaussian Pencil',
-    accent: '#F4B956',
+    accent: '#F4C46C',
     p1Label: 'Line 1 Slope m₁',
     p1Min: 0.4,
     p1Max: 2.5,
@@ -91,7 +91,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'a1-exponential': {
     badge: 'Exponential Cascade · f(x) = a · bˣ',
-    accent: '#F4B956',
+    accent: '#F4C46C',
     p1Label: 'Initial Value a',
     p1Min: 0.5,
     p1Max: 2.5,
@@ -105,7 +105,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'g-triangles': {
     badge: 'Rigid-Motion Triangle Congruence (SAS / SSS)',
-    accent: '#38D4FF',
+    accent: '#46D6E8',
     p1Label: 'Side a Scale',
     p1Min: 0.7,
     p1Max: 1.4,
@@ -119,7 +119,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'g-right-trig': {
     badge: 'Pythagorean Visual Proof · a² + b² = c²',
-    accent: '#38D4FF',
+    accent: '#46D6E8',
     p1Label: 'Leg a',
     p1Min: 2.0,
     p1Max: 5.5,
@@ -133,7 +133,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'g-circles': {
     badge: 'Inscribed Angle Invariance & Sweeping Sector',
-    accent: '#38D4FF',
+    accent: '#46D6E8',
     p1Label: 'Central Arc 2θ (deg)',
     p1Min: 40,
     p1Max: 200,
@@ -147,7 +147,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'a2-complex': {
     badge: 'Complex Argand Plane & Euler Phase Rotation',
-    accent: '#34E8A5',
+    accent: '#45E6A6',
     p1Label: 'Real Axis Shift h',
     p1Min: -2.0,
     p1Max: 2.0,
@@ -161,7 +161,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'a2-polynomials': {
     badge: 'Polynomial Root Multiplicity & Inflection Morph',
-    accent: '#34E8A5',
+    accent: '#45E6A6',
     p1Label: 'Root r₂ Position',
     p1Min: -1.5,
     p1Max: 1.8,
@@ -175,7 +175,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'a2-rational': {
     badge: 'Rational Poles & Asymptotic Limit Tracers',
-    accent: '#34E8A5',
+    accent: '#45E6A6',
     p1Label: 'Vertical Pole x = p',
     p1Min: -2.0,
     p1Max: 2.0,
@@ -189,7 +189,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'pc-vectors': {
     badge: '2×2 Matrix Linear Transformation & Determinant Area',
-    accent: '#FF785A',
+    accent: '#FF8563',
     p1Label: 'Horizontal Shear b',
     p1Min: -1.5,
     p1Max: 1.5,
@@ -203,7 +203,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'pc-series': {
     badge: 'Infinite Geometric Series & Square Subdivision Limit',
-    accent: '#FF7A5C',
+    accent: '#FF8563',
     p1Label: 'Common Ratio r',
     p1Min: 0.2,
     p1Max: 0.85,
@@ -217,7 +217,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'a1-inequalities': {
     badge: 'Two-Variable Inequalities & Feasible Half-Plane Shading',
-    accent: '#F5BC5E',
+    accent: '#F4C46C',
     p1Label: 'Lower Bound Slope m₁',
     p1Min: -1.5,
     p1Max: 1.8,
@@ -231,7 +231,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'g-transformations': {
     badge: 'Rigid Rotation, Reflection & Dilation Symmetry Trail',
-    accent: '#38D9FF',
+    accent: '#46D6E8',
     p1Label: 'Rotation Sweep (deg)',
     p1Min: 30,
     p1Max: 180,
@@ -245,7 +245,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'g-coordinate': {
     badge: 'Coordinate Distance Norm, Midpoint & Perpendicular Bisector',
-    accent: '#38D9FF',
+    accent: '#46D6E8',
     p1Label: 'Point B Radius',
     p1Min: 1.4,
     p1Max: 3.4,
@@ -259,7 +259,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'a2-probability': {
     badge: 'Gaussian Normal Bell Curve · 68-95-99.7 Empirical Bands',
-    accent: '#36EBA8',
+    accent: '#45E6A6',
     p1Label: 'Mean Center μ',
     p1Min: -1.5,
     p1Max: 1.5,
@@ -273,7 +273,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'pc-polar': {
     badge: 'Polar Coordinate Radar & Glowing Rose Petals r(θ) = a cos(nθ)',
-    accent: '#FF7A5C',
+    accent: '#FF8563',
     p1Label: 'Petal Frequency n',
     p1Min: 2,
     p1Max: 7,
@@ -287,7 +287,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'pc-conics': {
     badge: 'Conic Sections · Ellipse Foci String (d₁ + d₂ = 2a) ↔ Hyperbola',
-    accent: '#FF7A5C',
+    accent: '#FF8563',
     p1Label: 'Eccentricity e',
     p1Min: 0.15,
     p1Max: 1.55,
@@ -301,7 +301,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'pc-limits': {
     badge: 'Differential Calculus Bridge · Secant → Instantaneous Tangent (h → 0)',
-    accent: '#FF7A5C',
+    accent: '#FF8563',
     p1Label: 'Anchor Point x₀',
     p1Min: -1.6,
     p1Max: 1.8,
@@ -315,7 +315,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'a1-abs-piecewise': {
     badge: 'Absolute Value V-Vertex & Distance Caliper · f(x) = a|x − h| + k',
-    accent: '#F5BC5E',
+    accent: '#F4C46C',
     p1Label: 'Wing Slope a',
     p1Min: -2.2,
     p1Max: 2.2,
@@ -329,7 +329,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'a1-radicals-exp': {
     badge: 'Radical Curve & Rational Exponents · y = a√(x − h)',
-    accent: '#F5BC5E',
+    accent: '#F4C46C',
     p1Label: 'Vertical Stretch a',
     p1Min: 0.5,
     p1Max: 2.4,
@@ -343,7 +343,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'a1-statistics': {
     badge: 'Least-Squares Linear Regression & Live Residual Error Squares',
-    accent: '#F5BC5E',
+    accent: '#F4C46C',
     p1Label: 'Model Slope m',
     p1Min: 0.1,
     p1Max: 1.4,
@@ -357,7 +357,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'g-parallel-angles': {
     badge: 'Parallel Rails Cut by Rotating Transversal · Angle Invariants',
-    accent: '#38D9FF',
+    accent: '#46D6E8',
     p1Label: 'Transversal Base Angle (°)',
     p1Min: 35,
     p1Max: 145,
@@ -371,7 +371,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'g-similarity': {
     badge: 'Homothety Projection Rays · Perimeter (k) vs Area Scaling (k²)',
-    accent: '#38D9FF',
+    accent: '#46D6E8',
     p1Label: 'Dilation Factor k',
     p1Min: 1.15,
     p1Max: 2.5,
@@ -385,7 +385,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'g-quadrilaterals': {
     badge: 'Quadrilateral Hierarchy Morph · Diagonals, Shear & 90° Symmetry',
-    accent: '#38D9FF',
+    accent: '#46D6E8',
     p1Label: 'Parallelogram Shear',
     p1Min: 0,
     p1Max: 1.2,
@@ -399,7 +399,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'a2-quad-systems': {
     badge: 'Nonlinear System · Sweeping Secant/Tangent Intersections (Δ)',
-    accent: '#36EBA8',
+    accent: '#45E6A6',
     p1Label: 'Line Slope m',
     p1Min: -1.8,
     p1Max: 1.8,
@@ -413,7 +413,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'a2-radicals': {
     badge: 'Function Composition & Inverse Reflection Mirror Across y = x',
-    accent: '#36EBA8',
+    accent: '#45E6A6',
     p1Label: 'Horizontal Shift h',
     p1Min: -1.4,
     p1Max: 1.2,
@@ -427,7 +427,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'a2-combinatorics': {
     badge: 'Pascal Binomial Lattice · Live Combinatorial Pathways C(n, k)',
-    accent: '#36EBA8',
+    accent: '#45E6A6',
     p1Label: 'Binomial Power n',
     p1Min: 4,
     p1Max: 7,
@@ -441,7 +441,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'pc-trig-identities': {
     badge: 'Pythagorean Wave Conservation · sin²θ + cos²θ ≡ 1 Live Stack',
-    accent: '#FF7A5C',
+    accent: '#FF8563',
     p1Label: 'Harmonic Frequency',
     p1Min: 0.8,
     p1Max: 2.5,
@@ -455,7 +455,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'pc-law-sines': {
     badge: 'Oblique Triangle Circumcircle · Constant Diameter 2R = a / sin(A)',
-    accent: '#FF7A5C',
+    accent: '#FF8563',
     p1Label: 'Vertex A Sweep',
     p1Min: 0.5,
     p1Max: 2.5,
@@ -469,7 +469,7 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
   },
   'pc-parametric': {
     badge: 'Parametric Lissajous Orbit & Instantaneous Velocity Vector v(t)',
-    accent: '#FF7A5C',
+    accent: '#FF8563',
     p1Label: 'X-Frequency a',
     p1Min: 1,
     p1Max: 5,
@@ -482,6 +482,78 @@ const TOPIC_META: Record<TopicVisualId, TopicMeta> = {
     p2Default: 2,
   },
 };
+
+function drawAxesWithTicks(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  cx: number,
+  cy: number,
+  unit: number,
+  showNumericTags = true,
+  axisY = cy
+) {
+  ctx.strokeStyle = 'rgba(244, 196, 108, 0.24)';
+  ctx.lineWidth = 1.25;
+  ctx.beginPath();
+  ctx.moveTo(0, axisY);
+  ctx.lineTo(width, axisY);
+  ctx.moveTo(cx, 0);
+  ctx.lineTo(cx, height);
+  ctx.stroke();
+
+  ctx.font = '500 9.5px "JetBrains Mono", monospace';
+  ctx.fillStyle = 'rgba(168, 178, 198, 0.56)';
+  ctx.strokeStyle = 'rgba(244, 196, 108, 0.34)';
+  ctx.lineWidth = 1;
+
+  for (let k = -8; k <= 8; k++) {
+    if (k === 0) continue;
+    const tx = cx + k * unit;
+    if (tx > 22 && tx < width - 22) {
+      ctx.beginPath();
+      ctx.moveTo(tx, axisY - 3.5);
+      ctx.lineTo(tx, axisY + 3.5);
+      ctx.stroke();
+      if (showNumericTags) {
+        ctx.textAlign = 'center';
+        ctx.fillText(String(k), tx, axisY + 14);
+      }
+    }
+    const ty = axisY - k * unit;
+    if (ty > 22 && ty < height - 22) {
+      ctx.beginPath();
+      ctx.moveTo(cx - 3.5, ty);
+      ctx.lineTo(cx + 3.5, ty);
+      ctx.stroke();
+      if (showNumericTags) {
+        ctx.textAlign = 'right';
+        ctx.fillText(String(k), cx - 7, ty + 3);
+      }
+    }
+  }
+  ctx.textAlign = 'left';
+}
+
+function glowStroke(
+  ctx: CanvasRenderingContext2D,
+  color: string,
+  lineWidth: number,
+  blur: number,
+  drawFn: () => void
+) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.shadowColor = color;
+  ctx.shadowBlur = blur;
+  ctx.beginPath();
+  drawFn();
+  ctx.stroke();
+  ctx.restore();
+}
 
 export function TopicVisualCanvas({
   topicId,
@@ -524,21 +596,34 @@ export function TopicVisualCanvas({
 
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.fillStyle = '#05070C';
-    ctx.fillRect(0, 0, width, height);
 
+    // Harmonized AUREA obsidian radial backdrop (#05060A with subtle warm core)
     const cx = width * 0.5;
     const cy = height * 0.52;
+    const bgGrad = ctx.createRadialGradient(
+      cx,
+      cy,
+      10,
+      cx,
+      cy,
+      Math.max(width, height) * 0.68
+    );
+    bgGrad.addColorStop(0, '#0C0E16');
+    bgGrad.addColorStop(0.55, '#07080E');
+    bgGrad.addColorStop(1, '#05060A');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, width, height);
+
     if (renderExtendedTopic({ ctx, topicId: id, width, height, cx, cy, p1: v1, p2: v2, t })) {
       ctx.restore();
       return;
     }
     const unit = Math.min(width, height) * 0.095;
 
-    // Subtle background grid
-    ctx.strokeStyle = 'rgba(237, 235, 228, 0.055)';
+    // Fine cartographic golden grid
+    ctx.strokeStyle = 'rgba(244, 196, 108, 0.055)';
     ctx.lineWidth = 1;
-    for (let g = -10; g <= 10; g++) {
+    for (let g = -12; g <= 12; g++) {
       const gx = cx + g * unit;
       const gy = cy - g * unit;
       if (gx >= 0 && gx <= width) {
@@ -585,27 +670,30 @@ export function TopicVisualCanvas({
         color: string,
         label: string
       ) => {
-        ctx.fillStyle = `${color}28`;
+        ctx.save();
+        ctx.fillStyle = `${color}26`;
         ctx.strokeStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 10;
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.roundRect(bx, by, bw, bh, 4);
         ctx.fill();
         ctx.stroke();
-        ctx.fillStyle = '#F2F0E8';
+        ctx.restore();
+        ctx.fillStyle = '#F7F4EC';
         ctx.font = '600 12px "JetBrains Mono", monospace';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(label, bx + bw * 0.5, by + bh * 0.5);
       };
 
-      drawBlock(ox, oy, wX, hX, '#F4B956', 'x²');
-      drawBlock(ox + wX + gap, oy, wP, hX, '#38D4FF', `${pLen}x`);
-      drawBlock(ox, oy + hX + gap, wX, hQ, '#34E8A5', `${qLen}x`);
-      drawBlock(ox + wX + gap, oy + hX + gap, wP, hQ, '#FF785A', `${(pLen * qLen).toFixed(1)}`);
+      drawBlock(ox, oy, wX, hX, '#F4C46C', 'x²');
+      drawBlock(ox + wX + gap, oy, wP, hX, '#46D6E8', `${pLen}x`);
+      drawBlock(ox, oy + hX + gap, wX, hQ, '#45E6A6', `${qLen}x`);
+      drawBlock(ox + wX + gap, oy + hX + gap, wP, hQ, '#FF8563', `${(pLen * qLen).toFixed(1)}`);
 
-      // Outer dimension brackets
-      ctx.fillStyle = '#A7B3C7';
+      ctx.fillStyle = '#A8B2C6';
       ctx.font = '11px "JetBrains Mono", monospace';
       ctx.fillText(`x + ${pLen}`, ox + (wX + gap + wP) * 0.5, oy - 12);
       ctx.fillText(`x + ${qLen}`, ox - 28, oy + (hX + gap + hQ) * 0.5);
@@ -615,30 +703,19 @@ export function TopicVisualCanvas({
     // 2. A1-LINEAR: CONSTANT SLOPE & SECANT TRIANGLE
     // -------------------------------------------------------------------------
     if (id === 'a1-linear') {
-      ctx.strokeStyle = 'rgba(237, 235, 228, 0.22)';
-      ctx.beginPath();
-      ctx.moveTo(0, cy);
-      ctx.lineTo(width, cy);
-      ctx.moveTo(cx, 0);
-      ctx.lineTo(cx, height);
-      ctx.stroke();
+      drawAxesWithTicks(ctx, width, height, cx, cy, unit);
 
       const m = v1;
       const b = v2;
       const toPx = (x: number, y: number): [number, number] => [cx + x * unit, cy - y * unit];
 
-      // Full line
-      ctx.globalCompositeOperation = 'lighter';
-      ctx.strokeStyle = '#F4B956';
-      ctx.lineWidth = 2.6;
       const [x1, y1] = toPx(-6, m * -6 + b);
       const [x2, y2] = toPx(6, m * 6 + b);
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
+      glowStroke(ctx, '#F4C46C', 2.6, 14, () => {
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+      });
 
-      // Animated sliding slope triangle of width dx = 1.5
       const tx = -2.2 + u * 3.0;
       const ty = m * tx + b;
       const dx = 1.5;
@@ -647,7 +724,7 @@ export function TopicVisualCanvas({
       const [pB0, pB1] = toPx(tx + dx, ty);
       const [pC0, pC1] = toPx(tx + dx, ty + dy);
 
-      ctx.fillStyle = 'rgba(56, 212, 255, 0.16)';
+      ctx.fillStyle = 'rgba(70, 214, 232, 0.16)';
       ctx.beginPath();
       ctx.moveTo(pA0, pA1);
       ctx.lineTo(pB0, pB1);
@@ -655,29 +732,23 @@ export function TopicVisualCanvas({
       ctx.closePath();
       ctx.fill();
 
-      ctx.strokeStyle = '#38D4FF';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(pA0, pA1);
-      ctx.lineTo(pB0, pB1);
-      ctx.stroke();
+      glowStroke(ctx, '#46D6E8', 2.1, 8, () => {
+        ctx.moveTo(pA0, pA1);
+        ctx.lineTo(pB0, pB1);
+      });
+      glowStroke(ctx, '#45E6A6', 2.1, 8, () => {
+        ctx.moveTo(pB0, pB1);
+        ctx.lineTo(pC0, pC1);
+      });
 
-      ctx.strokeStyle = '#34E8A5';
-      ctx.beginPath();
-      ctx.moveTo(pB0, pB1);
-      ctx.lineTo(pC0, pC1);
-      ctx.stroke();
-
-      ctx.globalCompositeOperation = 'source-over';
       ctx.font = '10px "JetBrains Mono", monospace';
-      ctx.fillStyle = '#38D4FF';
+      ctx.fillStyle = '#46D6E8';
       ctx.fillText(`Δx = ${dx.toFixed(1)}`, (pA0 + pB0) * 0.5 - 18, pA1 + 14);
-      ctx.fillStyle = '#34E8A5';
+      ctx.fillStyle = '#45E6A6';
       ctx.fillText(`Δy = ${dy.toFixed(2)}`, pB0 + 8, (pB1 + pC1) * 0.5);
 
-      // Y-intercept dot
       const [ix, iy] = toPx(0, b);
-      ctx.fillStyle = '#FF785A';
+      ctx.fillStyle = '#FF8563';
       ctx.beginPath();
       ctx.arc(ix, iy, 5, 0, Math.PI * 2);
       ctx.fill();
@@ -687,13 +758,7 @@ export function TopicVisualCanvas({
     // 3. A1-SYSTEMS: LINEAR SYSTEMS & GAUSSIAN ELIMINATION PENCIL
     // -------------------------------------------------------------------------
     if (id === 'a1-systems') {
-      ctx.strokeStyle = 'rgba(237, 235, 228, 0.2)';
-      ctx.beginPath();
-      ctx.moveTo(0, cy);
-      ctx.lineTo(width, cy);
-      ctx.moveTo(cx, 0);
-      ctx.lineTo(cx, height);
-      ctx.stroke();
+      drawAxesWithTicks(ctx, width, height, cx, cy, unit);
 
       const m1 = v1;
       const b1 = -0.8;
@@ -704,8 +769,11 @@ export function TopicVisualCanvas({
       const toPx = (x: number, y: number): [number, number] => [cx + x * unit, cy - y * unit];
 
       const drawLine = (m: number, b: number, color: string, widthPx = 2.4, dashed = false) => {
+        ctx.save();
         if (dashed) ctx.setLineDash([6, 4]);
         ctx.strokeStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = dashed ? 6 : 12;
         ctx.lineWidth = widthPx;
         const [lx1, ly1] = toPx(-6, m * -6 + b);
         const [lx2, ly2] = toPx(6, m * 6 + b);
@@ -713,31 +781,28 @@ export function TopicVisualCanvas({
         ctx.moveTo(lx1, ly1);
         ctx.lineTo(lx2, ly2);
         ctx.stroke();
-        ctx.setLineDash([]);
+        ctx.restore();
       };
 
-      ctx.globalCompositeOperation = 'lighter';
-      drawLine(m1, b1, '#F4B956');
-      drawLine(m2, b2, '#38D4FF');
+      drawLine(m1, b1, '#F4C46C');
+      drawLine(m2, b2, '#46D6E8');
 
-      // Animated linear combination (elimination line morphing to horizontal y = y*)
       const mComb = (1 - u) * m1 + u * 0;
       const bComb = yStar - mComb * xStar;
-      drawLine(mComb, bComb, '#34E8A5', 1.8, true);
+      drawLine(mComb, bComb, '#45E6A6', 1.8, true);
 
       const [sx, sy] = toPx(xStar, yStar);
       const halo = ctx.createRadialGradient(sx, sy, 1, sx, sy, 20);
-      halo.addColorStop(0, '#FFFFFF');
-      halo.addColorStop(0.4, '#34E8A5');
+      halo.addColorStop(0, '#FFE29E');
+      halo.addColorStop(0.4, '#45E6A6');
       halo.addColorStop(1, 'transparent');
       ctx.fillStyle = halo;
       ctx.beginPath();
       ctx.arc(sx, sy, 20, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.globalCompositeOperation = 'source-over';
       ctx.font = '600 11px "JetBrains Mono", monospace';
-      ctx.fillStyle = '#34E8A5';
+      ctx.fillStyle = '#45E6A6';
       ctx.fillText(`(${xStar.toFixed(2)}, ${yStar.toFixed(2)})`, sx + 12, sy - 10);
     }
 
@@ -748,34 +813,24 @@ export function TopicVisualCanvas({
       const baseY = height * 0.78;
       const toPx = (x: number, y: number): [number, number] => [cx + x * unit, baseY - y * unit * 0.75];
 
-      ctx.strokeStyle = 'rgba(237, 235, 228, 0.22)';
-      ctx.beginPath();
-      ctx.moveTo(0, baseY);
-      ctx.lineTo(width, baseY);
-      ctx.moveTo(cx, 0);
-      ctx.lineTo(cx, height);
-      ctx.stroke();
+      drawAxesWithTicks(ctx, width, height, cx, cy, unit, true, baseY);
 
       const a = v1;
       const b = v2;
-      ctx.globalCompositeOperation = 'lighter';
-      ctx.strokeStyle = '#F4B956';
-      ctx.lineWidth = 2.6;
-      ctx.beginPath();
-      for (let i = 0; i <= 140; i++) {
-        const x = -3.8 + (i / 140) * 7.2;
-        const y = a * Math.pow(b, x);
-        const [px, py] = toPx(x, y);
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      }
-      ctx.stroke();
+      glowStroke(ctx, '#F4C46C', 2.7, 15, () => {
+        for (let i = 0; i <= 140; i++) {
+          const x = -3.8 + (i / 140) * 7.2;
+          const y = a * Math.pow(b, x);
+          const [px, py] = toPx(x, y);
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+      });
 
-      // Animated tracer & discrete multiplier bars
       for (let k = -2; k <= 2; k++) {
         const yk = a * Math.pow(b, k);
         const [bx, by] = toPx(k, yk);
-        ctx.strokeStyle = 'rgba(56, 212, 255, 0.38)';
+        ctx.strokeStyle = 'rgba(70, 214, 232, 0.42)';
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(bx, baseY);
@@ -786,13 +841,13 @@ export function TopicVisualCanvas({
       const tx = -2.2 + u * 4.2;
       const ty = a * Math.pow(b, tx);
       const [px, py] = toPx(tx, ty);
-      const glow = ctx.createRadialGradient(px, py, 1, px, py, 16);
-      glow.addColorStop(0, '#FFFFFF');
-      glow.addColorStop(0.4, '#F4B956');
+      const glow = ctx.createRadialGradient(px, py, 1, px, py, 18);
+      glow.addColorStop(0, '#FFE29E');
+      glow.addColorStop(0.45, '#F4C46C');
       glow.addColorStop(1, 'transparent');
       ctx.fillStyle = glow;
       ctx.beginPath();
-      ctx.arc(px, py, 16, 0, Math.PI * 2);
+      ctx.arc(px, py, 18, 0, Math.PI * 2);
       ctx.fill();
     }
 
@@ -822,8 +877,11 @@ export function TopicVisualCanvas({
           oy - (lx * s + ly * c) * scaleT,
         ]);
 
+        ctx.save();
         ctx.fillStyle = `${color}22`;
         ctx.strokeStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 11;
         ctx.lineWidth = 2.4;
         ctx.beginPath();
         ctx.moveTo(pts[0][0], pts[0][1]);
@@ -832,6 +890,7 @@ export function TopicVisualCanvas({
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
+        ctx.restore();
 
         ctx.fillStyle = color;
         ctx.font = '600 11px "JetBrains Mono", monospace';
@@ -842,15 +901,14 @@ export function TopicVisualCanvas({
 
       const targetX = cx + 45;
       const targetY = cy + 45;
-      drawTri(targetX, targetY, 0.12, '#F4B956', '');
+      drawTri(targetX, targetY, 0.12, '#F4C46C', '');
 
-      // Animated pre-image gliding & rotating into exact superposition
       const startX = cx - 155;
       const startY = cy + 65;
       const curX = startX + (targetX - startX) * u;
       const curY = startY + (targetY - startY) * u;
       const curRot = -0.65 * (1 - u) + 0.12 * u;
-      drawTri(curX, curY, curRot, '#38D4FF', '′');
+      drawTri(curX, curY, curRot, '#46D6E8', '′');
     }
 
     // -------------------------------------------------------------------------
@@ -866,25 +924,26 @@ export function TopicVisualCanvas({
       const ox = (width < 520 ? cx : width * 0.34) - boxPx * 0.5;
       const oy = cy - boxPx * 0.5;
 
-      // Outer (a+b) x (a+b) square
-      ctx.fillStyle = 'rgba(244, 185, 86, 0.12)';
-      ctx.strokeStyle = 'rgba(237, 235, 228, 0.4)';
+      ctx.fillStyle = 'rgba(244, 196, 108, 0.12)';
+      ctx.strokeStyle = 'rgba(244, 196, 108, 0.42)';
       ctx.lineWidth = 2;
       ctx.strokeRect(ox, oy, boxPx, boxPx);
       ctx.fillRect(ox, oy, boxPx, boxPx);
 
-      // Highlighted uncovered area (c² at u=0 morphing into a² + b² at u=1)
       if (u > 0.72) {
         const alpha = ((u - 0.72) / 0.28) * 0.35;
-        ctx.fillStyle = `rgba(56, 212, 255, ${alpha.toFixed(2)})`;
+        ctx.fillStyle = `rgba(70, 214, 232, ${alpha.toFixed(2)})`;
         ctx.fillRect(ox + b * sc, oy, a * sc, a * sc);
-        ctx.fillStyle = `rgba(52, 232, 165, ${alpha.toFixed(2)})`;
+        ctx.fillStyle = `rgba(69, 230, 166, ${alpha.toFixed(2)})`;
         ctx.fillRect(ox, oy + a * sc, b * sc, b * sc);
       }
 
       const drawRightTri = (pts: [number, number][]) => {
-        ctx.fillStyle = 'rgba(18, 25, 39, 0.92)';
-        ctx.strokeStyle = '#38D4FF';
+        ctx.save();
+        ctx.fillStyle = 'rgba(13, 16, 26, 0.92)';
+        ctx.strokeStyle = '#46D6E8';
+        ctx.shadowColor = '#46D6E8';
+        ctx.shadowBlur = 8;
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(ox + pts[0][0] * sc, oy + pts[0][1] * sc);
@@ -893,31 +952,12 @@ export function TopicVisualCanvas({
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
+        ctx.restore();
       };
 
       const lerpPts = (p0: [number, number][], p1: [number, number][]): [number, number][] =>
         p0.map((pt, i) => [pt[0] + (p1[i][0] - pt[0]) * u, pt[1] + (p1[i][1] - pt[1]) * u]);
 
-      // T1 (top-left stationary): (0,0)-(a,0)-(0,b) -> (0,0)-(b,0)-(0,a) wait: keep exact congruent orientations!
-      // State u=0 (tilted c² square in center):
-      // T1: (0,0), (a,0), (0,b)
-      // T2: (a,0), (a+b,0), (a+b,a)
-      // T3: (a+b,a), (a+b,a+b), (b,a+b)
-      // T4: (0,b), (b,a+b), (0,a+b)
-      // State u=1 (two rectangles a×b leaving a² top-left and b² bottom-right!):
-      // Wait: T1 + T3 form top-right a×b rectangle if:
-      // T1 stays at (0,0)-(a,0)-(0,b) and T3 translates by (-b, -a) from [(a+b,a),(a+b,a+b),(b,a+b)] to [(a,0),(a,b),(0,b)]!
-      // And T2 translates left by (-a, 0)? No: T2 is (a,0)-(a+b,0)-(a+b,a) (legs b horizontal, a vertical);
-      // T4 is (0,b)-(b,a+b)-(0,a+b) (legs b horizontal, a vertical) -> translate T4 right by (+a, -b) to [(a,0),(a+b,a),(a,a)]?
-      // Even simpler exact translation proof:
-      // Keep T1 at [(0,0), (a,0), (0,b)]
-      // Slide T3 from [(a+b,a), (a+b,a+b), (b,a+b)] -> [(a,0), (a,b), (0,b)] (pure translation (-b, -a)!)
-      // Slide T2 from [(a,0), (a+b,0), (a+b,a)] -> [(a,b), (a+b,b), (a+b,a+b)] (pure translation (0, +b)!)
-      // Slide T4 from [(0,b), (b,a+b), (0,a+b)] -> [(a,b), (a+b,a+b), (a,a+b)] (pure translation (+a, 0)!)
-      // Check uncovered squares at u=1:
-      // Top-right [a..a+b] × [0..b] has area b × b = b²!
-      // Bottom-left [0..a] × [b..a+b] has area a × a = a²!
-      // Pure translations without even rotating a single triangle!!
       drawRightTri([
         [0, 0],
         [a, 0],
@@ -966,33 +1006,31 @@ export function TopicVisualCanvas({
         )
       );
 
-      // Area labels inside uncovered squares
       ctx.font = '600 13px "JetBrains Mono", monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       if (u < 0.35) {
-        ctx.fillStyle = '#F4B956';
+        ctx.fillStyle = '#FFE29E';
         ctx.fillText(`c² = ${(c * c).toFixed(1)}`, ox + boxPx * 0.5, oy + boxPx * 0.5);
       } else if (u > 0.65) {
-        ctx.fillStyle = '#34E8A5';
+        ctx.fillStyle = '#45E6A6';
         ctx.fillText(`b²=${(b * b).toFixed(1)}`, ox + (a + b * 0.5) * sc, oy + b * 0.5 * sc);
-        ctx.fillStyle = '#F4B956';
+        ctx.fillStyle = '#FFE29E';
         ctx.fillText(`a²=${(a * a).toFixed(1)}`, ox + a * 0.5 * sc, oy + (b + a * 0.5) * sc);
       }
 
-      // Right side trigonometric readout card on wide viewports
       if (width >= 520) {
         const rx = width * 0.72;
         const thetaDeg = ((Math.atan2(b, a) * 180) / Math.PI).toFixed(1);
         ctx.textAlign = 'left';
         ctx.font = '600 12px "JetBrains Mono", monospace';
-        ctx.fillStyle = '#F4B956';
+        ctx.fillStyle = '#F4C46C';
         ctx.fillText(`Hypotenuse c = ${c.toFixed(2)}`, rx - 70, cy - 45);
-        ctx.fillStyle = '#38D4FF';
+        ctx.fillStyle = '#46D6E8';
         ctx.fillText(`sin(${thetaDeg}°) = ${(b / c).toFixed(3)}`, rx - 70, cy - 15);
-        ctx.fillStyle = '#34E8A5';
+        ctx.fillStyle = '#45E6A6';
         ctx.fillText(`cos(${thetaDeg}°) = ${(a / c).toFixed(3)}`, rx - 70, cy + 15);
-        ctx.fillStyle = '#FF785A';
+        ctx.fillStyle = '#FF8563';
         ctx.fillText(`tan(${thetaDeg}°) = ${(b / a).toFixed(3)}`, rx - 70, cy + 45);
       }
     }
@@ -1006,53 +1044,42 @@ export function TopicVisualCanvas({
       const a1 = -centralRad * 0.5;
       const a2 = centralRad * 0.5;
 
-      // Sweeping sector fill
-      ctx.fillStyle = 'rgba(56, 212, 255, 0.16)';
+      ctx.fillStyle = 'rgba(70, 214, 232, 0.16)';
       ctx.beginPath();
       ctx.moveTo(cx, cy);
       ctx.arc(cx, cy, rPx, a1, a2);
       ctx.closePath();
       ctx.fill();
 
-      // Main circle
-      ctx.strokeStyle = '#38D4FF';
-      ctx.lineWidth = 2.2;
-      ctx.beginPath();
-      ctx.arc(cx, cy, rPx, 0, Math.PI * 2);
-      ctx.stroke();
+      glowStroke(ctx, '#46D6E8', 2.2, 12, () => {
+        ctx.arc(cx, cy, rPx, 0, Math.PI * 2);
+      });
 
       const ax = cx + rPx * Math.cos(a1);
       const ay = cy + rPx * Math.sin(a1);
       const bx = cx + rPx * Math.cos(a2);
       const by = cy + rPx * Math.sin(a2);
 
-      // Orbiting inscribed vertex P on the major arc
       const pAng = Math.PI + (u - 0.5) * 1.4;
       const px = cx + rPx * Math.cos(pAng);
       const py = cy + rPx * Math.sin(pAng);
 
-      // Central angle chords
-      ctx.strokeStyle = '#F4B956';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(ax, ay);
-      ctx.lineTo(cx, cy);
-      ctx.lineTo(bx, by);
-      ctx.stroke();
+      glowStroke(ctx, '#F4C46C', 2, 10, () => {
+        ctx.moveTo(ax, ay);
+        ctx.lineTo(cx, cy);
+        ctx.lineTo(bx, by);
+      });
 
-      // Inscribed angle chords
-      ctx.strokeStyle = '#34E8A5';
-      ctx.lineWidth = 2.2;
-      ctx.beginPath();
-      ctx.moveTo(ax, ay);
-      ctx.lineTo(px, py);
-      ctx.lineTo(bx, by);
-      ctx.stroke();
+      glowStroke(ctx, '#45E6A6', 2.2, 10, () => {
+        ctx.moveTo(ax, ay);
+        ctx.lineTo(px, py);
+        ctx.lineTo(bx, by);
+      });
 
-      ctx.fillStyle = '#34E8A5';
+      ctx.fillStyle = '#45E6A6';
       ctx.font = '600 11px "JetBrains Mono", monospace';
       ctx.fillText(`Inscribed θ = ${(v1 * 0.5).toFixed(1)}°`, px - 45, py - 12);
-      ctx.fillStyle = '#F4B956';
+      ctx.fillStyle = '#FFE29E';
       ctx.fillText(`Central 2θ = ${v1.toFixed(0)}°`, cx + 10, cy + 4);
     }
 
@@ -1060,48 +1087,36 @@ export function TopicVisualCanvas({
     // 8. A2-COMPLEX: COMPLEX ARGAND PLANE & EULER PHASE ROTATION
     // -------------------------------------------------------------------------
     if (id === 'a2-complex') {
-      ctx.strokeStyle = 'rgba(237, 235, 228, 0.22)';
-      ctx.beginPath();
-      ctx.moveTo(0, cy);
-      ctx.lineTo(width, cy);
-      ctx.moveTo(cx, 0);
-      ctx.lineTo(cx, height);
-      ctx.stroke();
+      drawAxesWithTicks(ctx, width, height, cx, cy, unit);
 
       const h = v1;
       const delta = v2;
       const toPx = (re: number, im: number): [number, number] => [cx + re * unit, cy - im * unit];
 
-      // Unit phase circle
-      ctx.strokeStyle = 'rgba(52, 232, 165, 0.22)';
+      ctx.strokeStyle = 'rgba(69, 230, 166, 0.24)';
       ctx.beginPath();
       ctx.arc(cx, cy, unit * 2, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Rotating Euler phasor e^(i t)
       const [ex, ey] = toPx(2 * Math.cos(t * 1.4), 2 * Math.sin(t * 1.4));
-      ctx.strokeStyle = 'rgba(56, 212, 255, 0.65)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(ex, ey);
-      ctx.stroke();
+      glowStroke(ctx, '#46D6E8', 2.1, 10, () => {
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(ex, ey);
+      });
 
-      // Conjugate roots r = h ± sqrt(delta)/2
       const rootOffset = Math.sqrt(Math.abs(delta)) * 0.5;
       const r1: [number, number] = delta >= 0 ? [h + rootOffset, 0] : [h, rootOffset];
       const r2: [number, number] = delta >= 0 ? [h - rootOffset, 0] : [h, -rootOffset];
 
       for (const [re, im] of [r1, r2]) {
         const [rx, ry] = toPx(re, im);
-        ctx.strokeStyle = delta >= 0 ? '#F4B956' : '#FF785A';
-        ctx.lineWidth = 2.2;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(rx, ry);
-        ctx.stroke();
+        const col = delta >= 0 ? '#F4C46C' : '#FF8563';
+        glowStroke(ctx, col, 2.2, 10, () => {
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(rx, ry);
+        });
 
-        ctx.fillStyle = delta >= 0 ? '#F4B956' : '#FF785A';
+        ctx.fillStyle = col;
         ctx.beginPath();
         ctx.arc(rx, ry, 6, 0, Math.PI * 2);
         ctx.fill();
@@ -1112,13 +1127,7 @@ export function TopicVisualCanvas({
     // 9. A2-POLYNOMIALS: ROOT MULTIPLICITY & INFLECTION MORPH
     // -------------------------------------------------------------------------
     if (id === 'a2-polynomials') {
-      ctx.strokeStyle = 'rgba(237, 235, 228, 0.22)';
-      ctx.beginPath();
-      ctx.moveTo(0, cy);
-      ctx.lineTo(width, cy);
-      ctx.moveTo(cx, 0);
-      ctx.lineTo(cx, height);
-      ctx.stroke();
+      drawAxesWithTicks(ctx, width, height, cx, cy, unit);
 
       const r1 = -2.0;
       const r2 = v1;
@@ -1126,35 +1135,30 @@ export function TopicVisualCanvas({
       const evalP = (x: number) => 0.28 * (x - r1) * Math.pow(x - r2, mult);
       const toPx = (x: number, y: number): [number, number] => [cx + x * unit, cy - y * unit];
 
-      ctx.globalCompositeOperation = 'lighter';
-      ctx.strokeStyle = '#34E8A5';
-      ctx.lineWidth = 2.8;
-      ctx.beginPath();
-      for (let i = 0; i <= 180; i++) {
-        const x = -3.6 + (i / 180) * 7.2;
-        const y = evalP(x);
-        const [px, py] = toPx(x, Math.max(-6, Math.min(6, y)));
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      }
-      ctx.stroke();
+      glowStroke(ctx, '#45E6A6', 2.8, 15, () => {
+        for (let i = 0; i <= 180; i++) {
+          const x = -3.6 + (i / 180) * 7.2;
+          const y = evalP(x);
+          const [px, py] = toPx(x, Math.max(-6, Math.min(6, y)));
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+      });
 
-      // Animated tangent surfer
       const sxVal = -2.4 + u * 4.6;
       const syVal = evalP(sxVal);
       const [spx, spy] = toPx(sxVal, syVal);
-      ctx.fillStyle = '#F4B956';
+      ctx.fillStyle = '#FFE29E';
       ctx.beginPath();
       ctx.arc(spx, spy, 6, 0, Math.PI * 2);
       ctx.fill();
 
-      // Root markers
       for (const [r, label] of [
         [r1, 'r₁ (m=1 cross)'],
         [r2, `r₂ (m=${mult})`],
       ] as [number, string][]) {
         const [rx, ry] = toPx(r, 0);
-        ctx.fillStyle = '#38D4FF';
+        ctx.fillStyle = '#46D6E8';
         ctx.beginPath();
         ctx.arc(rx, ry, 5.5, 0, Math.PI * 2);
         ctx.fill();
@@ -1171,57 +1175,45 @@ export function TopicVisualCanvas({
       const c = v2;
       const toPx = (x: number, y: number): [number, number] => [cx + x * unit, cy - y * unit];
 
-      // Axes
-      ctx.strokeStyle = 'rgba(237, 235, 228, 0.18)';
-      ctx.beginPath();
-      ctx.moveTo(0, cy);
-      ctx.lineTo(width, cy);
-      ctx.moveTo(cx, 0);
-      ctx.lineTo(cx, height);
-      ctx.stroke();
+      drawAxesWithTicks(ctx, width, height, cx, cy, unit);
 
-      // Dashed asymptotes x = p and y = c
       const [pxAsym] = toPx(p, 0);
       const [, pyAsym] = toPx(0, c);
       ctx.setLineDash([6, 4]);
-      ctx.strokeStyle = '#FF785A';
+      ctx.strokeStyle = '#FF8563';
       ctx.lineWidth = 1.6;
       ctx.beginPath();
       ctx.moveTo(pxAsym, 0);
       ctx.lineTo(pxAsym, height);
       ctx.stroke();
 
-      ctx.strokeStyle = '#38D4FF';
+      ctx.strokeStyle = '#46D6E8';
       ctx.beginPath();
       ctx.moveTo(0, pyAsym);
       ctx.lineTo(width, pyAsym);
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Two branches of f(x) = 1 / (x - p) + c
       const drawBranch = (xStart: number, xEnd: number) => {
-        ctx.strokeStyle = '#34E8A5';
-        ctx.lineWidth = 2.6;
-        ctx.beginPath();
-        for (let i = 0; i <= 90; i++) {
-          const x = xStart + (i / 90) * (xEnd - xStart);
-          const y = 1 / (x - p) + c;
-          const [sx, sy] = toPx(x, Math.max(-8, Math.min(8, y)));
-          if (i === 0) ctx.moveTo(sx, sy);
-          else ctx.lineTo(sx, sy);
-        }
-        ctx.stroke();
+        glowStroke(ctx, '#45E6A6', 2.6, 13, () => {
+          for (let i = 0; i <= 90; i++) {
+            const x = xStart + (i / 90) * (xEnd - xStart);
+            const y = 1 / (x - p) + c;
+            const [sx, sy] = toPx(x, Math.max(-8, Math.min(8, y)));
+            if (i === 0) ctx.moveTo(sx, sy);
+            else ctx.lineTo(sx, sy);
+          }
+        });
       };
       drawBranch(p - 5, p - 0.18);
       drawBranch(p + 0.18, p + 5);
 
-      // Animated limit tracers approaching pole x -> p⁻ and x -> p⁺
       const dist = 2.6 - u * 2.35;
       for (const sgn of [-1, 1]) {
         const lx = p + sgn * dist;
         const ly = 1 / (lx - p) + c;
         const [tx, ty] = toPx(lx, ly);
-        ctx.fillStyle = '#F4B956';
+        ctx.fillStyle = '#F4C46C';
         ctx.beginPath();
         ctx.arc(tx, ty, 5.5, 0, Math.PI * 2);
         ctx.fill();
@@ -1242,8 +1234,7 @@ export function TopicVisualCanvas({
         cy - (m10 * x + m11 * y) * unit,
       ];
 
-      // Warped lattice lines
-      ctx.strokeStyle = 'rgba(255, 120, 90, 0.18)';
+      ctx.strokeStyle = 'rgba(255, 133, 99, 0.2)';
       ctx.lineWidth = 1;
       for (let g = -4; g <= 4; g++) {
         const [x1, y1] = toPx(g, -4);
@@ -1261,13 +1252,12 @@ export function TopicVisualCanvas({
         ctx.stroke();
       }
 
-      // Transformed unit square (parallelogram of area det(M))
       const [o0, o1] = toPx(0, 0);
       const [i0, i1] = toPx(1, 0);
       const [j0, j1] = toPx(0, 1);
       const [ij0, ij1] = toPx(1, 1);
 
-      ctx.fillStyle = 'rgba(52, 232, 165, 0.24)';
+      ctx.fillStyle = 'rgba(69, 230, 166, 0.24)';
       ctx.beginPath();
       ctx.moveTo(o0, o1);
       ctx.lineTo(i0, i1);
@@ -1276,18 +1266,15 @@ export function TopicVisualCanvas({
       ctx.closePath();
       ctx.fill();
 
-      ctx.strokeStyle = '#38D4FF';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(o0, o1);
-      ctx.lineTo(i0, i1);
-      ctx.stroke();
+      glowStroke(ctx, '#46D6E8', 3, 10, () => {
+        ctx.moveTo(o0, o1);
+        ctx.lineTo(i0, i1);
+      });
 
-      ctx.strokeStyle = '#F4B956';
-      ctx.beginPath();
-      ctx.moveTo(o0, o1);
-      ctx.lineTo(j0, j1);
-      ctx.stroke();
+      glowStroke(ctx, '#F4C46C', 3, 10, () => {
+        ctx.moveTo(o0, o1);
+        ctx.lineTo(j0, j1);
+      });
     }
 
     // -------------------------------------------------------------------------
@@ -1299,7 +1286,6 @@ export function TopicVisualCanvas({
       const limit = a1 / (1 - r);
       const activeTerms = 2 + Math.floor(u * 10);
 
-      // Left half: Partial Sums Staircase approaching L = a₁ / (1 - r)
       const leftX = 36;
       const plotW = width * 0.5 - 56;
       const baseY = height - 42;
@@ -1307,7 +1293,7 @@ export function TopicVisualCanvas({
 
       const limitY = baseY - Math.min(1, limit / 6) * maxH;
       ctx.setLineDash([5, 4]);
-      ctx.strokeStyle = '#34E8A5';
+      ctx.strokeStyle = '#45E6A6';
       ctx.lineWidth = 1.6;
       ctx.beginPath();
       ctx.moveTo(leftX, limitY);
@@ -1322,15 +1308,14 @@ export function TopicVisualCanvas({
         const bh = Math.min(1, sum / 6) * maxH;
         const bx = leftX + (n - 1) * (barW + 4);
         const by = baseY - bh;
-        ctx.fillStyle = n <= activeTerms ? '#FF785A' : 'rgba(255, 120, 90, 0.22)';
+        ctx.fillStyle = n <= activeTerms ? '#FF8563' : 'rgba(255, 133, 99, 0.22)';
         ctx.fillRect(bx, by, barW, bh);
       }
 
-      // Right half: Geometric Unit-Square Subdivision (1/2 + 1/4 + 1/8 + 1/16...)
       const sqSize = Math.min(width * 0.36, height * 0.68);
       const sqX = width * 0.56;
       const sqY = cy - sqSize * 0.5;
-      ctx.strokeStyle = 'rgba(237, 235, 228, 0.35)';
+      ctx.strokeStyle = 'rgba(244, 196, 108, 0.38)';
       ctx.lineWidth = 1.8;
       ctx.strokeRect(sqX, sqY, sqSize, sqSize);
 
@@ -1338,9 +1323,9 @@ export function TopicVisualCanvas({
       let ry = sqY;
       let rw = sqSize;
       let rh = sqSize;
-      const colors = ['#FF785A', '#F4B956', '#34E8A5', '#38D4FF'];
+      const colors = ['#FF8563', '#F4C46C', '#45E6A6', '#46D6E8'];
       for (let k = 0; k < Math.min(activeTerms, 8); k++) {
-        ctx.fillStyle = `${colors[k % 4]}44`;
+        ctx.fillStyle = `${colors[k % 4]}40`;
         ctx.strokeStyle = colors[k % 4];
         ctx.lineWidth = 1.4;
         if (k % 2 === 0) {
@@ -1348,7 +1333,7 @@ export function TopicVisualCanvas({
           ctx.fillRect(rx, ry, halfW, rh);
           ctx.strokeRect(rx, ry, halfW, rh);
           if (halfW > 26) {
-            ctx.fillStyle = '#F2F0E8';
+            ctx.fillStyle = '#F7F4EC';
             ctx.font = '10px "JetBrains Mono", monospace';
             ctx.fillText(`1/${Math.pow(2, k + 1)}`, rx + 6, ry + 16);
           }
@@ -1359,7 +1344,7 @@ export function TopicVisualCanvas({
           ctx.fillRect(rx, ry, rw, halfH);
           ctx.strokeRect(rx, ry, rw, halfH);
           if (halfH > 22) {
-            ctx.fillStyle = '#F2F0E8';
+            ctx.fillStyle = '#F7F4EC';
             ctx.font = '10px "JetBrains Mono", monospace';
             ctx.fillText(`1/${Math.pow(2, k + 1)}`, rx + 6, ry + 14);
           }
@@ -1374,23 +1359,16 @@ export function TopicVisualCanvas({
     // -------------------------------------------------------------------------
     if (id === 'a1-inequalities') {
       const toPx = (x: number, y: number): [number, number] => [cx + x * unit, cy - y * unit];
-      ctx.strokeStyle = 'rgba(237, 235, 228, 0.2)';
-      ctx.beginPath();
-      ctx.moveTo(0, cy);
-      ctx.lineTo(width, cy);
-      ctx.moveTo(cx, 0);
-      ctx.lineTo(cx, height);
-      ctx.stroke();
+      drawAxesWithTicks(ctx, width, height, cx, cy, unit);
 
       const m1 = v1;
       const b1 = -0.8;
       const m2 = -0.45;
       const b2 = v2;
 
-      // Shaded feasible wedge where y >= m1*x + b1 AND y <= m2*x + b2
       const xInter = (b2 - b1) / (m1 - m2 || 0.01);
       const yInter = m1 * xInter + b1;
-      ctx.fillStyle = 'rgba(54, 235, 168, 0.16)';
+      ctx.fillStyle = 'rgba(69, 230, 166, 0.16)';
       ctx.beginPath();
       const [ix, iy] = toPx(xInter, yInter);
       const leftX = -6.5;
@@ -1402,19 +1380,15 @@ export function TopicVisualCanvas({
       ctx.closePath();
       ctx.fill();
 
-      // Solid boundary line 1 (y >= m1*x + b1)
-      ctx.strokeStyle = '#F5BC5E';
-      ctx.lineWidth = 2.4;
       const [a1x, a1y] = toPx(-6, m1 * -6 + b1);
       const [a2x, a2y] = toPx(6, m1 * 6 + b1);
-      ctx.beginPath();
-      ctx.moveTo(a1x, a1y);
-      ctx.lineTo(a2x, a2y);
-      ctx.stroke();
+      glowStroke(ctx, '#F4C46C', 2.4, 11, () => {
+        ctx.moveTo(a1x, a1y);
+        ctx.lineTo(a2x, a2y);
+      });
 
-      // Dashed strict boundary line 2 (y < m2*x + b2)
       ctx.setLineDash([7, 5]);
-      ctx.strokeStyle = '#38D9FF';
+      ctx.strokeStyle = '#46D6E8';
       ctx.lineWidth = 2.2;
       const [b1x, b1y] = toPx(-6, m2 * -6 + b2);
       const [b2x, b2y] = toPx(6, m2 * 6 + b2);
@@ -1424,12 +1398,11 @@ export function TopicVisualCanvas({
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Orbiting test probe point (turns emerald inside feasible zone, coral outside)
       const pxMath = -1.2 + 2.4 * Math.cos(t * 0.9);
       const pyMath = 0.3 + 1.8 * Math.sin(t * 1.15);
       const valid = pyMath >= m1 * pxMath + b1 && pyMath < m2 * pxMath + b2;
       const [psx, psy] = toPx(pxMath, pyMath);
-      const pCol = valid ? '#36EBA8' : '#FF7A5C';
+      const pCol = valid ? '#45E6A6' : '#FF8563';
 
       const halo = ctx.createRadialGradient(psx, psy, 2, psx, psy, 20);
       halo.addColorStop(0, pCol);
@@ -1439,7 +1412,7 @@ export function TopicVisualCanvas({
       ctx.arc(psx, psy, 20, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = '#FFFFFF';
+      ctx.fillStyle = '#F7F4EC';
       ctx.beginPath();
       ctx.arc(psx, psy, 4.5, 0, Math.PI * 2);
       ctx.fill();
@@ -1458,17 +1431,10 @@ export function TopicVisualCanvas({
     // -------------------------------------------------------------------------
     if (id === 'g-transformations') {
       const toPx = (x: number, y: number): [number, number] => [cx + x * unit, cy - y * unit];
-      ctx.strokeStyle = 'rgba(237, 235, 228, 0.16)';
-      ctx.beginPath();
-      ctx.moveTo(0, cy);
-      ctx.lineTo(width, cy);
-      ctx.moveTo(cx, 0);
-      ctx.lineTo(cx, height);
-      ctx.stroke();
+      drawAxesWithTicks(ctx, width, height, cx, cy, unit);
 
-      // Mirror axis y = x
       ctx.setLineDash([5, 5]);
-      ctx.strokeStyle = 'rgba(245, 188, 94, 0.45)';
+      ctx.strokeStyle = 'rgba(244, 196, 108, 0.48)';
       ctx.beginPath();
       const [m1x, m1y] = toPx(-4, -4);
       const [m2x, m2y] = toPx(4, 4);
@@ -1484,9 +1450,14 @@ export function TopicVisualCanvas({
         [0.6, 1.2],
       ];
 
-      const drawPoly = (pts: [number, number][], stroke: string, fill: string, lw = 2) => {
+      const drawPoly = (pts: [number, number][], stroke: string, fill: string, lw = 2, glow = false) => {
+        ctx.save();
         ctx.fillStyle = fill;
         ctx.strokeStyle = stroke;
+        if (glow) {
+          ctx.shadowColor = stroke;
+          ctx.shadowBlur = 11;
+        }
         ctx.lineWidth = lw;
         ctx.beginPath();
         pts.forEach(([x, y], idx) => {
@@ -1497,16 +1468,14 @@ export function TopicVisualCanvas({
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
+        ctx.restore();
       };
 
-      // Pre-image
-      drawPoly(shape, '#F5BC5E', 'rgba(245, 188, 94, 0.14)', 2.2);
+      drawPoly(shape, '#F4C46C', 'rgba(244, 196, 108, 0.14)', 2.2, true);
 
-      // Reflected image across y = x
       const reflected = shape.map(([x, y]): [number, number] => [y, x]);
-      drawPoly(reflected, 'rgba(54, 235, 168, 0.7)', 'rgba(54, 235, 168, 0.1)', 1.5);
+      drawPoly(reflected, 'rgba(69, 230, 166, 0.72)', 'rgba(69, 230, 166, 0.1)', 1.5);
 
-      // Animated motion ghosts + rotated & dilated active image
       const maxAng = (v1 * Math.PI) / 180;
       for (let g = 1; g <= 5; g++) {
         const frac = (g / 5) * u;
@@ -1520,9 +1489,10 @@ export function TopicVisualCanvas({
         ]);
         drawPoly(
           transformed,
-          g === 5 ? '#38D9FF' : `rgba(56, 217, 255, ${(0.08 + g * 0.08).toFixed(2)})`,
-          g === 5 ? 'rgba(56, 217, 255, 0.22)' : 'transparent',
-          g === 5 ? 2.4 : 1.1
+          g === 5 ? '#46D6E8' : `rgba(70, 214, 232, ${(0.08 + g * 0.08).toFixed(2)})`,
+          g === 5 ? 'rgba(70, 214, 232, 0.22)' : 'transparent',
+          g === 5 ? 2.4 : 1.1,
+          g === 5
         );
       }
     }
@@ -1532,13 +1502,7 @@ export function TopicVisualCanvas({
     // -------------------------------------------------------------------------
     if (id === 'g-coordinate') {
       const toPx = (x: number, y: number): [number, number] => [cx + x * unit, cy - y * unit];
-      ctx.strokeStyle = 'rgba(237, 235, 228, 0.18)';
-      ctx.beginPath();
-      ctx.moveTo(0, cy);
-      ctx.lineTo(width, cy);
-      ctx.moveTo(cx, 0);
-      ctx.lineTo(cx, height);
-      ctx.stroke();
+      drawAxesWithTicks(ctx, width, height, cx, cy, unit);
 
       const ax = v2;
       const ay = -0.9;
@@ -1555,9 +1519,8 @@ export function TopicVisualCanvas({
       const [scx, scy] = toPx(bx, ay);
       const [smx, smy] = toPx(mx, my);
 
-      // Right-triangle legs Δx & Δy
       ctx.setLineDash([4, 4]);
-      ctx.strokeStyle = '#F5BC5E';
+      ctx.strokeStyle = '#F4C46C';
       ctx.lineWidth = 1.6;
       ctx.beginPath();
       ctx.moveTo(sax, say);
@@ -1566,31 +1529,27 @@ export function TopicVisualCanvas({
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Perpendicular bisector locus line
       const len = Math.max(0.01, dist);
       const nx = -dy / len;
       const ny = dx / len;
       const [p1x, p1y] = toPx(mx - nx * 4, my - ny * 4);
       const [p2x, p2y] = toPx(mx + nx * 4, my + ny * 4);
-      ctx.strokeStyle = 'rgba(54, 235, 168, 0.55)';
+      ctx.strokeStyle = 'rgba(69, 230, 166, 0.58)';
       ctx.lineWidth = 1.6;
       ctx.beginPath();
       ctx.moveTo(p1x, p1y);
       ctx.lineTo(p2x, p2y);
       ctx.stroke();
 
-      // Main segment AB
-      ctx.strokeStyle = '#38D9FF';
-      ctx.lineWidth = 2.6;
-      ctx.beginPath();
-      ctx.moveTo(sax, say);
-      ctx.lineTo(sbx, sby);
-      ctx.stroke();
+      glowStroke(ctx, '#46D6E8', 2.6, 12, () => {
+        ctx.moveTo(sax, say);
+        ctx.lineTo(sbx, sby);
+      });
 
       for (const [px, py, col, lbl] of [
-        [sax, say, '#F5BC5E', `A(${ax.toFixed(1)}, ${ay.toFixed(1)})`],
-        [sbx, sby, '#38D9FF', `B(${bx.toFixed(1)}, ${by.toFixed(1)})`],
-        [smx, smy, '#36EBA8', `M(${mx.toFixed(1)}, ${my.toFixed(1)})`],
+        [sax, say, '#F4C46C', `A(${ax.toFixed(1)}, ${ay.toFixed(1)})`],
+        [sbx, sby, '#46D6E8', `B(${bx.toFixed(1)}, ${by.toFixed(1)})`],
+        [smx, smy, '#45E6A6', `M(${mx.toFixed(1)}, ${my.toFixed(1)})`],
       ] as [number, number, string, string][]) {
         ctx.fillStyle = col;
         ctx.beginPath();
@@ -1617,7 +1576,6 @@ export function TopicVisualCanvas({
       const gauss = (x: number) =>
         (1 / (sigma * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * ((x - mu) / sigma) ** 2);
 
-      // Sweeping z-score shading from μ - z*σ to μ + z*σ
       const zSweep = 0.6 + u * 2.4;
       const fillBand = (zMax: number, color: string) => {
         ctx.fillStyle = color;
@@ -1637,36 +1595,30 @@ export function TopicVisualCanvas({
         ctx.fill();
       };
 
-      fillBand(Math.min(zSweep, 3), 'rgba(56, 217, 255, 0.14)');
-      fillBand(Math.min(zSweep, 2), 'rgba(54, 235, 168, 0.18)');
-      fillBand(Math.min(zSweep, 1), 'rgba(245, 188, 94, 0.24)');
+      fillBand(Math.min(zSweep, 3), 'rgba(70, 214, 232, 0.14)');
+      fillBand(Math.min(zSweep, 2), 'rgba(69, 230, 166, 0.18)');
+      fillBand(Math.min(zSweep, 1), 'rgba(244, 196, 108, 0.24)');
 
-      // Live stochastic histogram bars breathing beneath Gaussian density
       for (let b = -14; b <= 14; b++) {
         const bxMath = b * 0.32;
         const jitter = 0.88 + 0.16 * Math.sin(t * 2.4 + b * 1.7);
         const pdfVal = gauss(bxMath) * jitter;
         const [sx, sy] = toPx(bxMath, pdfVal);
-        ctx.fillStyle = 'rgba(54, 235, 168, 0.26)';
+        ctx.fillStyle = 'rgba(69, 230, 166, 0.26)';
         ctx.fillRect(sx - 5, sy, 10, baseY - sy);
       }
 
-      // Glowing Normal Curve Outline
-      ctx.globalCompositeOperation = 'lighter';
-      ctx.strokeStyle = '#36EBA8';
-      ctx.lineWidth = 2.8;
-      ctx.beginPath();
-      for (let i = 0; i <= 160; i++) {
-        const x = -4.5 + (i / 160) * 9.0;
-        const [sx, sy] = toPx(x, gauss(x));
-        if (i === 0) ctx.moveTo(sx, sy);
-        else ctx.lineTo(sx, sy);
-      }
-      ctx.stroke();
+      glowStroke(ctx, '#45E6A6', 2.8, 14, () => {
+        for (let i = 0; i <= 160; i++) {
+          const x = -4.5 + (i / 160) * 9.0;
+          const [sx, sy] = toPx(x, gauss(x));
+          if (i === 0) ctx.moveTo(sx, sy);
+          else ctx.lineTo(sx, sy);
+        }
+      });
 
-      ctx.globalCompositeOperation = 'source-over';
       ctx.font = '600 10.5px "JetBrains Mono", monospace';
-      ctx.fillStyle = '#F5BC5E';
+      ctx.fillStyle = '#FFE29E';
       ctx.textAlign = 'center';
       ctx.fillText(`±1σ: 68.3% · ±2σ: 95.4% · ±3σ: 99.7%`, cx, 24);
     }
@@ -1679,8 +1631,7 @@ export function TopicVisualCanvas({
       const amp = v2;
       const rUnit = Math.min(width, height) * 0.145;
 
-      // Polar radar rings & spokes
-      ctx.strokeStyle = 'rgba(226, 232, 246, 0.08)';
+      ctx.strokeStyle = 'rgba(244, 196, 108, 0.11)';
       ctx.lineWidth = 1;
       for (let k = 1; k <= 3; k++) {
         ctx.beginPath();
@@ -1695,8 +1646,7 @@ export function TopicVisualCanvas({
         ctx.stroke();
       }
 
-      // Faint full rose blueprint
-      ctx.strokeStyle = 'rgba(255, 122, 92, 0.22)';
+      ctx.strokeStyle = 'rgba(255, 133, 99, 0.22)';
       ctx.lineWidth = 1.3;
       ctx.beginPath();
       for (let i = 0; i <= 360; i++) {
@@ -1709,41 +1659,31 @@ export function TopicVisualCanvas({
       }
       ctx.stroke();
 
-      // Animated live traced petals with additive bloom
       const sweepMax = (t * 0.85) % (Math.PI * 2);
-      ctx.globalCompositeOperation = 'lighter';
-      ctx.beginPath();
       const steps = Math.max(12, Math.floor((sweepMax / (Math.PI * 2)) * 320));
       let tipX = cx;
       let tipY = cy;
-      for (let i = 0; i <= steps; i++) {
-        const th = (i / steps) * sweepMax;
-        const r = amp * Math.cos(n * th) * rUnit;
-        const px = cx + r * Math.cos(th);
-        const py = cy - r * Math.sin(th);
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-        tipX = px;
-        tipY = py;
-      }
-      ctx.strokeStyle = 'rgba(255, 122, 92, 0.35)';
-      ctx.lineWidth = 7;
-      ctx.stroke();
-      ctx.strokeStyle = '#FF7A5C';
-      ctx.lineWidth = 2.4;
-      ctx.stroke();
+      glowStroke(ctx, '#FF8563', 2.5, 14, () => {
+        for (let i = 0; i <= steps; i++) {
+          const th = (i / steps) * sweepMax;
+          const r = amp * Math.cos(n * th) * rUnit;
+          const px = cx + r * Math.cos(th);
+          const py = cy - r * Math.sin(th);
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+          tipX = px;
+          tipY = py;
+        }
+      });
 
-      // Rotating polar arm & glowing tip beacon
-      ctx.strokeStyle = '#F5BC5E';
-      ctx.lineWidth = 1.8;
-      ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(tipX, tipY);
-      ctx.stroke();
+      glowStroke(ctx, '#F4C46C', 1.8, 8, () => {
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(tipX, tipY);
+      });
 
       const glow = ctx.createRadialGradient(tipX, tipY, 1, tipX, tipY, 18);
-      glow.addColorStop(0, '#FFFFFF');
-      glow.addColorStop(0.4, '#FF7A5C');
+      glow.addColorStop(0, '#FFE29E');
+      glow.addColorStop(0.45, '#FF8563');
       glow.addColorStop(1, 'transparent');
       ctx.fillStyle = glow;
       ctx.beginPath();
@@ -1760,54 +1700,38 @@ export function TopicVisualCanvas({
       const cFocus = a * e;
       const toPx = (x: number, y: number): [number, number] => [cx + x * unit, cy - y * unit];
 
-      ctx.strokeStyle = 'rgba(237, 235, 228, 0.16)';
-      ctx.beginPath();
-      ctx.moveTo(0, cy);
-      ctx.lineTo(width, cy);
-      ctx.moveTo(cx, 0);
-      ctx.lineTo(cx, height);
-      ctx.stroke();
+      drawAxesWithTicks(ctx, width, height, cx, cy, unit);
 
       const [f1x, f1y] = toPx(-cFocus, 0);
       const [f2x, f2y] = toPx(cFocus, 0);
 
       if (e < 0.98) {
-        // Ellipse: x²/a² + y²/b² = 1
         const b = a * Math.sqrt(Math.max(0.04, 1 - e * e));
-        ctx.globalCompositeOperation = 'lighter';
-        ctx.strokeStyle = '#FF7A5C';
-        ctx.lineWidth = 2.6;
-        ctx.beginPath();
-        ctx.ellipse(cx, cy, a * unit, b * unit, 0, 0, Math.PI * 2);
-        ctx.stroke();
+        glowStroke(ctx, '#FF8563', 2.6, 14, () => {
+          ctx.ellipse(cx, cy, a * unit, b * unit, 0, 0, Math.PI * 2);
+        });
 
-        // Orbiting point P with glowing foci strings F1-P and F2-P proving d1 + d2 = 2a
         const px = a * Math.cos(t * 1.05);
         const py = b * Math.sin(t * 1.05);
         const [spx, spy] = toPx(px, py);
 
-        ctx.strokeStyle = '#38D9FF';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(f1x, f1y);
-        ctx.lineTo(spx, spy);
-        ctx.stroke();
+        glowStroke(ctx, '#46D6E8', 2, 8, () => {
+          ctx.moveTo(f1x, f1y);
+          ctx.lineTo(spx, spy);
+        });
+        glowStroke(ctx, '#F4C46C', 2, 8, () => {
+          ctx.moveTo(f2x, f2y);
+          ctx.lineTo(spx, spy);
+        });
 
-        ctx.strokeStyle = '#F5BC5E';
-        ctx.beginPath();
-        ctx.moveTo(f2x, f2y);
-        ctx.lineTo(spx, spy);
-        ctx.stroke();
-
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = '#FFE29E';
         ctx.beginPath();
         ctx.arc(spx, spy, 5, 0, Math.PI * 2);
         ctx.fill();
       } else {
-        // Hyperbola: x²/a² - y²/b² = 1 with dashed asymptotes y = ±(b/a)x
         const b = a * Math.sqrt(Math.max(0.08, e * e - 1));
         ctx.setLineDash([6, 5]);
-        ctx.strokeStyle = 'rgba(56, 217, 255, 0.45)';
+        ctx.strokeStyle = 'rgba(70, 214, 232, 0.45)';
         ctx.lineWidth = 1.4;
         for (const sgn of [-1, 1]) {
           const [ax1, ay1] = toPx(-5, sgn * (b / a) * -5);
@@ -1819,29 +1743,25 @@ export function TopicVisualCanvas({
         }
         ctx.setLineDash([]);
 
-        ctx.globalCompositeOperation = 'lighter';
-        ctx.strokeStyle = '#FF7A5C';
-        ctx.lineWidth = 2.6;
         for (const branch of [-1, 1]) {
-          ctx.beginPath();
-          for (let i = 0; i <= 80; i++) {
-            const tau = -1.6 + (i / 80) * 3.2;
-            const x = branch * a * Math.cosh(tau);
-            const y = b * Math.sinh(tau);
-            const [sx, sy] = toPx(x, y);
-            if (i === 0) ctx.moveTo(sx, sy);
-            else ctx.lineTo(sx, sy);
-          }
-          ctx.stroke();
+          glowStroke(ctx, '#FF8563', 2.6, 14, () => {
+            for (let i = 0; i <= 80; i++) {
+              const tau = -1.6 + (i / 80) * 3.2;
+              const x = branch * a * Math.cosh(tau);
+              const y = b * Math.sinh(tau);
+              const [sx, sy] = toPx(x, y);
+              if (i === 0) ctx.moveTo(sx, sy);
+              else ctx.lineTo(sx, sy);
+            }
+          });
         }
       }
 
-      ctx.globalCompositeOperation = 'source-over';
       for (const [fx, fy, lbl] of [
         [f1x, f1y, 'F₁'],
         [f2x, f2y, 'F₂'],
       ] as [number, number, string][]) {
-        ctx.fillStyle = '#36EBA8';
+        ctx.fillStyle = '#45E6A6';
         ctx.beginPath();
         ctx.arc(fx, fy, 5, 0, Math.PI * 2);
         ctx.fill();
@@ -1860,32 +1780,21 @@ export function TopicVisualCanvas({
       const dfn = (x: number) => 2 * a * x;
       const toPx = (x: number, y: number): [number, number] => [cx + x * unit, cy - y * unit];
 
-      ctx.strokeStyle = 'rgba(237, 235, 228, 0.18)';
-      ctx.beginPath();
-      ctx.moveTo(0, cy);
-      ctx.lineTo(width, cy);
-      ctx.moveTo(cx, 0);
-      ctx.lineTo(cx, height);
-      ctx.stroke();
+      drawAxesWithTicks(ctx, width, height, cx, cy, unit);
 
-      // Curve f(x) = a*x² - 1.2
-      ctx.globalCompositeOperation = 'lighter';
-      ctx.strokeStyle = '#38D9FF';
-      ctx.lineWidth = 2.6;
-      ctx.beginPath();
-      for (let i = 0; i <= 140; i++) {
-        const x = -3.8 + (i / 140) * 7.6;
-        const [sx, sy] = toPx(x, fn(x));
-        if (i === 0) ctx.moveTo(sx, sy);
-        else ctx.lineTo(sx, sy);
-      }
-      ctx.stroke();
+      glowStroke(ctx, '#46D6E8', 2.6, 14, () => {
+        for (let i = 0; i <= 140; i++) {
+          const x = -3.8 + (i / 140) * 7.6;
+          const [sx, sy] = toPx(x, fn(x));
+          if (i === 0) ctx.moveTo(sx, sy);
+          else ctx.lineTo(sx, sy);
+        }
+      });
 
-      // True instantaneous tangent line at x0
       const y0 = fn(x0);
       const mTan = dfn(x0);
       ctx.setLineDash([5, 5]);
-      ctx.strokeStyle = 'rgba(54, 235, 168, 0.55)';
+      ctx.strokeStyle = 'rgba(69, 230, 166, 0.58)';
       ctx.lineWidth = 1.6;
       const [t1x, t1y] = toPx(x0 - 3, y0 - 3 * mTan);
       const [t2x, t2y] = toPx(x0 + 3, y0 + 3 * mTan);
@@ -1895,35 +1804,31 @@ export function TopicVisualCanvas({
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Animated secant step h(t) shrinking from 2.2 -> 0.04
       const hStep = 0.04 + (1 - u) * 2.15;
       const x1 = x0 + hStep;
       const y1 = fn(x1);
       const mSec = (y1 - y0) / hStep;
 
-      ctx.strokeStyle = '#FF7A5C';
-      ctx.lineWidth = 2.4;
       const [s1x, s1y] = toPx(x0 - 2.6, y0 - 2.6 * mSec);
       const [s2x, s2y] = toPx(x0 + 3.2, y0 + 3.2 * mSec);
-      ctx.beginPath();
-      ctx.moveTo(s1x, s1y);
-      ctx.lineTo(s2x, s2y);
-      ctx.stroke();
+      glowStroke(ctx, '#FF8563', 2.4, 12, () => {
+        ctx.moveTo(s1x, s1y);
+        ctx.lineTo(s2x, s2y);
+      });
 
       const [p0x, p0y] = toPx(x0, y0);
       const [p1x, p1y] = toPx(x1, y1);
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.fillStyle = '#36EBA8';
+      ctx.fillStyle = '#45E6A6';
       ctx.beginPath();
       ctx.arc(p0x, p0y, 5.5, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = '#F5BC5E';
+      ctx.fillStyle = '#F4C46C';
       ctx.beginPath();
       ctx.arc(p1x, p1y, 5.5, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.font = '600 10.5px "JetBrains Mono", monospace';
-      ctx.fillStyle = '#F5BC5E';
+      ctx.fillStyle = '#FFE29E';
       ctx.fillText(`h = ${hStep.toFixed(2)} · Secant m = ${mSec.toFixed(2)} → f′(${x0.toFixed(1)}) = ${mTan.toFixed(2)}`, 16, 24);
     }
 
@@ -1939,7 +1844,7 @@ export function TopicVisualCanvas({
       const rect = container.getBoundingClientRect();
       const width = Math.max(240, Math.floor(rect.width));
       const height = Math.max(200, Math.floor(rect.height));
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.floor(width * dpr);
       canvas.height = Math.floor(height * dpr);
       sizeRef.current = { width, height, dpr };
@@ -2049,14 +1954,14 @@ export function TopicVisualCanvas({
   })();
 
   return (
-    <div className="instrument-frame fiducial-frame overflow-hidden">
-      <div className="px-4 py-2.5 border-b hairline-rule bg-[#080C15]/90 flex flex-wrap items-center justify-between gap-2">
+    <div className="instrument-frame fiducial-frame overflow-hidden bg-[#0B0C12] border border-[rgba(244,196,108,0.17)]">
+      <div className="px-4 py-2.5 border-b border-[rgba(244,196,108,0.17)] bg-[#0B0C12]/95 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <span
             className="w-2 h-2 rounded-full"
             style={{ backgroundColor: meta.accent, boxShadow: `0 0 10px ${meta.accent}` }}
           />
-          <span className="font-mono-data text-[10px] uppercase tracking-[0.16em] text-[#A7B3C7]">
+          <span className="font-mono-data text-[10px] uppercase tracking-[0.16em] text-[#A8B2C6]">
             {meta.badge}
           </span>
         </div>
@@ -2066,7 +1971,7 @@ export function TopicVisualCanvas({
             type="button"
             onClick={() => setPlaying((p) => !p)}
             aria-label={playing ? 'Pause animation' : 'Play animation'}
-            className="p-1.5 rounded border border-[rgba(237,235,228,0.16)] text-[#F2F0E8]"
+            className="p-1.5 rounded-md border border-[rgba(244,196,108,0.2)] bg-[#11131C] text-[#F7F4EC] hover:border-[#F4C46C]/50 transition-colors"
           >
             {playing ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
           </button>
@@ -2078,24 +1983,24 @@ export function TopicVisualCanvas({
               timeRef.current = 0;
             }}
             aria-label="Reset parameters"
-            className="p-1.5 rounded border border-[rgba(237,235,228,0.16)] text-[#A7B3C7] hover:text-[#F2F0E8]"
+            className="p-1.5 rounded-md border border-[rgba(244,196,108,0.2)] bg-[#11131C] text-[#A8B2C6] hover:text-[#FFE29E] hover:border-[#F4C46C]/50 transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
-      <div ref={containerRef} className={`relative w-full ${heightClass} bg-[#05070C]`}>
+      <div ref={containerRef} className={`relative w-full ${heightClass} bg-[#05060A]`}>
         <canvas ref={canvasRef} className="block w-full h-full" />
-        <div className="pointer-events-none absolute bottom-3 left-3 obsidian-glass rounded px-3 py-1.5 text-xs">
-          <MathTex tex={formulaTex} className="text-[#F2F0E8]" />
+        <div className="pointer-events-none absolute bottom-3 left-3 obsidian-glass rounded-lg px-3 py-1.5 text-xs border border-[rgba(244,196,108,0.24)]">
+          <MathTex tex={formulaTex} className="text-[#F7F4EC]" />
         </div>
       </div>
 
       {!compact && (
-        <div className="px-4 py-3 border-t hairline-rule bg-[#080C15]/95 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+        <div className="px-4 py-3 border-t border-[rgba(244,196,108,0.17)] bg-[#0B0C12]/95 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
           <label className="space-y-1">
-            <span className="flex justify-between font-mono-data text-[10px] text-[#A7B3C7]">
+            <span className="flex justify-between font-mono-data text-[10px] text-[#A8B2C6]">
               <span>{meta.p1Label}</span>
               <span style={{ color: meta.accent }}>{p1.toFixed(2)}</span>
             </span>
@@ -2112,9 +2017,9 @@ export function TopicVisualCanvas({
           </label>
 
           <label className="space-y-1">
-            <span className="flex justify-between font-mono-data text-[10px] text-[#A7B3C7]">
+            <span className="flex justify-between font-mono-data text-[10px] text-[#A8B2C6]">
               <span>{meta.p2Label}</span>
-              <span className="text-[#38D4FF]">{p2.toFixed(2)}</span>
+              <span className="text-[#46D6E8]">{p2.toFixed(2)}</span>
             </span>
             <input
               type="range"
@@ -2124,7 +2029,7 @@ export function TopicVisualCanvas({
               value={p2}
               onChange={(e) => setP2(Number(e.target.value))}
               className="meridian-slider"
-              style={{ ['--slider-accent' as string]: '#38D4FF' }}
+              style={{ ['--slider-accent' as string]: '#46D6E8' }}
             />
           </label>
         </div>

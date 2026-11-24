@@ -11,7 +11,9 @@ import {
   Play,
   RotateCcw,
   Sparkles,
+  Trophy,
   XCircle,
+  Zap,
 } from 'lucide-react';
 import { MathTex } from './MathTex';
 import { EquationMiniVisual, EquationVisualKind } from '../visuals/equations/EquationMiniVisual';
@@ -131,14 +133,14 @@ function AnimatedWorkedSolution({
       animate={{ opacity: 1, y: 0 }}
       exit={reducedMotion ? undefined : { opacity: 0, y: -6 }}
       transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-      className="p-4 sm:p-5 rounded-xl bg-[#0A101B] border border-white/[0.12] space-y-4 overflow-hidden"
+      className="p-4 sm:p-5 rounded-2xl bg-[#0B0C12] border border-[#F4C46C]/25 space-y-4 overflow-hidden shadow-[inset_0_1px_0_rgba(255,234,186,0.1)]"
     >
       {/* Header + Playback Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b hairline-rule">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-3.5 h-3.5 text-[#36EBA8]" />
-          <p className="font-mono-data text-[10.5px] uppercase tracking-wider text-[#36EBA8]">
-            Animated Worked Solution · Stage {Math.min(visibleCount, totalStages)}/{totalStages}
+          <Sparkles className="w-3.5 h-3.5 text-[#45E6A6]" />
+          <p className="font-mono-data text-[10.5px] uppercase tracking-wider text-[#45E6A6]">
+            Worked Solution Timeline · Stage {Math.min(visibleCount, totalStages)}/{totalStages}
           </p>
         </div>
 
@@ -155,9 +157,9 @@ function AnimatedWorkedSolution({
             }}
             className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border transition-colors"
             style={{
-              borderColor: playing ? accentColor : 'rgba(255,255,255,0.14)',
-              backgroundColor: playing ? `${accentColor}1E` : 'rgba(255,255,255,0.04)',
-              color: playing ? accentColor : '#EDEBE4',
+              borderColor: playing ? accentColor : 'rgba(244, 196, 108, 0.22)',
+              backgroundColor: playing ? `${accentColor}1E` : 'rgba(255, 255, 255, 0.03)',
+              color: playing ? accentColor : '#F7F4EC',
             }}
           >
             {playing ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
@@ -172,7 +174,7 @@ function AnimatedWorkedSolution({
             }}
             disabled={visibleCount <= 1}
             aria-label="Previous solution stage"
-            className="p-1.5 rounded-full border border-white/10 text-[#9CA6B8] hover:text-[#EDEBE4] disabled:opacity-35 transition-colors"
+            className="p-1.5 rounded-full border border-[#F4C46C]/20 text-[#A8B2C6] hover:text-[#F7F4EC] disabled:opacity-35 transition-colors"
           >
             <ChevronLeft className="w-3 h-3" />
           </button>
@@ -185,7 +187,7 @@ function AnimatedWorkedSolution({
             }}
             disabled={visibleCount >= totalStages}
             aria-label="Next solution stage"
-            className="p-1.5 rounded-full border border-white/10 text-[#9CA6B8] hover:text-[#EDEBE4] disabled:opacity-35 transition-colors"
+            className="p-1.5 rounded-full border border-[#F4C46C]/20 text-[#A8B2C6] hover:text-[#F7F4EC] disabled:opacity-35 transition-colors"
           >
             <ChevronRight className="w-3 h-3" />
           </button>
@@ -196,7 +198,7 @@ function AnimatedWorkedSolution({
               setPlaying(false);
               setVisibleCount(totalStages);
             }}
-            className="px-2.5 py-1 rounded-full border border-white/10 text-[#9CA6B8] hover:text-[#EDEBE4] transition-colors"
+            className="px-2.5 py-1 rounded-full border border-[#F4C46C]/20 text-[#A8B2C6] hover:text-[#F7F4EC] transition-colors"
           >
             Show All
           </button>
@@ -205,7 +207,7 @@ function AnimatedWorkedSolution({
             type="button"
             onClick={handleReplay}
             aria-label="Replay worked solution"
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-white/10 text-[#9CA6B8] hover:text-[#EDEBE4] transition-colors"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[#F4C46C]/20 text-[#A8B2C6] hover:text-[#F7F4EC] transition-colors"
           >
             <RotateCcw className="w-3 h-3" /> Replay
           </button>
@@ -218,11 +220,11 @@ function AnimatedWorkedSolution({
       >
         <div className={`${resolvedVisual ? 'lg:col-span-7' : ''} relative pl-6 space-y-2.5`}>
           {/* Vertical Animated Derivation Rail */}
-          <div className="absolute left-2 top-2 bottom-2 w-[2px] rounded-full bg-white/[0.08] overflow-hidden">
+          <div className="absolute left-2 top-2 bottom-2 w-[2px] rounded-full bg-[#F4C46C]/12 overflow-hidden">
             <motion.div
               className="w-full h-full rounded-full origin-top"
               style={{
-                background: `linear-gradient(180deg, ${accentColor}, #36EBA8)`,
+                background: `linear-gradient(180deg, #F4C46C, ${accentColor}, #45E6A6)`,
                 boxShadow: `0 0 10px ${accentColor}`,
               }}
               initial={false}
@@ -233,30 +235,34 @@ function AnimatedWorkedSolution({
 
           {stages.slice(0, visibleCount).map((st, sIdx) => {
             const isActive = sIdx === activeIdx;
-            const nodeColor = st.isFinal ? '#36EBA8' : isActive ? accentColor : 'rgba(237,235,228,0.35)';
+            const nodeColor = st.isFinal
+              ? '#45E6A6'
+              : isActive
+                ? accentColor
+                : 'rgba(244, 196, 108, 0.45)';
             return (
               <motion.div
                 key={`${question.id}-stage-${sIdx}`}
                 initial={reducedMotion ? false : { opacity: 0, x: -12 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 26 }}
-                className="relative p-3 rounded-lg border transition-colors text-xs space-y-1.5"
+                className="relative p-3.5 rounded-xl border transition-colors text-xs space-y-1.5"
                 style={{
                   backgroundColor: st.isFinal
-                    ? 'rgba(54, 235, 168, 0.08)'
+                    ? 'rgba(69, 230, 166, 0.08)'
                     : isActive
-                      ? 'rgba(255, 255, 255, 0.05)'
-                      : '#070C15',
+                      ? 'rgba(244, 196, 108, 0.07)'
+                      : '#060609',
                   borderColor: st.isFinal
-                    ? 'rgba(54, 235, 168, 0.45)'
+                    ? 'rgba(69, 230, 166, 0.48)'
                     : isActive
-                      ? `${accentColor}66`
-                      : 'rgba(255, 255, 255, 0.08)',
-                  boxShadow: isActive ? `0 0 20px -10px ${nodeColor}` : undefined,
+                      ? `${accentColor}77`
+                      : 'rgba(244, 196, 108, 0.14)',
+                  boxShadow: isActive ? `0 0 22px -10px ${nodeColor}` : undefined,
                 }}
               >
                 <span
-                  className="absolute -left-[21px] top-4 w-2.5 h-2.5 rounded-full border border-[#0A101B]"
+                  className="absolute -left-[21px] top-4 w-2.5 h-2.5 rounded-full border border-[#0B0C12]"
                   style={{
                     backgroundColor: nodeColor,
                     boxShadow: isActive ? `0 0 8px ${nodeColor}` : undefined,
@@ -265,39 +271,49 @@ function AnimatedWorkedSolution({
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <span
                     className="font-mono-data text-[10px] uppercase tracking-wider"
-                    style={{ color: st.isFinal ? '#36EBA8' : accentColor }}
+                    style={{ color: st.isFinal ? '#45E6A6' : accentColor }}
                   >
                     Stage 0{sIdx + 1} · {st.label}
                   </span>
                 </div>
                 {st.tex && (
                   <div className="overflow-x-auto">
-                    <MathTex tex={st.tex} className="text-[#F4F3EE]" />
+                    <MathTex tex={st.tex} className="text-[#F7F4EC]" />
                   </div>
                 )}
                 {st.resultText && (
-                  <p className="font-mono-data text-xs text-[#36EBA8] font-semibold">
+                  <p className="font-mono-data text-xs text-[#45E6A6] font-semibold">
                     {st.resultText}
                   </p>
                 )}
-                <p className="text-[#9CA6B8] leading-relaxed">{st.note}</p>
+                <p className="text-[#A8B2C6] leading-relaxed">{st.note}</p>
               </motion.div>
             );
           })}
         </div>
 
         {resolvedVisual && (
-          <div className="lg:col-span-5 space-y-1.5">
+          <div
+            className="lg:col-span-5 space-y-2"
+            aria-label={`Worked Visual Stage ${Math.min(visibleCount, totalStages)} of ${totalStages}`}
+          >
+            <div className="flex items-center justify-between px-1">
+              <span className="font-mono-data text-[10px] uppercase tracking-widest text-[#F4C46C]">
+                Geometric Companion
+              </span>
+              <span className="font-mono-data text-[10px] text-[#727D94]">
+                Stage 0{Math.min(visibleCount, totalStages)} / 0{totalStages}
+              </span>
+            </div>
             <EquationMiniVisual
               kind={resolvedVisual}
               accent={accentColor}
               replayKey={`${question.id}-vis-${visibleCount}`}
-              heightClass="h-[156px]"
-              caption={`Worked Visual · Stage ${Math.min(visibleCount, totalStages)}/${totalStages}`}
+              heightClass="h-[158px]"
               showReplay
             />
-            <p className="font-mono-data text-[10px] text-[#6F7F99] px-1">
-              Visual diagram re-draws in sync with algebraic solution stages.
+            <p className="font-mono-data text-[10px] text-[#727D94] px-1">
+              Vector diagram syncs automatically with each algebraic stage.
             </p>
           </div>
         )}
@@ -314,6 +330,11 @@ export function PracticeEngine({ questions, accentColor, visualKinds }: Practice
   const [openSolutions, setOpenSolutions] = useState<Record<string, boolean>>({});
 
   const solvedCount = Object.values(results).filter((r) => r === 'correct').length;
+  const totalCount = Math.max(1, questions.length);
+  const masteryPct = Math.round((solvedCount / totalCount) * 100);
+  const xpEarned = solvedCount * 25;
+  const xpTotal = questions.length * 25;
+  const allVerified = questions.length > 0 && solvedCount === questions.length;
 
   const checkQuestion = (q: PracticeQuestion, overrideAnswer?: string) => {
     const raw = (overrideAnswer ?? answers[q.id] ?? '').trim();
@@ -344,36 +365,70 @@ export function PracticeEngine({ questions, accentColor, visualKinds }: Practice
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b hairline-rule">
-        <div className="flex items-center gap-3">
-          <span className="font-mono-data text-xs text-[#9CA6B8]">
-            Mastery Check:{' '}
-            <strong style={{ color: accentColor }}>
-              {solvedCount} / {questions.length}
-            </strong>{' '}
-            verified
-          </span>
-          <div className="w-28 h-1.5 rounded-full bg-[#161D29] overflow-hidden">
-            <div
-              className="h-full transition-all duration-300"
+      {/* Golden HUD Mastery Terminal Header */}
+      <div className="instrument-panel p-4 flex flex-wrap items-center justify-between gap-4 border-[#F4C46C]/25">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4 min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span
+              className="w-7 h-7 rounded-lg border flex items-center justify-center shrink-0"
               style={{
-                width: `${(solvedCount / Math.max(1, questions.length)) * 100}%`,
-                backgroundColor: accentColor,
+                borderColor: allVerified ? 'rgba(69, 230, 166, 0.55)' : 'rgba(244, 196, 108, 0.4)',
+                backgroundColor: allVerified ? 'rgba(69, 230, 166, 0.14)' : 'rgba(244, 196, 108, 0.1)',
               }}
-            />
+            >
+              {allVerified ? (
+                <Trophy className="w-3.5 h-3.5 text-[#45E6A6]" />
+              ) : (
+                <Zap className="w-3.5 h-3.5 text-[#F4C46C]" />
+              )}
+            </span>
+            <div>
+              <span className="font-mono-data text-[10px] uppercase tracking-[0.18em] text-[#727D94] block">
+                Mastery Terminal
+              </span>
+              <span className="font-mono-data text-xs text-[#F7F4EC]">
+                <strong style={{ color: allVerified ? '#45E6A6' : accentColor }}>
+                  {solvedCount} / {questions.length}
+                </strong>{' '}
+                verified · <span className="text-[#FFE29E]">{masteryPct}%</span>
+              </span>
+            </div>
+          </div>
+
+          <div className="flex-1 min-w-[140px] max-w-xs space-y-1">
+            <div className="flex justify-between font-mono-data text-[10px]">
+              <span className="text-[#F4C46C]">XP {xpEarned} / {xpTotal}</span>
+              <span className={allVerified ? 'text-[#45E6A6]' : 'text-[#A8B2C6]'}>
+                {allVerified ? 'SIGNAL LOCKED' : 'CALIBRATING'}
+              </span>
+            </div>
+            <div className="h-2 rounded-full bg-[#060609] border border-[#F4C46C]/20 overflow-hidden">
+              <motion.div
+                className="h-full rounded-full"
+                style={{
+                  background: `linear-gradient(90deg, #F4C46C, ${accentColor}, #45E6A6)`,
+                  boxShadow: `0 0 12px ${accentColor}`,
+                }}
+                initial={false}
+                animate={{ width: `${masteryPct}%` }}
+                transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 240, damping: 24 }}
+              />
+            </div>
           </div>
         </div>
+
         {Object.keys(results).length > 0 && (
           <button
             type="button"
             onClick={resetAll}
-            className="inline-flex items-center gap-1.5 text-xs font-mono-data text-[#9CA6B8] hover:text-[#EDEBE4]"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#F4C46C]/25 bg-[#060609]/80 text-xs font-mono-data text-[#A8B2C6] hover:text-[#FFE29E] hover:border-[#F4C46C]/50 transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" /> Reset Set
           </button>
         )}
       </div>
 
+      {/* Practice Cards */}
       <div className="space-y-4">
         {questions.map((q, idx) => {
           const status = results[q.id];
@@ -384,27 +439,34 @@ export function PracticeEngine({ questions, accentColor, visualKinds }: Practice
             (visualKinds && visualKinds.length > 0 ? visualKinds[idx % visualKinds.length] : undefined);
 
           return (
-            <div
+            <motion.div
               key={q.id}
-              className="instrument-frame p-5 space-y-4 transition-colors"
+              layout={!reducedMotion}
+              className="instrument-frame p-4 sm:p-5 space-y-4 transition-colors"
               style={{
                 borderColor:
                   status === 'correct'
-                    ? 'rgba(52, 211, 153, 0.45)'
+                    ? 'rgba(69, 230, 166, 0.52)'
                     : status === 'incorrect'
-                      ? 'rgba(249, 115, 91, 0.45)'
+                      ? 'rgba(255, 133, 99, 0.52)'
+                      : undefined,
+                boxShadow:
+                  status === 'correct'
+                    ? '0 0 28px -14px rgba(69, 230, 166, 0.55)'
+                    : status === 'incorrect'
+                      ? '0 0 28px -14px rgba(255, 133, 99, 0.45)'
                       : undefined,
               }}
             >
               <div className="flex items-start justify-between gap-3">
-                <div className="space-y-2">
-                  <span className="font-mono-data text-[11px] uppercase tracking-wider text-[#6C7689]">
-                    Problem 0{idx + 1}
+                <div className="space-y-2 min-w-0 flex-1">
+                  <span className="font-mono-data text-[10.5px] uppercase tracking-[0.18em] text-[#F4C46C]/85 block">
+                    Checkpoint 0{idx + 1} · +25 XP
                   </span>
-                  <p className="text-sm sm:text-base text-[#EDEBE4] leading-relaxed">{q.prompt}</p>
+                  <p className="text-sm sm:text-base text-[#F7F4EC] leading-relaxed">{q.prompt}</p>
                   {q.promptTex && (
-                    <div className="py-1">
-                      <MathTex tex={q.promptTex} displayMode className="text-[#EDEBE4]" />
+                    <div className="py-1 overflow-x-auto">
+                      <MathTex tex={q.promptTex} displayMode className="text-[#F7F4EC]" />
                     </div>
                   )}
                 </div>
@@ -416,7 +478,7 @@ export function PracticeEngine({ questions, accentColor, visualKinds }: Practice
                       animate={{ opacity: 1, scale: 1 }}
                       exit={reducedMotion ? undefined : { opacity: 0, scale: 0.85 }}
                       transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-                      className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono-data bg-[#34D399]/15 text-[#34D399]"
+                      className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono-data border border-[#45E6A6]/45 bg-[#45E6A6]/15 text-[#45E6A6]"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" /> Verified
                     </motion.span>
@@ -428,7 +490,7 @@ export function PracticeEngine({ questions, accentColor, visualKinds }: Practice
                       animate={{ opacity: 1, scale: 1 }}
                       exit={reducedMotion ? undefined : { opacity: 0, scale: 0.85 }}
                       transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-                      className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono-data bg-[#F9735B]/15 text-[#F9735B]"
+                      className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono-data border border-[#FF8563]/45 bg-[#FF8563]/15 text-[#FF8563]"
                     >
                       <XCircle className="w-3.5 h-3.5" /> Re-check
                     </motion.span>
@@ -442,37 +504,40 @@ export function PracticeEngine({ questions, accentColor, visualKinds }: Practice
                     const selected = answers[q.id] === opt.id;
                     const isThisCorrect = status && opt.id === String(q.correctAnswer);
                     return (
-                      <button
+                      <motion.button
                         key={opt.id}
                         type="button"
+                        whileTap={reducedMotion ? undefined : { scale: 0.99 }}
                         onClick={() => {
                           setAnswers((prev) => ({ ...prev, [q.id]: opt.id }));
                           checkQuestion(q, opt.id);
                         }}
-                        className="text-left px-4 py-3 rounded-xl border text-sm transition-all flex items-center gap-3"
+                        className="text-left px-4 py-3 rounded-xl border text-sm transition-all flex items-center gap-3 hover:border-[#F4C46C]/40"
                         style={{
-                          backgroundColor: selected ? 'rgba(255,255,255,0.07)' : '#070B14',
+                          backgroundColor: selected ? 'rgba(244, 196, 108, 0.1)' : '#0B0C12',
                           borderColor:
                             selected && status === 'correct'
-                              ? '#36EBA8'
+                              ? '#45E6A6'
                               : selected && status === 'incorrect'
-                                ? '#FF7A5C'
+                                ? '#FF8563'
                                 : isThisCorrect && solOpen
-                                  ? 'rgba(54, 235, 168, 0.5)'
+                                  ? 'rgba(69, 230, 166, 0.55)'
                                   : selected
                                     ? accentColor
-                                    : 'rgba(237, 235, 228, 0.12)',
+                                    : 'rgba(244, 196, 108, 0.16)',
                         }}
                       >
-                        <span className="font-mono-data text-xs text-[#6C7689] uppercase">
+                        <span className="font-mono-data text-xs text-[#F4C46C]/80 uppercase shrink-0">
                           {opt.id}.
                         </span>
-                        {opt.tex ? (
-                          <MathTex tex={opt.tex} className="text-[#EDEBE4]" />
-                        ) : (
-                          <span className="text-[#EDEBE4]">{opt.label}</span>
-                        )}
-                      </button>
+                        <span className="min-w-0 overflow-x-auto">
+                          {opt.tex ? (
+                            <MathTex tex={opt.tex} className="text-[#F7F4EC]" />
+                          ) : (
+                            <span className="text-[#F7F4EC]">{opt.label}</span>
+                          )}
+                        </span>
+                      </motion.button>
                     );
                   })}
                 </div>
@@ -496,18 +561,20 @@ export function PracticeEngine({ questions, accentColor, visualKinds }: Practice
                       }
                       placeholder="Enter numeric value"
                       aria-label={`Answer for problem ${idx + 1}`}
-                      className="w-44 px-3.5 py-2 rounded-full bg-[#060A13] border border-white/15 font-mono-data text-sm text-[#F4F3EE] focus:border-white/40"
+                      className="w-44 px-3.5 py-2 rounded-full bg-[#060609] border border-[#F4C46C]/25 font-mono-data text-sm text-[#F7F4EC] placeholder:text-[#727D94] focus:border-[#F4C46C]"
                     />
                     {q.unitLabel && (
-                      <span className="font-mono-data text-xs text-[#A5B4CC]">{q.unitLabel}</span>
+                      <span className="font-mono-data text-xs text-[#A8B2C6]">{q.unitLabel}</span>
                     )}
                   </div>
                   <button
                     type="submit"
-                    className="px-5 py-2 rounded-full text-xs font-semibold text-[#03050A] transition-all hover:brightness-110"
-                    style={{ backgroundColor: accentColor }}
+                    className="px-5 py-2 rounded-full text-xs font-semibold text-[#060609] transition-all hover:brightness-110 shadow-[0_0_20px_-6px_rgba(244,196,108,0.6)]"
+                    style={{
+                      background: `linear-gradient(135deg, ${accentColor}, #FFE29E)`,
+                    }}
                   >
-                    Check Answer
+                    Verify Answer
                   </button>
                 </form>
               )}
@@ -518,9 +585,9 @@ export function PracticeEngine({ questions, accentColor, visualKinds }: Practice
                   onClick={() =>
                     setOpenHints((prev) => ({ ...prev, [q.id]: !prev[q.id] }))
                   }
-                  className="inline-flex items-center gap-1.5 font-mono-data text-[#9CA6B8] hover:text-[#EDEBE4]"
+                  className="inline-flex items-center gap-1.5 font-mono-data text-[#A8B2C6] hover:text-[#FFE29E] transition-colors"
                 >
-                  <HelpCircle className="w-3.5 h-3.5" />
+                  <HelpCircle className="w-3.5 h-3.5 text-[#F4C46C]" />
                   {hintOpen ? 'Hide Hint' : 'Show Hint'}
                 </button>
                 <button
@@ -528,12 +595,12 @@ export function PracticeEngine({ questions, accentColor, visualKinds }: Practice
                   onClick={() =>
                     setOpenSolutions((prev) => ({ ...prev, [q.id]: !prev[q.id] }))
                   }
-                  className="inline-flex items-center gap-1.5 font-mono-data text-[#9CA6B8] hover:text-[#EDEBE4]"
+                  className="inline-flex items-center gap-1.5 font-mono-data text-[#A8B2C6] hover:text-[#45E6A6] transition-colors"
                 >
                   {solOpen ? (
-                    <ChevronUp className="w-3.5 h-3.5" />
+                    <ChevronUp className="w-3.5 h-3.5 text-[#45E6A6]" />
                   ) : (
-                    <ChevronDown className="w-3.5 h-3.5" />
+                    <ChevronDown className="w-3.5 h-3.5 text-[#45E6A6]" />
                   )}
                   {solOpen ? 'Hide Step-by-Step Solution' : 'Step-by-Step Solution'}
                 </button>
@@ -549,8 +616,8 @@ export function PracticeEngine({ questions, accentColor, visualKinds }: Practice
                     transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                     className="overflow-hidden"
                   >
-                    <div className="p-3 rounded bg-[#161D29] border border-[rgba(229,169,76,0.22)] text-xs text-[#EDEBE4]/90">
-                      <span className="font-mono-data text-[#E5A94C] mr-2">HINT:</span>
+                    <div className="p-3.5 rounded-xl bg-[#11131C] border border-[#F4C46C]/30 text-xs text-[#F7F4EC]/90">
+                      <span className="font-mono-data text-[#F4C46C] mr-2">HINT:</span>
                       {q.hint}
                     </div>
                   </motion.div>
@@ -567,7 +634,7 @@ export function PracticeEngine({ questions, accentColor, visualKinds }: Practice
                   />
                 )}
               </AnimatePresence>
-            </div>
+            </motion.div>
           );
         })}
       </div>

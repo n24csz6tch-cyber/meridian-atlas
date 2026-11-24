@@ -12,9 +12,9 @@ interface DerivationStepVisualProps {
 }
 
 /**
- * Synchronized visual companion for Layer 3 Guided Step-by-Step Derivations.
+ * Step-matched visual companion for Layer 3 Guided Step-by-Step Derivations.
  * Renders the geometric/graphical visual matched to the active derivation step
- * with glowing stage telemetry, animated draw-in, and step-progress reticle.
+ * with AUREA Golden Observatory telemetry, animated draw-in, and step-progress reticle.
  */
 export function DerivationStepVisual({
   visualKinds,
@@ -40,14 +40,14 @@ export function DerivationStepVisual({
               className="w-2 h-2 rounded-full inline-block"
               style={{ backgroundColor: accent, boxShadow: `0 0 10px ${accent}` }}
             />
-            Live Step Visual · Stage 0{stepIndex + 1} / 0{count}
+            Guided Step Visual · 0{stepIndex + 1} / 0{count}
           </span>
-          <span className="font-mono-data text-[10px] text-[#6F7F99] truncate max-w-[220px]">
+          <span className="font-mono-data text-[10px] text-[#A8B2C6] truncate max-w-[220px]">
             {stepTitle.replace(/^Step \d+ · /, '')}
           </span>
         </div>
 
-        <div className="h-1 w-full rounded-full bg-white/[0.06] overflow-hidden">
+        <div className="h-1 w-full rounded-full bg-[rgba(244,196,108,0.12)] overflow-hidden">
           <motion.div
             className="h-full rounded-full"
             style={{ backgroundColor: accent, boxShadow: `0 0 10px ${accent}` }}
@@ -71,7 +71,7 @@ export function DerivationStepVisual({
             accent={accent}
             replayKey={`${activeKind}-${stepIndex}`}
             heightClass="h-[195px]"
-            caption={`Synchronized Stage 0${stepIndex + 1}`}
+            caption={stepTitle}
             showReplay
           />
         </motion.div>
@@ -140,8 +140,34 @@ function plot(fn: (x: number) => number | null, x0: number, x1: number, y0: numb
   return parts.join(' ');
 }
 
+function PulseBeacon({ cx, cy, color }: { cx: number; cy: number; color: string }) {
+  const reducedMotion = useReducedMotion();
+  if (reducedMotion) {
+    return (
+      <g>
+        <circle cx={cx} cy={cy} r={7} fill={color} fillOpacity={0.22} />
+        <circle cx={cx} cy={cy} r={3.8} fill={color} stroke="#06070B" strokeWidth={1.2} />
+      </g>
+    );
+  }
+  return (
+    <g>
+      <motion.circle
+        cx={cx}
+        cy={cy}
+        r={7}
+        fill={color}
+        animate={{ scale: [1, 1.55, 1], opacity: [0.28, 0.06, 0.28] }}
+        transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+        style={{ transformOrigin: `${cx}px ${cy}px` }}
+      />
+      <circle cx={cx} cy={cy} r={3.8} fill={color} stroke="#06070B" strokeWidth={1.2} />
+    </g>
+  );
+}
+
 /**
- * Dedicated Red/Coral (FALSE) vs Emerald (TRUE) geometric proof plot for Layer 5.
+ * Dedicated Amber-Coral (FALSE) vs Jade (TRUE) geometric proof plot for Layer 5.
  * Visually proves WHY a classic student error fails rather than merely stating it in text.
  */
 export function MisconceptionVisual({
@@ -151,13 +177,17 @@ export function MisconceptionVisual({
 }: MisconceptionVisualProps) {
   const uid = useId().replace(/:/g, '');
   const gridId = `mgrid-${kind}-${uid}`;
+  const glowId = `mglow-${kind}-${uid}`;
   const clipId = `mclip-${kind}-${uid}`;
   const reducedMotion = useReducedMotion();
   const [localReplay, setLocalReplay] = useState(0);
-  const coral = '#FF7A5C';
-  const emerald = '#36EBA8';
-  const gold = '#F5BC5E';
-  const cyan = '#38D9FF';
+
+  const coral = '#FF8563';
+  const emerald = '#45E6A6';
+  const gold = '#F4C46C';
+  const starGold = '#FFE29E';
+  const cyan = '#46D6E8';
+  const axisStroke = 'rgba(244, 196, 108, 0.22)';
 
   const renderGraphic = () => {
     switch (kind) {
@@ -172,12 +202,13 @@ export function MisconceptionVisual({
             <text x={82} y={132} fill={coral} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">Missing 6x wings!</text>
             {/* Right: True (x+3)² */}
             <rect x={218} y={32} width={52} height={52} fill={`${emerald}26`} stroke={emerald} strokeWidth={1.6} />
-            <rect x={270} y={32} width={28} height={52} fill={`${gold}32`} stroke={gold} strokeWidth={1.5} />
-            <rect x={218} y={84} width={52} height={28} fill={`${gold}32`} stroke={gold} strokeWidth={1.5} />
+            <rect x={270} y={32} width={28} height={52} fill={`${gold}30`} stroke={gold} strokeWidth={1.5} />
+            <rect x={218} y={84} width={52} height={28} fill={`${gold}30`} stroke={gold} strokeWidth={1.5} />
             <rect x={270} y={84} width={28} height={28} fill={`${emerald}32`} stroke={emerald} strokeWidth={1.6} />
+            <PulseBeacon cx={270} cy={84} color={starGold} />
             <text x={244} y={62} fill={emerald} fontSize={10} textAnchor="middle" fontFamily="JetBrains Mono">x²</text>
-            <text x={284} y={62} fill={gold} fontSize={9} textAnchor="middle" fontFamily="JetBrains Mono">3x</text>
-            <text x={244} y={102} fill={gold} fontSize={9} textAnchor="middle" fontFamily="JetBrains Mono">3x</text>
+            <text x={284} y={62} fill={starGold} fontSize={9} textAnchor="middle" fontFamily="JetBrains Mono">3x</text>
+            <text x={244} y={102} fill={starGold} fontSize={9} textAnchor="middle" fontFamily="JetBrains Mono">3x</text>
             <text x={284} y={102} fill={emerald} fontSize={9} textAnchor="middle" fontFamily="JetBrains Mono">9</text>
             <text x={258} y={132} fill={emerald} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">Full Area = x² + 6x + 9</text>
           </g>
@@ -186,8 +217,8 @@ export function MisconceptionVisual({
       case 'slope-invert':
         return (
           <g>
-            <line x1={28} y1={126} x2={332} y2={126} stroke="rgba(255,255,255,0.18)" />
-            <line x1={70} y1={18} x2={70} y2={136} stroke="rgba(255,255,255,0.18)" />
+            <line x1={28} y1={126} x2={332} y2={126} stroke={axisStroke} />
+            <line x1={70} y1={18} x2={70} y2={136} stroke={axisStroke} />
             <path d={plot((x) => 2.5 * x, -0.5, 4, -0.5, 5)} fill="none" stroke={emerald} strokeWidth={2.3} />
             <path d={plot((x) => 0.4 * x, -0.5, 4, -0.5, 5)} fill="none" stroke={coral} strokeWidth={2.1} strokeDasharray="5 3" />
             <text x={156} y={42} fill={emerald} fontSize={9.5} fontFamily="JetBrains Mono">TRUE m = Δy/Δx = 2.5</text>
@@ -195,13 +226,36 @@ export function MisconceptionVisual({
           </g>
         );
 
+      case 'exp-add-vs-mult':
+        return (
+          <g>
+            <line x1={28} y1={124} x2={332} y2={124} stroke={axisStroke} />
+            <path d={plot((x) => Math.pow(2, x + 2), 0, 3, 0, 32)} fill="none" stroke={emerald} strokeWidth={2.3} />
+            <path d={plot((x) => Math.pow(2, 2 * x), 0, 3, 0, 32)} fill="none" stroke={coral} strokeWidth={2} strokeDasharray="5 3" />
+            <text x={182} y={92} fill={emerald} fontSize={9.5} fontFamily="JetBrains Mono">2ˣ · 2² = 2^(x+2)</text>
+            <text x={144} y={36} fill={coral} fontSize={9.5} fontFamily="JetBrains Mono">FALSE: 2^(2x) explodes!</text>
+          </g>
+        );
+
+      case 'parallel-no-cross':
+        return (
+          <g>
+            <line x1={28} y1={120} x2={332} y2={120} stroke={axisStroke} />
+            <path d={plot((x) => 0.65 * x + 1.2, -3, 4, -1, 5)} fill="none" stroke={emerald} strokeWidth={2.3} />
+            <path d={plot((x) => 0.65 * x - 0.3, -3, 4, -1, 5)} fill="none" stroke={cyan} strokeWidth={2.1} />
+            <text x={180} y={42} fill={emerald} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">Equal slopes m₁ = m₂ → Parallel (∅ solutions)</text>
+            <text x={180} y={136} fill={coral} fontSize={9} textAnchor="middle" fontFamily="JetBrains Mono">Trap: forcing an intersection where lines never meet</text>
+          </g>
+        );
+
       case 'abs-shift-sign':
         return (
           <g>
-            <line x1={28} y1={118} x2={332} y2={118} stroke="rgba(255,255,255,0.18)" />
-            <line x1={180} y1={18} x2={180} y2={136} stroke="rgba(255,255,255,0.18)" />
+            <line x1={28} y1={118} x2={332} y2={118} stroke={axisStroke} />
+            <line x1={180} y1={18} x2={180} y2={136} stroke={axisStroke} />
             <path d={plot((x) => Math.abs(x - 2), -4, 4, -0.4, 4)} fill="none" stroke={emerald} strokeWidth={2.3} />
             <path d={plot((x) => Math.abs(x + 2), -4, 4, -0.4, 4)} fill="none" stroke={coral} strokeWidth={2} strokeDasharray="5 3" />
+            <PulseBeacon cx={256} cy={109} color={emerald} />
             <text x={256} y={134} fill={emerald} fontSize={9} textAnchor="middle" fontFamily="JetBrains Mono">|x−2| RIGHT (+2)</text>
             <text x={102} y={134} fill={coral} fontSize={9} textAnchor="middle" fontFamily="JetBrains Mono">Trap: shifted LEFT</text>
           </g>
@@ -210,7 +264,7 @@ export function MisconceptionVisual({
       case 'exp-vs-linear':
         return (
           <g>
-            <line x1={28} y1={126} x2={332} y2={126} stroke="rgba(255,255,255,0.18)" />
+            <line x1={28} y1={126} x2={332} y2={126} stroke={axisStroke} />
             <path d={plot((x) => Math.pow(2, x), 0, 4, 0, 16)} fill="none" stroke={emerald} strokeWidth={2.3} />
             <path d={plot((x) => 2 * x + 1, 0, 4, 0, 16)} fill="none" stroke={coral} strokeWidth={2} strokeDasharray="5 3" />
             <text x={210} y={40} fill={emerald} fontSize={9.5} fontFamily="JetBrains Mono">2ˣ explodes to 16</text>
@@ -249,24 +303,26 @@ export function MisconceptionVisual({
       case 'inscribed-vs-central':
         return (
           <g>
-            <circle cx={180} cy={78} r={54} fill="none" stroke="rgba(255,255,255,0.2)" />
+            <circle cx={180} cy={78} r={54} fill="none" stroke="rgba(244,196,108,0.24)" />
             <line x1={180} y1={78} x2={228} y2={102} stroke={coral} strokeWidth={1.8} />
             <line x1={180} y1={78} x2={216} y2={38} stroke={coral} strokeWidth={1.8} />
             <line x1={128} y1={66} x2={228} y2={102} stroke={emerald} strokeWidth={1.8} />
             <line x1={128} y1={66} x2={216} y2={38} stroke={emerald} strokeWidth={1.8} />
+            <PulseBeacon cx={180} cy={78} color={coral} />
+            <PulseBeacon cx={128} cy={66} color={emerald} />
             <text x={242} y={76} fill={coral} fontSize={9.5} fontFamily="JetBrains Mono">Central 2θ = 80°</text>
-            <text x={32} y={72} fill={emerald} fontSize={9.5} fontFamily="JetBrains Mono">Inscribed θ = 40°</text>
+            <text x={26} y={72} fill={emerald} fontSize={9.5} fontFamily="JetBrains Mono">Inscribed θ = 40°</text>
           </g>
         );
 
       case 'poly-divide-zero':
         return (
           <g>
-            <line x1={24} y1={84} x2={336} y2={84} stroke="rgba(255,255,255,0.22)" />
+            <line x1={24} y1={84} x2={336} y2={84} stroke={axisStroke} />
             <path d={plot((x) => 0.35 * (x * x * x - 4 * x), -2.6, 2.6, -3.5, 3.5)} fill="none" stroke={emerald} strokeWidth={2.2} />
             <circle cx={180} cy={84} r={7} fill={`${coral}33`} stroke={coral} strokeWidth={2} />
-            <circle cx={104} cy={84} r={4.2} fill={emerald} />
-            <circle cx={256} cy={84} r={4.2} fill={emerald} />
+            <PulseBeacon cx={104} cy={84} color={emerald} />
+            <PulseBeacon cx={256} cy={84} color={emerald} />
             <text x={180} y={114} fill={coral} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">Dividing by x erases x = 0!</text>
           </g>
         );
@@ -274,7 +330,7 @@ export function MisconceptionVisual({
       case 'trig-double-vs-amp':
         return (
           <g>
-            <line x1={24} y1={78} x2={336} y2={78} stroke="rgba(255,255,255,0.2)" />
+            <line x1={24} y1={78} x2={336} y2={78} stroke={axisStroke} />
             <path d={plot((x) => Math.sin(2 * x), 0, 6.28, -2.3, 2.3)} fill="none" stroke={emerald} strokeWidth={2.2} />
             <path d={plot((x) => 2 * Math.sin(x), 0, 6.28, -2.3, 2.3)} fill="none" stroke={coral} strokeWidth={1.9} strokeDasharray="5 3" />
             <text x={228} y={32} fill={coral} fontSize={9} fontFamily="JetBrains Mono">2·sin(x): taller</text>
@@ -287,14 +343,14 @@ export function MisconceptionVisual({
           <g>
             <polygon points="74,116 202,116 254,42" fill={`${emerald}1A`} stroke={emerald} strokeWidth={2} />
             <polygon points="74,116 202,116 202,42" fill="none" stroke={coral} strokeDasharray="4 3" strokeWidth={1.6} />
-            <text x={140} y={134} fill={emerald} fontSize={9} textAnchor="middle" fontFamily="JetBrains Mono">Obtuse C &gt; 90° → −2ab cos C ADDS length!</text>
+            <text x={180} y={134} fill={emerald} fontSize={9} textAnchor="middle" fontFamily="JetBrains Mono">Obtuse C &gt; 90° → −2ab cos C ADDS length!</text>
           </g>
         );
 
       case 'series-diverge-r1':
         return (
           <g>
-            <line x1={24} y1={126} x2={336} y2={126} stroke="rgba(255,255,255,0.2)" />
+            <line x1={24} y1={126} x2={336} y2={126} stroke={axisStroke} />
             <path d={plot((x) => 2 * (1 - Math.pow(0.5, x)), 0, 6, 0, 4.5)} fill="none" stroke={emerald} strokeWidth={2.3} />
             <path d={plot((x) => 0.45 * Math.pow(1.45, x), 0, 6, 0, 4.5)} fill="none" stroke={coral} strokeWidth={2} strokeDasharray="5 3" />
             <line x1={24} y1={72} x2={336} y2={72} stroke={gold} strokeDasharray="3 3" strokeWidth={1.2} />
@@ -306,10 +362,10 @@ export function MisconceptionVisual({
       case 'limit-hole-vs-value':
         return (
           <g>
-            <line x1={24} y1={124} x2={336} y2={124} stroke="rgba(255,255,255,0.18)" />
+            <line x1={24} y1={124} x2={336} y2={124} stroke={axisStroke} />
             <path d={plot((x) => 0.7 * x + 1.2, -1, 4, 0, 4.5)} fill="none" stroke={emerald} strokeWidth={2.2} />
-            <circle cx={196} cy={68} r={5.5} fill="#050811" stroke={emerald} strokeWidth={2.2} />
-            <circle cx={196} cy={108} r={4.5} fill={coral} />
+            <circle cx={196} cy={68} r={5.5} fill="#06070B" stroke={emerald} strokeWidth={2.2} />
+            <PulseBeacon cx={196} cy={108} color={coral} />
             <text x={208} y={68} fill={emerald} fontSize={9.5} fontFamily="JetBrains Mono">Limit L exists (open hole)</text>
             <text x={208} y={112} fill={coral} fontSize={9.5} fontFamily="JetBrains Mono">Point jump f(a) ≠ L</text>
           </g>
@@ -318,10 +374,11 @@ export function MisconceptionVisual({
       case 'radical-extraneous-branch':
         return (
           <g>
-            <line x1={24} y1={90} x2={336} y2={90} stroke="rgba(255,255,255,0.2)" />
-            <line x1={88} y1={16} x2={88} y2={140} stroke="rgba(255,255,255,0.2)" />
+            <line x1={24} y1={90} x2={336} y2={90} stroke={axisStroke} />
+            <line x1={88} y1={16} x2={88} y2={140} stroke={axisStroke} />
             <path d={plot((x) => (x >= -1 ? Math.sqrt(x + 1) : null), -2, 5, -2.5, 3)} fill="none" stroke={emerald} strokeWidth={2.3} />
             <path d={plot((x) => (x >= -1 ? -Math.sqrt(x + 1) : null), -2, 5, -2.5, 3)} fill="none" stroke={coral} strokeWidth={1.8} strokeDasharray="4 3" />
+            <PulseBeacon cx={132} cy={90} color={starGold} />
             <text x={200} y={42} fill={emerald} fontSize={9.5} fontFamily="JetBrains Mono">+√(x+1) principal branch</text>
             <text x={182} y={132} fill={coral} fontSize={9} fontFamily="JetBrains Mono">Ghost −√ branch (extraneous!)</text>
           </g>
@@ -330,7 +387,7 @@ export function MisconceptionVisual({
       case 'rational-cancel-sum':
         return (
           <g>
-            <line x1={24} y1={122} x2={336} y2={122} stroke="rgba(255,255,255,0.2)" />
+            <line x1={24} y1={122} x2={336} y2={122} stroke={axisStroke} />
             <path d={plot((x) => (x > 0.4 ? 1 + 5 / x : null), 0, 8, 0, 8)} fill="none" stroke={emerald} strokeWidth={2.3} />
             <path d={plot(() => 6, 0, 8, 0, 8)} fill="none" stroke={coral} strokeWidth={2} strokeDasharray="5 3" />
             <text x={208} y={48} fill={coral} fontSize={9.5} fontFamily="JetBrains Mono">FALSE constant y = 6</text>
@@ -346,8 +403,8 @@ export function MisconceptionVisual({
             <line x1={120} y1={18} x2={228} y2={140} stroke={gold} strokeWidth={2} />
             <path d="M150,52 A20,20 0 0,1 163,66" fill={`${emerald}33`} stroke={emerald} strokeWidth={1.7} />
             <path d="M198,108 A20,20 0 0,0 185,94" fill={`${coral}33`} stroke={coral} strokeWidth={1.7} />
-            <text x={240} y={44} fill={emerald} fontSize={9} fontFamily="JetBrains Mono">Same-side interior:</text>
-            <text x={240} y={58} fill={gold} fontSize={9} fontFamily="JetBrains Mono">α + β = 180° (NOT α=β)</text>
+            <text x={235} y={44} fill={emerald} fontSize={9} fontFamily="JetBrains Mono">Same-side interior:</text>
+            <text x={235} y={58} fill={starGold} fontSize={9} fontFamily="JetBrains Mono">α + β = 180° (NOT α=β)</text>
           </g>
         );
 
@@ -357,6 +414,7 @@ export function MisconceptionVisual({
             <line x1={62} y1={116} x2={200} y2={116} stroke={coral} strokeWidth={2.2} strokeDasharray="4 3" />
             <line x1={200} y1={116} x2={252} y2={42} stroke={coral} strokeWidth={2.2} strokeDasharray="4 3" />
             <line x1={62} y1={116} x2={252} y2={42} stroke={emerald} strokeWidth={2.5} />
+            <PulseBeacon cx={252} cy={42} color={emerald} />
             <text x={118} y={66} fill={emerald} fontSize={9.5} fontFamily="JetBrains Mono">‖u+v‖ ≤ ‖u‖ + ‖v‖</text>
             <text x={180} y={134} fill={coral} fontSize={9} fontFamily="JetBrains Mono">Detour ‖u‖ + ‖v‖ is longer</text>
           </g>
@@ -378,23 +436,24 @@ export function MisconceptionVisual({
           <g>
             <polygon points="36,118 320,38 320,18 36,18" fill={`${emerald}22`} />
             <line x1={36} y1={118} x2={320} y2={38} stroke={emerald} strokeWidth={2.2} strokeDasharray="6 4" />
-            <circle cx={180} cy={78} r={5.5} fill="#050811" stroke={coral} strokeWidth={2} />
+            <circle cx={180} cy={78} r={5.5} fill="#06070B" stroke={coral} strokeWidth={2} />
             <text x={194} y={88} fill={coral} fontSize={9.5} fontFamily="JetBrains Mono">Strict &gt; excludes boundary line!</text>
           </g>
         );
 
       default: {
-        // Universal high-clarity diverging TRUE vs FALSE curve proof
         const trueCurve = plot((x) => 0.36 * x * x + 0.55 * x + 0.3, -3, 3.2, -2, 5);
         const falseCurve = plot((x) => 0.36 * x * x - 0.85, -3, 3.2, -2, 5);
         return (
           <g>
-            <line x1={24} y1={116} x2={336} y2={116} stroke="rgba(255,255,255,0.18)" />
-            <line x1={180} y1={16} x2={180} y2={136} stroke="rgba(255,255,255,0.18)" />
+            <line x1={24} y1={116} x2={336} y2={116} stroke={axisStroke} />
+            <line x1={180} y1={16} x2={180} y2={136} stroke={axisStroke} />
             <path d={trueCurve} fill="none" stroke={emerald} strokeWidth={2.3} />
             <path d={falseCurve} fill="none" stroke={coral} strokeWidth={2.1} strokeDasharray="5 3" />
             <line x1={264} y1={42} x2={264} y2={84} stroke={gold} strokeWidth={1.8} />
-            <text x={270} y={66} fill={gold} fontSize={9.5} fontFamily="JetBrains Mono">Δ Gap</text>
+            <PulseBeacon cx={264} cy={42} color={emerald} />
+            <PulseBeacon cx={264} cy={84} color={coral} />
+            <text x={272} y={66} fill={starGold} fontSize={9.5} fontFamily="JetBrains Mono">Δ Gap</text>
             <text x={36} y={32} fill={emerald} fontSize={9} fontFamily="JetBrains Mono">TRUE LAW</text>
             <text x={36} y={46} fill={coral} fontSize={9} fontFamily="JetBrains Mono">FALLACY</text>
           </g>
@@ -404,23 +463,23 @@ export function MisconceptionVisual({
   };
 
   return (
-    <div className="rounded-xl bg-[#050811] border border-white/[0.09] overflow-hidden">
-      <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2 border-b border-white/[0.07] bg-white/[0.02]">
-        <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#F4F3EE]">
+    <div className="rounded-xl bg-[#06070B] border border-[rgba(244,196,108,0.17)] overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2 border-b border-[rgba(244,196,108,0.14)] bg-[#0B0C12]">
+        <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#F7F4EC]">
           Geometric Discrepancy Proof
         </span>
         <div className="flex flex-wrap items-center gap-3 font-mono-data text-[10px]">
-          <span className="flex items-center gap-1 text-[#FF7A5C]">
-            <span className="w-2.5 h-0.5 bg-[#FF7A5C] inline-block" /> {falseLabel}
+          <span className="flex items-center gap-1 text-[#FF8563]">
+            <span className="w-2.5 h-0.5 bg-[#FF8563] inline-block" /> {falseLabel}
           </span>
-          <span className="flex items-center gap-1 text-[#36EBA8]">
-            <span className="w-2.5 h-0.5 bg-[#36EBA8] inline-block" /> {trueLabel}
+          <span className="flex items-center gap-1 text-[#45E6A6]">
+            <span className="w-2.5 h-0.5 bg-[#45E6A6] inline-block" /> {trueLabel}
           </span>
           <button
             type="button"
             onClick={() => setLocalReplay((n) => n + 1)}
             aria-label="Replay misconception proof animation"
-            className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white/[0.05] border border-white/10 text-[#A5B4CC] hover:text-[#F4F3EE] hover:border-white/25 transition-colors"
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#11131C] border border-[rgba(244,196,108,0.2)] text-[#A8B2C6] hover:text-[#FFE29E] hover:border-[#F4C46C]/50 transition-colors"
           >
             <RotateCcw className="w-2.5 h-2.5" /> Replay Proof
           </button>
@@ -429,8 +488,12 @@ export function MisconceptionVisual({
       <svg viewBox={`0 0 ${MW} ${MH}`} className="w-full h-[155px]" role="img" aria-label="Visual misconception comparison">
         <defs>
           <pattern id={gridId} width="24" height="24" patternUnits="userSpaceOnUse">
-            <path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+            <path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(244, 196, 108, 0.055)" strokeWidth="1" />
           </pattern>
+          <radialGradient id={glowId} cx="50%" cy="50%" r="65%">
+            <stop offset="0%" stopColor="rgba(244, 196, 108, 0.07)" />
+            <stop offset="100%" stopColor="rgba(6, 7, 11, 0)" />
+          </radialGradient>
           <clipPath id={clipId}>
             <motion.rect
               key={`clip-${localReplay}`}
@@ -443,6 +506,7 @@ export function MisconceptionVisual({
             />
           </clipPath>
         </defs>
+        <rect x={0} y={0} width={MW} height={MH} fill={`url(#${glowId})`} />
         <rect x={0} y={0} width={MW} height={MH} fill={`url(#${gridId})`} />
         <motion.g
           key={localReplay}
@@ -484,7 +548,7 @@ export function ApplicationVisual({ kind, accent, domainTag }: ApplicationVisual
         <span className="font-mono-data text-[10px] uppercase tracking-widest" style={{ color: accent }}>
           Applied Telemetry Schematic
         </span>
-        <span className="font-mono-data text-[10px] text-[#6F7F99]">{domainTag}</span>
+        <span className="font-mono-data text-[10px] text-[#A8B2C6]">{domainTag}</span>
       </div>
       <EquationMiniVisual kind={kind} accent={accent} heightClass="h-[168px]" caption={domainTag} />
     </div>

@@ -43,7 +43,7 @@ const TEMPLATES: Record<string, { label: string; rows: GradeCategory[] }> = {
   },
 };
 
-const SEGMENT_COLORS = ['#F5BC5E', '#38D9FF', '#36EBA8', '#FF7A5C', '#A78BFA', '#FB923C'];
+const SEGMENT_COLORS = ['#F5C25B', '#46D6E8', '#45E6A6', '#FF8563', '#FFE29E', '#B88938'];
 
 export function GradePlannerPage() {
   const [selectedCourse, setSelectedCourse] = useState<CourseId>('algebra-1');
@@ -114,46 +114,44 @@ export function GradePlannerPage() {
     if (stats.requiredFinal === null) {
       return {
         label: 'No Final Category Marked',
-        color: '#A5B4CC',
+        color: '#A8B2C6',
         note: 'Toggle one category as Final Slot to simulate required exam score.',
       };
     }
     if (stats.requiredFinal <= 0) {
       return {
         label: 'Target Locked Even at 0%',
-        color: '#36EBA8',
+        color: '#45E6A6',
         note: 'Prior earned points already guarantee your target score.',
       };
     }
     if (stats.requiredFinal <= 85) {
       return {
         label: 'Comfortably Achievable',
-        color: '#36EBA8',
+        color: '#45E6A6',
         note: 'Maintain steady review to hit or beat this benchmark.',
       };
     }
     if (stats.requiredFinal <= 100) {
       return {
         label: 'High-Focus Stretch Target',
-        color: '#F5BC5E',
+        color: '#F4C46C',
         note: 'Requires dedicated mastery or raising current coursework before finals.',
       };
     }
     return {
       label: 'Exceeds 100% — Raise Pre-Final Averages',
-      color: '#FF7A5C',
+      color: '#FF8563',
       note: 'Raise current coursework scores or adjust syllabus target.',
     };
   })();
 
-  // Radial gauge arc geometry
   const gaugePct =
     stats.requiredFinal === null ? 0 : Math.max(0, Math.min(100, stats.requiredFinal));
   const arcR = 58;
-  const arcC = Math.PI * arcR; // semicircle length
+  const arcC = Math.PI * arcR;
   const arcDash = (gaugePct / 100) * arcC;
 
-  // Linear sensitivity plot coordinates (F in [0..100], G in [50..105])
   const mapF = (f: number) => 28 + (f / 100) * 260;
   const mapG = (g: number) => 122 - ((Math.max(45, Math.min(105, g)) - 45) / 60) * 102;
   const gAt0 = stats.earnedPreFinal;
@@ -164,10 +162,10 @@ export function GradePlannerPage() {
   return (
     <AtlasShell activeCourse={selectedCourse}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
-        <header className="border-b hairline-rule pb-6 space-y-4">
+        <header className="instrument-frame fiducial-frame p-6 sm:p-7 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-[#F5BC5E]/45 bg-[#F5BC5E]/10 text-[11px] font-mono-data text-[#F5BC5E]">
-              <Info className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-[#F4C46C]/45 bg-[#F4C46C]/10 text-[11px] font-mono-data text-[#FFE29E]">
+              <Info className="w-3.5 h-3.5 text-[#F4C46C]" />
               Custom User Weights (Editable — Match Your Syllabus)
             </div>
 
@@ -182,15 +180,15 @@ export function GradePlannerPage() {
                     onClick={() => setSelectedCourse(cid)}
                     className={`px-3.5 py-1 rounded-full text-xs font-mono-data border transition-all ${
                       active
-                        ? 'text-[#03050A] font-semibold'
-                        : 'bg-[#090E18] text-[#A5B4CC] border-white/12 hover:text-[#F4F3EE]'
+                        ? 'text-[#060609] font-semibold'
+                        : 'bg-[#0B0C12] text-[#A8B2C6] border-[#F4C46C]/20 hover:text-[#F7F4EC] hover:border-[#F4C46C]/45'
                     }`}
                     style={
                       active
                         ? {
                             backgroundColor: c.accent,
                             borderColor: c.accent,
-                            boxShadow: `0 0 16px -4px ${c.accent}`,
+                            boxShadow: `0 0 18px -4px ${c.accent}`,
                           }
                         : undefined
                     }
@@ -203,12 +201,12 @@ export function GradePlannerPage() {
           </div>
 
           <div className="max-w-3xl space-y-2">
-            <h1 className="font-serif-editorial text-4xl sm:text-5xl text-[#F4F3EE]">
+            <h1 className="font-serif-editorial text-4xl sm:text-5xl text-[#F7F4EC]">
               Syllabus Grade Planner &amp; Linear Sensitivity Observatory
             </h1>
-            <p className="text-sm text-[#A5B4CC] leading-relaxed">
+            <p className="text-sm text-[#A8B2C6] leading-relaxed">
               Enter your teacher&apos;s exact category percentages below — clearly marked as{' '}
-              <strong className="text-[#F4F3EE]">user-editable custom weights</strong> — and watch
+              <strong className="text-[#FFE29E]">user-editable custom weights</strong> — and watch
               your linear weighted-average line <MathTex tex="G(F) = E + w_{\text{final}}F" /> solve{' '}
               <em>&ldquo;What score do I need on the final?&rdquo;</em> in real time.
             </p>
@@ -221,7 +219,7 @@ export function GradePlannerPage() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <Scale className="w-4 h-4" style={{ color: course.accent }} />
-                <h2 className="font-serif-editorial text-2xl text-[#F4F3EE]">
+                <h2 className="font-serif-editorial text-2xl text-[#F7F4EC]">
                   Syllabus Category Weights
                 </h2>
               </div>
@@ -232,7 +230,7 @@ export function GradePlannerPage() {
                     key={key}
                     type="button"
                     onClick={() => setRows(tpl.rows.map((r) => ({ ...r })))}
-                    className="px-3 py-1 rounded-full text-[11px] font-mono-data bg-[#090E18] border border-white/12 text-[#A5B4CC] hover:text-[#F4F3EE]"
+                    className="px-3 py-1 rounded-full text-[11px] font-mono-data bg-[#0B0C12] border border-[#F4C46C]/20 text-[#A8B2C6] hover:text-[#FFE29E] hover:border-[#F4C46C]/45 transition-colors"
                   >
                     {tpl.label}
                   </button>
@@ -242,7 +240,7 @@ export function GradePlannerPage() {
 
             {/* Visual Stacked Syllabus Weight Bar */}
             <div className="space-y-2">
-              <div className="h-3 w-full rounded-full bg-[#060A13] border border-white/10 overflow-hidden flex">
+              <div className="h-3 w-full rounded-full bg-[#060609] border border-[#F4C46C]/20 overflow-hidden flex">
                 {rows.map((row, i) => {
                   const pct =
                     stats.totalWeight > 0 ? (Math.max(0, row.weight) / stats.totalWeight) * 100 : 0;
@@ -254,12 +252,12 @@ export function GradePlannerPage() {
                         backgroundColor: SEGMENT_COLORS[i % SEGMENT_COLORS.length],
                       }}
                       title={`${row.name}: ${row.weight}%`}
-                      className="h-full transition-all duration-300 border-r border-[#050811]/60"
+                      className="h-full transition-all duration-300 border-r border-[#060609]/60"
                     />
                   );
                 })}
               </div>
-              <div className="flex flex-wrap gap-3 font-mono-data text-[10px] text-[#A5B4CC]">
+              <div className="flex flex-wrap gap-3 font-mono-data text-[10px] text-[#A8B2C6]">
                 {rows.map((row, i) => (
                   <span key={row.id} className="inline-flex items-center gap-1.5">
                     <span
@@ -279,7 +277,7 @@ export function GradePlannerPage() {
                   className="instrument-panel p-3.5 grid grid-cols-1 sm:grid-cols-12 gap-3 items-center"
                 >
                   <div className="sm:col-span-5">
-                    <label className="flex items-center gap-1.5 font-mono-data text-[9px] uppercase text-[#6F7F99] mb-1">
+                    <label className="flex items-center gap-1.5 font-mono-data text-[9px] uppercase text-[#727D94] mb-1">
                       <span
                         className="w-2 h-2 rounded-full"
                         style={{ backgroundColor: SEGMENT_COLORS[i % SEGMENT_COLORS.length] }}
@@ -290,12 +288,12 @@ export function GradePlannerPage() {
                       type="text"
                       value={row.name}
                       onChange={(e) => updateRow(row.id, { name: e.target.value })}
-                      className="w-full px-3 py-1.5 rounded-lg bg-[#050811] border border-white/12 text-xs text-[#F4F3EE]"
+                      className="w-full px-3 py-1.5 rounded-lg bg-[#060609] border border-[#F4C46C]/20 text-xs text-[#F7F4EC] focus:border-[#F4C46C]"
                     />
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block font-mono-data text-[9px] uppercase text-[#6F7F99] mb-1">
+                    <label className="block font-mono-data text-[9px] uppercase text-[#727D94] mb-1">
                       Weight %
                     </label>
                     <input
@@ -304,12 +302,12 @@ export function GradePlannerPage() {
                       max={100}
                       value={row.weight}
                       onChange={(e) => updateRow(row.id, { weight: Number(e.target.value) })}
-                      className="w-full px-2.5 py-1.5 rounded-lg bg-[#050811] border border-white/12 text-xs font-mono-data text-[#F4F3EE]"
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-[#060609] border border-[#F4C46C]/20 text-xs font-mono-data text-[#F7F4EC] focus:border-[#F4C46C]"
                     />
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block font-mono-data text-[9px] uppercase text-[#6F7F99] mb-1">
+                    <label className="block font-mono-data text-[9px] uppercase text-[#727D94] mb-1">
                       Current %
                     </label>
                     <input
@@ -318,7 +316,7 @@ export function GradePlannerPage() {
                       max={110}
                       value={row.score}
                       onChange={(e) => updateRow(row.id, { score: Number(e.target.value) })}
-                      className="w-full px-2.5 py-1.5 rounded-lg bg-[#050811] border border-white/12 text-xs font-mono-data text-[#F4F3EE]"
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-[#060609] border border-[#F4C46C]/20 text-xs font-mono-data text-[#F7F4EC] focus:border-[#F4C46C]"
                     />
                   </div>
 
@@ -328,8 +326,8 @@ export function GradePlannerPage() {
                       onClick={() => updateRow(row.id, { isFinal: !row.isFinal })}
                       className={`px-2.5 py-1 rounded-full text-[10px] font-mono-data border transition-all ${
                         row.isFinal
-                          ? 'bg-[#38D9FF]/18 text-[#38D9FF] border-[#38D9FF]/55'
-                          : 'text-[#6F7F99] border-white/12 hover:text-[#F4F3EE]'
+                          ? 'bg-[#46D6E8]/18 text-[#46D6E8] border-[#46D6E8]/55'
+                          : 'text-[#727D94] border-[#F4C46C]/20 hover:text-[#F7F4EC]'
                       }`}
                     >
                       {row.isFinal ? 'Final Slot' : 'Term Work'}
@@ -338,7 +336,7 @@ export function GradePlannerPage() {
                       type="button"
                       onClick={() => removeCategory(row.id)}
                       aria-label={`Remove ${row.name}`}
-                      className="p-1.5 rounded-lg text-[#6F7F99] hover:text-[#FF7A5C]"
+                      className="p-1.5 rounded-lg text-[#727D94] hover:text-[#FF8563] transition-colors"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -351,17 +349,17 @@ export function GradePlannerPage() {
               <button
                 type="button"
                 onClick={addCategory}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono-data border border-white/15 text-[#F4F3EE] hover:border-[#38D9FF]"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono-data border border-[#F4C46C]/30 bg-[#0B0C12] text-[#F7F4EC] hover:border-[#F4C46C]/60 transition-colors"
               >
-                <Plus className="w-3.5 h-3.5" /> Add Category
+                <Plus className="w-3.5 h-3.5 text-[#F4C46C]" /> Add Category
               </button>
 
               <div className="flex items-center gap-3">
                 <span
-                  className={`font-mono-data text-xs px-3 py-1 rounded-full ${
+                  className={`font-mono-data text-xs px-3 py-1 rounded-full border ${
                     stats.totalWeight === 100
-                      ? 'bg-[#36EBA8]/15 text-[#36EBA8]'
-                      : 'bg-[#FF7A5C]/15 text-[#FF7A5C]'
+                      ? 'bg-[#45E6A6]/15 border-[#45E6A6]/40 text-[#45E6A6]'
+                      : 'bg-[#FF8563]/15 border-[#FF8563]/40 text-[#FF8563]'
                   }`}
                 >
                   Total Weight: {stats.totalWeight}%
@@ -370,7 +368,7 @@ export function GradePlannerPage() {
                   <button
                     type="button"
                     onClick={normalizeWeights}
-                    className="px-3 py-1 rounded-full text-xs font-mono-data bg-[#F5BC5E] text-[#03050A] font-semibold"
+                    className="px-3 py-1 rounded-full text-xs font-mono-data bg-gradient-to-r from-[#F4C46C] to-[#FFE29E] text-[#060609] font-semibold"
                   >
                     Normalize to 100%
                   </button>
@@ -384,7 +382,7 @@ export function GradePlannerPage() {
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <Calculator className="w-4 h-4" style={{ color: course.accent }} />
-                <h2 className="font-serif-editorial text-2xl text-[#F4F3EE]">
+                <h2 className="font-serif-editorial text-2xl text-[#F7F4EC]">
                   Final Exam Target Telemetry
                 </h2>
               </div>
@@ -401,12 +399,16 @@ export function GradePlannerPage() {
                     onClick={() => setTargetGrade(p.val)}
                     className={`py-2 rounded-full text-xs font-mono-data border transition-all ${
                       targetGrade === p.val
-                        ? 'text-[#03050A] font-semibold'
-                        : 'bg-[#090E18] text-[#A5B4CC] border-white/12'
+                        ? 'text-[#060609] font-semibold'
+                        : 'bg-[#0B0C12] text-[#A8B2C6] border-[#F4C46C]/20 hover:text-[#F7F4EC]'
                     }`}
                     style={
                       targetGrade === p.val
-                        ? { backgroundColor: course.accent, borderColor: course.accent }
+                        ? {
+                            backgroundColor: course.accent,
+                            borderColor: course.accent,
+                            boxShadow: `0 0 18px -5px ${course.accent}`,
+                          }
                         : undefined
                     }
                   >
@@ -416,7 +418,7 @@ export function GradePlannerPage() {
               </div>
 
               <label className="block space-y-1 text-xs">
-                <span className="flex justify-between font-mono-data text-[#A5B4CC]">
+                <span className="flex justify-between font-mono-data text-[#A8B2C6]">
                   <span>Custom Target Course Grade</span>
                   <span style={{ color: course.accent }}>{targetGrade}%</span>
                 </span>
@@ -438,7 +440,7 @@ export function GradePlannerPage() {
                   <path
                     d="M 22 80 A 58 58 0 0 1 138 80"
                     fill="none"
-                    stroke="rgba(255,255,255,0.1)"
+                    stroke="rgba(244, 196, 108, 0.14)"
                     strokeWidth="10"
                     strokeLinecap="round"
                   />
@@ -467,7 +469,7 @@ export function GradePlannerPage() {
                   <text
                     x="80"
                     y="84"
-                    fill="#6F7F99"
+                    fill="#727D94"
                     fontSize="7.5"
                     textAnchor="middle"
                     fontFamily="JetBrains Mono"
@@ -483,18 +485,17 @@ export function GradePlannerPage() {
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   {finalStatus.label}
                 </div>
-                <p className="text-xs text-[#A5B4CC] leading-relaxed">{finalStatus.note}</p>
+                <p className="text-xs text-[#A8B2C6] leading-relaxed">{finalStatus.note}</p>
               </div>
 
               {/* Live Linear Sensitivity Plot: G(F) vs Final Exam Score F */}
-              <div className="rounded-xl bg-[#050811] border border-white/[0.08] p-3 space-y-1.5">
-                <span className="font-mono-data text-[9.5px] uppercase tracking-wider text-[#6F7F99] block">
+              <div className="rounded-xl bg-[#060609] border border-[#F4C46C]/20 p-3 space-y-1.5">
+                <span className="font-mono-data text-[9.5px] uppercase tracking-wider text-[#727D94] block">
                   Linear Grade Projection · Course Grade G(F) vs Final Score F
                 </span>
                 <svg viewBox="0 0 308 138" className="w-full h-[132px]" role="img" aria-label="Grade sensitivity plot">
-                  <line x1="28" y1="122" x2="290" y2="122" stroke="rgba(255,255,255,0.2)" />
-                  <line x1="28" y1="16" x2="28" y2="122" stroke="rgba(255,255,255,0.2)" />
-                  {/* Target horizontal line */}
+                  <line x1="28" y1="122" x2="290" y2="122" stroke="rgba(244,196,108,0.22)" />
+                  <line x1="28" y1="16" x2="28" y2="122" stroke="rgba(244,196,108,0.22)" />
                   <line
                     x1="28"
                     y1={mapG(targetGrade)}
@@ -504,13 +505,12 @@ export function GradePlannerPage() {
                     strokeDasharray="4 3"
                     strokeWidth="1.2"
                   />
-                  {/* Projected grade line */}
                   <line
                     x1={mapF(0)}
                     y1={mapG(gAt0)}
                     x2={mapF(100)}
                     y2={mapG(gAt100)}
-                    stroke="#38D9FF"
+                    stroke="#46D6E8"
                     strokeWidth="2.4"
                   />
                   {reqClamped !== null && (
@@ -529,7 +529,7 @@ export function GradePlannerPage() {
                         cy={mapG(targetGrade)}
                         r="5"
                         fill={finalStatus.color}
-                        stroke="#050811"
+                        stroke="#060609"
                         strokeWidth="1.5"
                       />
                     </g>
@@ -537,8 +537,8 @@ export function GradePlannerPage() {
                   <text x="32" y={mapG(targetGrade) - 5} fill={course.accent} fontSize="8.5" fontFamily="JetBrains Mono">
                     Target {targetGrade}%
                   </text>
-                  <text x="28" y="134" fill="#6F7F99" fontSize="8" fontFamily="JetBrains Mono">0% Final</text>
-                  <text x="288" y="134" fill="#6F7F99" fontSize="8" textAnchor="end" fontFamily="JetBrains Mono">100% Final</text>
+                  <text x="28" y="134" fill="#727D94" fontSize="8" fontFamily="JetBrains Mono">0% Final</text>
+                  <text x="288" y="134" fill="#727D94" fontSize="8" textAnchor="end" fontFamily="JetBrains Mono">100% Final</text>
                 </svg>
               </div>
             </div>
@@ -546,7 +546,7 @@ export function GradePlannerPage() {
             <div className="pt-3 border-t hairline-rule overflow-x-auto">
               <MathTex
                 tex="F_{\text{req}} = \dfrac{G_{\text{target}} - \sum w_i s_i}{w_{\text{final}}}"
-                className="text-xs text-[#A5B4CC]"
+                className="text-xs text-[#A8B2C6]"
               />
             </div>
           </div>

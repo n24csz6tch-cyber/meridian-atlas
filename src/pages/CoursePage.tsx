@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowRight, Compass, ExternalLink, Network, Sparkles } from 'lucide-react';
+import { ArrowRight, BookOpen, Compass, ExternalLink, Network, Orbit, Sparkles } from 'lucide-react';
 import { AtlasShell } from '../components/AtlasShell';
 import { MathTex } from '../components/MathTex';
 import { COURSES, CURRICULUM_NODES } from '../data/curriculumGraph';
@@ -83,7 +83,8 @@ export function CoursePage() {
   return (
     <AtlasShell activeCourse={cid}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-12">
-        <header className="border-b hairline-rule pb-6 space-y-4">
+        {/* Course Observatory Header */}
+        <header className="instrument-frame fiducial-frame p-6 sm:p-8 space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span
               className="px-3.5 py-1 rounded-full text-xs font-mono-data border"
@@ -93,41 +94,95 @@ export function CoursePage() {
                 backgroundColor: `${course.accent}16`,
               }}
             >
-              {course.shortTitle} · CPALMS Course {course.cpalmsCode} · Complete {nodes.length}-Unit Curriculum
+              {course.shortTitle} · CPALMS Course {course.cpalmsCode} · {nodes.length}-Unit Curriculum
             </span>
             <a
               href={course.cpalmsUrl}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-mono-data text-[#A5B4CC] hover:text-[#F4F3EE]"
+              className="inline-flex items-center gap-1.5 text-xs font-mono-data text-[#A8B2C6] hover:text-[#FFE29E] transition-colors"
             >
               Official CPALMS Description <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
 
-          <div className="max-w-3xl space-y-2">
-            <h1 className="font-serif-editorial text-4xl sm:text-5xl text-[#F4F3EE]">
-              {course.title}
-            </h1>
-            <p className="text-sm sm:text-base text-[#A5B4CC] leading-relaxed">
-              {course.description} Spectral signature:{' '}
-              <strong className="text-[#F4F3EE]">{course.lightName}</strong>.
-            </p>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
+            <div className="lg:col-span-7 space-y-2.5">
+              <h1 className="font-serif-editorial text-4xl sm:text-5xl text-[#F7F4EC] leading-tight">
+                {course.title}
+              </h1>
+              <p className="text-sm sm:text-base text-[#A8B2C6] leading-relaxed">
+                {course.description} Spectral telemetry:{' '}
+                <strong className="text-[#FFE29E]">{course.lightName}</strong>.
+              </p>
+            </div>
+
+            {/* Prominent Cross-Hub Portals: Florida B.E.S.T. Textbook Hub & String Theory 3D Frontier */}
+            <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Link
+                to="/textbook"
+                className="instrument-panel p-4 flex flex-col justify-between gap-2 border-[#F4C46C]/30 hover:border-[#F4C46C]/65 transition-all group"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono-data text-[10px] uppercase tracking-widest text-[#F4C46C]">
+                    28-Chapter Guide
+                  </span>
+                  <BookOpen className="w-4 h-4 text-[#FFE29E] group-hover:scale-110 transition-transform" />
+                </div>
+                <div>
+                  <p className="font-serif-editorial text-lg text-[#F7F4EC]">
+                    Florida B.E.S.T. Textbook Hub
+                  </p>
+                  <p className="text-[11px] text-[#A8B2C6]">
+                    EOC benchmarks, worked proofs &amp; MTR habits
+                  </p>
+                </div>
+              </Link>
+
+              <Link
+                to="/frontier"
+                className="instrument-panel p-4 flex flex-col justify-between gap-2 border-[#F4C46C]/30 hover:border-[#FFE29E]/70 transition-all group"
+                style={{
+                  background:
+                    'linear-gradient(155deg, rgba(244, 196, 108, 0.12), rgba(11, 12, 18, 0.96))',
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono-data text-[10px] uppercase tracking-widest text-[#FFE29E]">
+                    Higher Math Bridge
+                  </span>
+                  <Orbit className="w-4 h-4 text-[#F4C46C] group-hover:rotate-45 transition-transform" />
+                </div>
+                <div>
+                  <p className="font-serif-editorial text-lg text-[#F7F4EC]">
+                    String Theory 3D Frontier
+                  </p>
+                  <p className="text-[11px] text-[#A8B2C6]">
+                    See how {course.shortTitle} scales to Calabi-Yau 3D
+                  </p>
+                </div>
+              </Link>
+            </div>
           </div>
         </header>
 
         {/* Complete 9-Unit Visual Course Curriculum */}
         <section className="space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F4F3EE]">
-              All {nodes.length} Full-Year 7-Layer Visual Lessons
-            </h2>
+            <div>
+              <span className="font-mono-data text-[10.5px] uppercase tracking-[0.2em] text-[#F4C46C] block">
+                7-Layer Interactive Curriculum
+              </span>
+              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
+                All {nodes.length} Full-Year Visual Modules
+              </h2>
+            </div>
             <Link
               to="/map"
-              className="inline-flex items-center gap-1.5 text-xs font-mono-data hover:underline"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono-data border border-[#F4C46C]/30 bg-[#0B0C12] hover:border-[#F4C46C]/60 transition-colors"
               style={{ color: course.accent }}
             >
-              <Compass className="w-3.5 h-3.5" /> Explore on 36-Symbol Neural Atlas
+              <Compass className="w-3.5 h-3.5" /> Explore on 36-Node Constellation
             </Link>
           </div>
 
@@ -142,7 +197,7 @@ export function CoursePage() {
                 <div
                   key={node.id}
                   className="instrument-frame p-4 sm:p-5 flex flex-col justify-between gap-4"
-                  style={{ borderColor: `${course.accent}3E` }}
+                  style={{ borderColor: `${course.accent}36` }}
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-2">
@@ -157,26 +212,28 @@ export function CoursePage() {
                         >
                           {node.symbol}
                         </span>
-                        <span className="font-mono-data text-xs text-[#A5B4CC]">{node.code}</span>
+                        <span className="font-mono-data text-xs text-[#A8B2C6]">{node.code}</span>
                       </div>
-                      <span className="font-mono-data text-[10px] px-2 py-0.5 rounded-full uppercase bg-[#36EBA8]/15 text-[#36EBA8]">
+                      <span className="font-mono-data text-[10px] px-2.5 py-0.5 rounded-full uppercase border border-[#45E6A6]/35 bg-[#45E6A6]/12 text-[#45E6A6]">
                         7 Layers Live
                       </span>
                     </div>
 
-                    <EquationMiniVisual
-                      kind={visualKind}
-                      accent={course.accent}
-                      heightClass="h-[108px]"
-                    />
-
-                    <div>
-                      <h3 className="font-serif-editorial text-xl text-[#F4F3EE]">{node.title}</h3>
-                      <p className="text-xs text-[#A5B4CC] leading-relaxed mt-1">{node.summary}</p>
+                    <div aria-label={`${node.title} geometric preview`}>
+                      <EquationMiniVisual
+                        kind={visualKind}
+                        accent={course.accent}
+                        heightClass="h-[108px]"
+                      />
                     </div>
 
-                    <div className="instrument-panel px-2.5 py-1.5 overflow-x-auto">
-                      <MathTex tex={node.formulaTex} className="text-xs text-[#F4F3EE]" />
+                    <div>
+                      <h3 className="font-serif-editorial text-xl text-[#F7F4EC]">{node.title}</h3>
+                      <p className="text-xs text-[#A8B2C6] leading-relaxed mt-1">{node.summary}</p>
+                    </div>
+
+                    <div className="instrument-panel px-3 py-2 overflow-x-auto">
+                      <MathTex tex={node.formulaTex} className="text-xs text-[#F7F4EC]" />
                     </div>
 
                     <div className="flex flex-wrap gap-1.5">
@@ -188,7 +245,7 @@ export function CoursePage() {
                             href={std?.sourceUrl ?? course.cpalmsUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="px-2 py-0.5 rounded-full text-[10px] font-mono-data bg-[#060A14] border border-white/10 text-[#A5B4CC] hover:text-[#F4F3EE]"
+                            className="px-2 py-0.5 rounded-full text-[10px] font-mono-data bg-[#060609] border border-[#F4C46C]/20 text-[#A8B2C6] hover:text-[#FFE29E] hover:border-[#F4C46C]/45 transition-colors"
                           >
                             {code}
                           </a>
@@ -199,8 +256,10 @@ export function CoursePage() {
 
                   <Link
                     to={node.route}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold text-[#03050A] hover:brightness-110 transition-all"
-                    style={{ backgroundColor: course.accent }}
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold text-[#060609] hover:brightness-110 transition-all shadow-[0_0_22px_-8px_rgba(244,196,108,0.55)]"
+                    style={{
+                      background: `linear-gradient(135deg, ${course.accent}, #FFE29E)`,
+                    }}
                   >
                     <Sparkles className="w-3.5 h-3.5" />
                     Open Visual 7-Layer Lesson
@@ -222,7 +281,7 @@ export function CoursePage() {
               >
                 60fps Interactive Concept Animators ({topicTabs.length} Engines)
               </span>
-              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F4F3EE]">
+              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
                 Live Visual Laboratories for {course.title}
               </h2>
             </div>
@@ -237,12 +296,16 @@ export function CoursePage() {
                     onClick={() => setSelectedTopicTab(tab.id)}
                     className={`px-3 py-1.5 rounded-full text-[11px] font-mono-data border transition-all ${
                       active
-                        ? 'text-[#03050A] font-semibold'
-                        : 'bg-[#090E18] text-[#A5B4CC] border-white/12 hover:text-[#F4F3EE]'
+                        ? 'text-[#060609] font-semibold'
+                        : 'bg-[#0B0C12] text-[#A8B2C6] border-[#F4C46C]/20 hover:text-[#F7F4EC] hover:border-[#F4C46C]/45'
                     }`}
                     style={
                       active
-                        ? { backgroundColor: course.accent, borderColor: course.accent }
+                        ? {
+                            backgroundColor: course.accent,
+                            borderColor: course.accent,
+                            boxShadow: `0 0 18px -5px ${course.accent}`,
+                          }
                         : undefined
                     }
                   >
@@ -259,7 +322,7 @@ export function CoursePage() {
         {/* Primary Flagship Course Workbench */}
         {cid === 'algebra-1' && (
           <section className="space-y-4">
-            <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F4F3EE]">
+            <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
               Algebra 1 Flagship Instrument · Quadratic Workbench
             </h2>
             <QuadraticWorkbench />
@@ -268,7 +331,7 @@ export function CoursePage() {
 
         {cid === 'geometry' && (
           <section className="space-y-4">
-            <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F4F3EE]">
+            <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
               Geometry Flagship 3D Instrument · Hinged Solid Nets
             </h2>
             <SolidNetLab />
@@ -278,15 +341,15 @@ export function CoursePage() {
         {cid === 'algebra-2' && (
           <section className="space-y-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F4F3EE]">
-                Algebra 2 Flagship Instruments · Logarithms &amp; Neural Matrices
+              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
+                Algebra 2 Flagship Instruments · Logarithms &amp; Harmonic Spine
               </h2>
               <Link
                 to="/neural"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-mono-data bg-[#38D9FF]/15 text-[#38D9FF] border border-[#38D9FF]/45 hover:bg-[#38D9FF]/25"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-mono-data bg-[#46D6E8]/15 text-[#46D6E8] border border-[#46D6E8]/45 hover:bg-[#46D6E8]/25 transition-colors"
               >
                 <Network className="w-3.5 h-3.5" />
-                Open Neural Matrix &amp; Vortex Lab →
+                Open Harmonic Matrix &amp; Vortex Lab →
               </Link>
             </div>
             <LogarithmLab />
@@ -295,9 +358,18 @@ export function CoursePage() {
 
         {cid === 'precalculus' && (
           <section className="space-y-5">
-            <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F4F3EE]">
-              Precalculus Flagship Harmonic &amp; Vector Labs
-            </h2>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
+                Precalculus Flagship Harmonic &amp; Vector Labs
+              </h2>
+              <Link
+                to="/frontier"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-mono-data bg-[#F4C46C]/15 text-[#FFE29E] border border-[#F4C46C]/45 hover:bg-[#F4C46C]/25 transition-colors"
+              >
+                <Orbit className="w-3.5 h-3.5 text-[#F4C46C]" />
+                Explore Calabi-Yau &amp; String 3D Frontier →
+              </Link>
+            </div>
             <UnitCircleWaveCanvas />
             <VectorParallelogramCanvas />
           </section>

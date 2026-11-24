@@ -16,25 +16,25 @@ export const STAGE_ACTS: StageActMeta[] = [
   {
     id: 'overture',
     number: 'ACT I',
-    title: 'MERIDIAN — Living Atlas of Mathematics',
-    subtitle: 'Four years of high school mathematics propelled by kinetic manifolds and vector fields.',
-    accent: '#F4B956',
+    title: 'AUREA — Living 3D Observatory of Mathematics',
+    subtitle: 'Four years of high school math connected to kinetic 3D manifolds and String Theory.',
+    accent: '#F4C46C',
     durationSec: 14,
   },
   {
-    id: 'cartography',
+    id: 'harmonic-spine',
     number: 'ACT II',
-    title: 'Cartography of Prerequisites',
-    subtitle: 'Tracing structural dependencies from Algebra 1 through Matrix Networks to Precalculus.',
-    accent: '#38D4FF',
-    durationSec: 16,
+    title: 'Golden Harmonic Spine & Constellation Atlas',
+    subtitle: 'Tracing 24 foundational theorems across golden filaments and 36 prerequisite nodes.',
+    accent: '#FFE29E',
+    durationSec: 20,
   },
   {
     id: 'parabola',
     number: 'ACT III',
     title: 'Algebra in Motion · The Discriminant Trichotomy',
     subtitle: 'Watching Δ = b² − 4ac carry a parabola across real roots, tangency, and complex lift.',
-    accent: '#F4B956',
+    accent: '#F5C25B',
     durationSec: 18,
   },
   {
@@ -42,7 +42,7 @@ export const STAGE_ACTS: StageActMeta[] = [
     number: 'ACT IV',
     title: 'Geometry Unfolded · Surface Area & Cross-Sections',
     subtitle: 'Deconstructing a 3D square pyramid along real geometric hinges into its planar 2D net.',
-    accent: '#38D4FF',
+    accent: '#46D6E8',
     durationSec: 18,
   },
   {
@@ -50,23 +50,31 @@ export const STAGE_ACTS: StageActMeta[] = [
     number: 'ACT V',
     title: 'Harmonic Waves & Neural Matrix Propagation',
     subtitle: 'Circular rotation projected into sinusoids, then layered into neural matrix transforms.',
-    accent: '#34E8A5',
+    accent: '#45E6A6',
     durationSec: 20,
   },
   {
-    id: 'animated-proofs',
+    id: 'string-calabi-yau',
     number: 'ACT VI',
+    title: 'String Theory & Calabi-Yau Manifolds 3D',
+    subtitle: 'How complex roots z₁ⁿ + z₂ⁿ = 1, Euler phase e^(iθ), and standing waves fold 6 extra dimensions.',
+    accent: '#F4C46C',
+    durationSec: 18,
+  },
+  {
+    id: 'animated-proofs',
+    number: 'ACT VII',
     title: 'Animated Proofs & Worked Solutions',
     subtitle: 'Watch geometric formulas draw themselves alongside synchronized step-by-step solved problems.',
-    accent: '#36EBA8',
+    accent: '#45E6A6',
     durationSec: 18,
   },
   {
     id: 'finale',
-    number: 'ACT VII',
-    title: 'Lorenz Chaos Finale & Closing Meridian',
-    subtitle: 'Two trajectories separated by 0.002 diverging across twin butterfly lobes.',
-    accent: '#FF785A',
+    number: 'ACT VIII',
+    title: 'Lorenz Chaos Finale & Closing Observatory',
+    subtitle: 'Two trajectories separated by 0.002 diverging across twin golden attractor lobes.',
+    accent: '#FF8563',
     durationSec: 14,
   },
 ];
@@ -84,28 +92,28 @@ export const MAP_FLIGHT_KEYFRAMES: {
     caption: 'A1-02 · Linear Functions anchor every slope and coordinate mapping.',
   },
   {
-    atSec: 3.8,
+    atSec: 2,
     selectedId: 'a1-quadratics',
     camera: { x: 520, y: 290, zoom: 1.1 },
-    caption: 'A1-05 · Quadratic Geometry branches into Geometry, Algebra 2 & Physics.',
+    caption: 'A1-08 · Quadratic Geometry branches into Geometry, Algebra 2 & Physics.',
   },
   {
-    atSec: 7.5,
+    atSec: 4,
     selectedId: 'g-solids',
     camera: { x: 930, y: 310, zoom: 1.08 },
-    caption: 'G-04 · 3D Solids & Nets extend right-triangle Pythagoras into 3D space.',
+    caption: 'G-09 · 3D Solids & Nets extend right-triangle Pythagoras into 3D space.',
   },
   {
-    atSec: 10.8,
+    atSec: 6,
     selectedId: 'a2-matrices',
     camera: { x: 1290, y: 258, zoom: 1.05 },
-    caption: 'A2-05 · Matrix transformations compose into multilayer neural architectures.',
+    caption: 'A2-07 · Matrix transformations compose into multilayer neural architectures.',
   },
   {
-    atSec: 13.5,
+    atSec: 8,
     selectedId: 'pc-unit-circle',
     camera: { x: 1610, y: 240, zoom: 0.96 },
-    caption: 'PC-01 · Circular Trigonometry unifies geometry, waves, and vector velocity.',
+    caption: 'PC-01 · Circular Trigonometry unifies geometry, waves, and String Harmonics.',
   },
 ];
 
@@ -210,6 +218,43 @@ export const SOLIDS_KEYFRAMES: {
     badge: 'Phase 4 · Parallel Cross-Section (MA.912.GR.4.1)',
     tex: '\\text{Horizontal Cut} \\implies \\text{Similar Square}',
     note: 'Refolding the solid and slicing parallel to the base always produces a scaled square.',
+  },
+];
+
+export const FRONTIER_KEYFRAMES: {
+  atSec: number;
+  badge: string;
+  courseBridge: string;
+  tex: string;
+  note: string;
+}[] = [
+  {
+    atSec: 0,
+    badge: '01 · Complex Polynomial Compactification',
+    courseBridge: 'Algebra 2 · Complex Roots of Unity',
+    tex: 'z_1^n + z_2^n = 1 \\implies z_k = r^{1/n}e^{i(\\theta + 2\\pi k)/n}',
+    note: 'Solving zⁿ = 1 places n symmetric roots around the unit circle—stitching n² smooth sheets into a 6D Calabi-Yau throat.',
+  },
+  {
+    atSec: 4.5,
+    badge: '02 · Euler Phase Rotation',
+    courseBridge: 'Algebra 2 & Precalculus · Complex Argand Plane',
+    tex: 'e^{i\\theta} = \\cos\\theta + i\\sin\\theta',
+    note: 'Multiplying a string amplitude by e^(iθ) rotates quantum states smoothly around hidden circular fibers.',
+  },
+  {
+    atSec: 9,
+    badge: '03 · Standing Wave String Harmonics',
+    courseBridge: 'Precalculus · Unit Circle Sinusoids',
+    tex: 'y(\\sigma, \\tau) = A\\sin(n\\sigma)\\cos(\\omega_n\\tau),\\quad E_n \\propto n\\sqrt{T}',
+    note: 'Just like overtones on a guitar string, integer modes n = 1, 2, 3… determine whether a string vibrates as light, gravity, or matter.',
+  },
+  {
+    atSec: 13.5,
+    badge: '04 · Topology & Dimensional Scaling',
+    courseBridge: 'Geometry · Euler Invariant & Volume Scaling',
+    tex: '\\chi = V - E + F,\\qquad N_{\\text{families}} = \\dfrac{|\\chi|}{2} = 3',
+    note: 'Raising tiny radius R ≈ 10⁻³⁵ m to the 6th power hides six dimensions while preserving the topological family count.',
   },
 ];
 

@@ -1,280 +1,174 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
+  Atom,
+  BookOpen,
   Calculator,
   Compass,
   Cpu,
   ExternalLink,
+  Layers,
   Network,
-  Pause,
-  Play,
+  Orbit,
   Presentation,
   Sparkles,
 } from 'lucide-react';
 import { AtlasShell } from '../components/AtlasShell';
 import { MathTex } from '../components/MathTex';
 import { COURSES, CURRICULUM_NODES } from '../data/curriculumGraph';
+import {
+  FLORIDA_COURSE_TEXTBOOK_META,
+  FLORIDA_TEXTBOOK_CHAPTERS,
+} from '../data/floridaTextbookGuide';
 import { CourseId, FLDOE_SOURCES } from '../data/standards';
-import { EquationMiniVisual, EquationVisualKind } from '../visuals/equations/EquationMiniVisual';
+import { CalabiYauManifold3D } from '../visuals/frontier/CalabiYauManifold3D';
+import { OrbitalSignalTorus3D } from '../visuals/frontier/OrbitalSignalTorus3D';
+import { GoldenHarmonicSpine } from '../visuals/harmony/GoldenHarmonicSpine';
 import { NeuralAtlasMap } from '../visuals/map/NeuralAtlasMap';
-import { NeuralMathEngine } from '../visuals/neural/NeuralMathEngine';
-import { ParabolaCanvas } from '../visuals/parabola/ParabolaCanvas';
-import { TopicVisualCanvas, TopicVisualId } from '../visuals/topics/TopicVisualCanvas';
-import { UnitCircleWaveCanvas } from '../visuals/trig/UnitCircleWaveCanvas';
-import { MathVortexCanvas, VortexMode } from '../visuals/vortex/MathVortexCanvas';
+import { ApolloniusCone3D } from '../visuals/solids/ApolloniusCone3D';
+import { MathVortexCanvas } from '../visuals/vortex/MathVortexCanvas';
 
 const COURSE_ORDER: CourseId[] = ['algebra-1', 'geometry', 'algebra-2', 'precalculus'];
 
-type HeroMode = 'vortex' | 'lorenz' | 'polar' | 'fourier' | 'complex';
+type HeroStageMode = 'orbital' | 'calabi' | 'vortex';
 
-const HERO_TABS: { id: HeroMode; label: string; accent: string }[] = [
-  { id: 'vortex', label: 'Vector Vortex', accent: '#38D9FF' },
-  { id: 'lorenz', label: 'Lorenz Butterfly', accent: '#F5BC5E' },
-  { id: 'polar', label: 'Polar Rose Bloom', accent: '#FF7A5C' },
-  { id: 'fourier', label: 'Fourier Epicycles', accent: '#36EBA8' },
-  { id: 'complex', label: 'Complex Phase', accent: '#38D9FF' },
-];
-
-const SIGNATURE_VISUAL_EQUATIONS: {
-  title: string;
-  course: string;
+const HERO_TABS: {
+  id: HeroStageMode;
+  label: string;
   accent: string;
-  kind: EquationVisualKind;
-  tex: string;
-  insight: string;
-  route: string;
+  formulaTex: string;
+  caption: string;
 }[] = [
   {
-    title: 'Least-Squares Residuals',
-    course: 'ALG I · A1-09',
-    accent: '#F5BC5E',
-    kind: 'residual-squares',
-    tex: '\\min \\sum_{i=1}^n (y_i - \\hat{y}_i)^2',
-    insight: 'Every vertical error becomes a glowing square minimized simultaneously.',
-    route: '/lesson/a1-statistics',
+    id: 'orbital',
+    label: 'Orbital String Flux 3D',
+    accent: '#F4C46C',
+    formulaTex: 'X^\\mu(\\tau, \\sigma) \\cdot S^1 \\times S^1',
+    caption: '60,000-particle 3D manifold — drag to orbit or click to emit radial shockwaves',
   },
   {
-    title: 'Quadratic Vertex & Δ',
-    course: 'ALG I · A1-08',
-    accent: '#F5BC5E',
-    kind: 'parabola-discriminant',
-    tex: 'f(x) = a(x-h)^2 + k',
-    insight: 'Discriminant sign flips parabolas cleanly from 2 roots to tangent to complex.',
-    route: '/lesson/quadratics',
+    id: 'calabi',
+    label: 'Calabi-Yau 3D',
+    accent: '#FFE29E',
+    formulaTex: 'z_1^n + z_2^n = 1',
+    caption: 'Compactified 6D manifold sheets, Hopf fibration rings, and relativistic worldsheets',
   },
   {
-    title: 'Pythagorean Area Proof',
-    course: 'GEOM · G-06',
-    accent: '#38D9FF',
-    kind: 'pythagoras-squares',
-    tex: 'a^2 + b^2 = c^2',
-    insight: 'Sliding congruent right triangles converts c² directly into a² + b².',
-    route: '/lesson/g-right-trig',
-  },
-  {
-    title: 'Similarity Area Scaling',
-    course: 'GEOM · G-03',
-    accent: '#38D9FF',
-    kind: 'area-scale-k2',
-    tex: '\\dfrac{\\text{Area}\'}{\\text{Area}} = k^2',
-    insight: 'Stretching linear edges by k packs k² copies into 2D area.',
-    route: '/lesson/g-similarity',
-  },
-  {
-    title: 'Pascal Binomial Theorem',
-    course: 'ALG II · A2-07',
-    accent: '#36EBA8',
-    kind: 'pascal-binomial',
-    tex: '(a+b)^n = \\sum_{k=0}^n \\binom{n}{k} a^{n-k}b^k',
-    insight: 'Lattice path counts generate every binomial expansion coefficient.',
-    route: '/lesson/a2-combinatorics',
-  },
-  {
-    title: 'Gaussian Normal Density',
-    course: 'ALG II · A2-09',
-    accent: '#36EBA8',
-    kind: 'normal-bell',
-    tex: 'P(|X-\\mu| \\le \\sigma) \\approx 68.3\\%',
-    insight: 'Symmetric bell area locks 68–95–99.7% empirical probability bands.',
-    route: '/lesson/a2-probability',
-  },
-  {
-    title: 'Law of Sines Circumcircle',
-    course: 'PRECALC · PC-04',
-    accent: '#FF7A5C',
-    kind: 'law-sines-circle',
-    tex: '\\dfrac{a}{\\sin A} = \\dfrac{b}{\\sin B} = 2R',
-    insight: 'Every oblique side-to-sine ratio equals the circumcircle diameter 2R.',
-    route: '/lesson/pc-law-sines',
-  },
-  {
-    title: 'Calculus Tangent Limit',
-    course: 'PRECALC · PC-09',
-    accent: '#FF7A5C',
-    kind: 'secant-to-tangent',
-    tex: 'f\'(x) = \\lim_{h \\to 0}\\dfrac{f(x+h)-f(x)}{h}',
-    insight: 'Shrinking h → 0 snaps average secant slopes onto instantaneous tangents.',
-    route: '/lesson/pc-limits',
+    id: 'vortex',
+    label: 'Math Vortex & Chaos',
+    accent: '#46D6E8',
+    formulaTex: '\\dot{x} = \\sigma(y-x),\\; \\dot{z} = xy - \\beta z',
+    caption: 'Interactive eigen-flow vortex, Lorenz chaos butterfly, and Fourier epicycles',
   },
 ];
 
-function LiveParabolaShowcase() {
-  const [autoSweep, setAutoSweep] = useState(true);
-  const [a, setA] = useState(0.85);
-  const [h, setH] = useState(1.2);
-  const [k, setK] = useState(-2.2);
-
-  useEffect(() => {
-    if (!autoSweep) return;
-    let t = 0;
-    const timer = window.setInterval(() => {
-      if (document.hidden) return;
-      t += 0.14;
-      setK(Number((-2.6 * Math.cos(t)).toFixed(2)));
-      setH(Number((1.4 * Math.sin(t * 0.65)).toFixed(2)));
-    }, 90);
-    return () => window.clearInterval(timer);
-  }, [autoSweep]);
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between px-1">
-        <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#F5BC5E]">
-          Live Discriminant Oscillation · Drag Vertex Anytime
-        </span>
-        <button
-          type="button"
-          onClick={() => setAutoSweep((s) => !s)}
-          className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono-data border border-[#F5BC5E]/45 text-[#F5BC5E] bg-[#F5BC5E]/10"
-        >
-          {autoSweep ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
-          {autoSweep ? 'Auto-Morph' : 'Manual'}
-        </button>
-      </div>
-      <ParabolaCanvas
-        a={a}
-        h={h}
-        k={k}
-        onChange={(next) => {
-          setAutoSweep(false);
-          setA(next.a);
-          setH(next.h);
-          setK(next.k);
-        }}
-        highlightFeature="roots"
-        showParentCurve
-        compactTelemetry
-        heightClass="h-[285px]"
-      />
-    </div>
-  );
-}
-
 export function HomePage() {
-  const [heroMode, setHeroMode] = useState<HeroMode>('vortex');
-  const [alg1Tab, setAlg1Tab] = useState<'parabola' | 'a1-statistics' | 'a1-abs-piecewise' | 'a1-inequalities'>('parabola');
-  const [geomTab, setGeomTab] = useState<TopicVisualId>('g-parallel-angles');
-  const [alg2Tab, setAlg2Tab] = useState<TopicVisualId>('a2-combinatorics');
-  const [pcTab, setPcTab] = useState<'unit' | 'pc-parametric' | 'pc-trig-identities' | 'pc-law-sines' | 'pc-limits'>('unit');
+  const [heroMode, setHeroMode] = useState<HeroStageMode>('orbital');
   const [dirFilter, setDirFilter] = useState<'all' | CourseId>('all');
+  const [dirView, setDirView] = useState<'both' | 'textbook' | 'lessons'>('both');
 
-  const activeTab = HERO_TABS.find((t) => t.id === heroMode) ?? HERO_TABS[0];
+  const activeHeroTab = HERO_TABS.find((t) => t.id === heroMode) ?? HERO_TABS[0];
   const visibleDirectoryCourses = dirFilter === 'all' ? COURSE_ORDER : [dirFilter];
 
   return (
     <AtlasShell>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-20">
-        {/* SECTION 1: LUXURY CINEMATIC HERO OBSERVATORY */}
-        <section className="grid grid-cols-1 md:grid-cols-12 gap-7 lg:gap-10 items-center pt-2">
+        {/* SECTION A: AUREA GOLDEN CYBER-OBSERVATORY HERO */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center pt-1">
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="md:col-span-5 space-y-6"
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            className="lg:col-span-5 space-y-6"
           >
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-[#F5BC5E]/35 bg-[#F5BC5E]/10 text-[11px] font-mono-data text-[#F5BC5E]">
-              <Sparkles className="w-3.5 h-3.5" />
-              36 FULL-YEAR INTERACTIVE LESSONS · FLORIDA B.E.S.T.
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#F4C46C]/35 bg-[#F4C46C]/10 text-[11px] font-mono-data uppercase tracking-[0.16em] text-[#FFE29E]">
+              <Sparkles className="w-3.5 h-3.5 text-[#F4C46C]" />
+              AUREA Observatory · High School to 10D Physics
             </div>
 
-            <h1 className="font-serif-editorial text-4xl sm:text-5xl lg:text-[3.6rem] text-[#F4F3EE] leading-[1.03] tracking-tight">
+            <h1 className="font-serif-editorial text-4xl sm:text-5xl lg:text-[3.55rem] text-[#F7F4EC] leading-[1.03] tracking-tight">
               See Mathematics{' '}
-              <em className="italic bg-gradient-to-r from-[#F5BC5E] via-[#38D9FF] to-[#FF7A5C] bg-clip-text text-transparent">
-                Think, Flow &amp; Connect.
+              <em className="italic bg-gradient-to-r from-[#FFE29E] via-[#F4C46C] to-[#FF8563] bg-clip-text text-transparent">
+                Move in 3D Dimensions
               </em>
             </h1>
 
-            <p className="text-sm sm:text-base text-[#A5B4CC] leading-relaxed">
-              A complete four-year high school mathematical observatory — every single equation
-              illustrated visually, 36 live 60fps engines, synchronized step-by-step proofs, visual
-              misconception labs, and an interactive neural constellation atlas.
+            <p className="text-sm sm:text-base text-[#A8B2C6] leading-relaxed">
+              Master Algebra 1, Geometry, Algebra 2, and Precalculus Honors through real-time 3D
+              engines, step-by-step proofs, and a 28-chapter Florida B.E.S.T. textbook—and discover
+              how the exact same exponents, waves, and curves describe modern physics and String
+              Theory.
             </p>
 
             <div className="flex flex-wrap items-center gap-2.5 pt-1">
-              <a
-                href="#neural-atlas"
+              <Link
+                to="/frontier"
                 className="luminous-pill-btn inline-flex items-center gap-2 px-5 py-2.5 text-xs sm:text-sm"
               >
-                <Network className="w-4 h-4" />
-                Explore 36-Symbol Atlas
+                <Orbit className="w-4 h-4" />
+                String Theory 3D
                 <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                to="/textbook"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-medium bg-[#11131C] border border-[#F4C46C]/35 text-[#FFE29E] hover:border-[#FFE29E]/70 hover:bg-[#F4C46C]/10 transition-all"
+              >
+                <BookOpen className="w-4 h-4 text-[#F4C46C]" />
+                Florida B.E.S.T. Book
+              </Link>
+              <a
+                href="#constellation"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-medium bg-[#0B0C12] border border-[#46D6E8]/35 text-[#46D6E8] hover:border-[#46D6E8]/70 hover:bg-[#46D6E8]/10 transition-all"
+              >
+                <Network className="w-4 h-4" />
+                36-Node Atlas
               </a>
               <Link
-                to="/neural"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-medium bg-white/[0.05] border border-white/15 text-[#F4F3EE] hover:border-[#38D9FF]/60 hover:bg-white/[0.09] transition-all"
-              >
-                <Cpu className="w-4 h-4 text-[#38D9FF]" />
-                Neural &amp; Vortex Lab
-              </Link>
-              <Link
-                to="/instruments"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-medium bg-white/[0.04] border border-white/12 text-[#A5B4CC] hover:text-[#F4F3EE] transition-all"
-              >
-                <Compass className="w-4 h-4 text-[#36EBA8]" />
-                16 Live Labs
-              </Link>
-              <Link
                 to="/presentation"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-medium bg-[#FF7A5C]/12 border border-[#FF7A5C]/45 text-[#FF7A5C] hover:bg-[#FF7A5C]/20 transition-all"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-medium bg-[#FF8563]/12 border border-[#FF8563]/40 text-[#FF8563] hover:bg-[#FF8563]/20 transition-all"
               >
                 <Presentation className="w-4 h-4" />
-                Live Presentation
+                Live Keynote
               </Link>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 pt-4 border-t hairline-rule">
+            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-[rgba(244,196,108,0.16)]">
               <div>
-                <span className="font-mono-data text-lg sm:text-xl text-[#F4F3EE] block">
+                <span className="font-mono-data text-lg sm:text-xl text-[#FFE29E] block">
                   36 / 36
                 </span>
-                <span className="text-[11px] text-[#6F7F99]">7-Layer Lessons</span>
+                <span className="text-[11px] text-[#A8B2C6]">7-Layer Lessons</span>
               </div>
               <div>
-                <span className="font-mono-data text-lg sm:text-xl text-[#F5BC5E] block">
+                <span className="font-mono-data text-lg sm:text-xl text-[#F4C46C] block">
+                  28 Chapters
+                </span>
+                <span className="text-[11px] text-[#A8B2C6]">Florida B.E.S.T. Book</span>
+              </div>
+              <div>
+                <span className="font-mono-data text-lg sm:text-xl text-[#46D6E8] block">
                   108+ Visuals
                 </span>
-                <span className="text-[11px] text-[#6F7F99]">Illustrated Equations</span>
-              </div>
-              <div>
-                <span className="font-mono-data text-lg sm:text-xl text-[#38D9FF] block">
-                  4 Full Years
-                </span>
-                <span className="text-[11px] text-[#6F7F99]">9 Units per Course</span>
+                <span className="text-[11px] text-[#A8B2C6]">3D &amp; Animated Proofs</span>
               </div>
             </div>
           </motion.div>
 
-          {/* Hero Kinetic Stage */}
+          {/* Live Interactive Hero 3D Stage */}
           <motion.div
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-            className="md:col-span-7 space-y-3"
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="lg:col-span-7 space-y-3"
           >
             <div className="flex flex-wrap items-center justify-between gap-2 px-1">
-              <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Hero mathematical engines">
+              <div
+                className="flex flex-wrap gap-1.5"
+                role="tablist"
+                aria-label="Hero 3D mathematical engines"
+              >
                 {HERO_TABS.map((tab) => {
                   const active = heroMode === tab.id;
                   return (
@@ -286,15 +180,15 @@ export function HomePage() {
                       onClick={() => setHeroMode(tab.id)}
                       className={`px-3 py-1 rounded-full text-[11px] font-mono-data border transition-all ${
                         active
-                          ? 'text-[#03050A] font-semibold'
-                          : 'bg-[#090E18]/80 text-[#A5B4CC] border-white/12 hover:text-[#F4F3EE]'
+                          ? 'text-[#060609] font-semibold'
+                          : 'bg-[#0B0C12]/90 text-[#A8B2C6] border-[rgba(244,196,108,0.18)] hover:text-[#F7F4EC]'
                       }`}
                       style={
                         active
                           ? {
                               backgroundColor: tab.accent,
                               borderColor: tab.accent,
-                              boxShadow: `0 0 18px -4px ${tab.accent}`,
+                              boxShadow: `0 0 20px -4px ${tab.accent}`,
                             }
                           : undefined
                       }
@@ -304,385 +198,235 @@ export function HomePage() {
                   );
                 })}
               </div>
-              <span className="font-mono-data text-[10px] text-[#36EBA8]">
-                ● 60fps Live Physics
+
+              <span className="inline-flex items-center gap-1.5 font-mono-data text-[10px] text-[#45E6A6]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#45E6A6] shadow-[0_0_8px_#45E6A6]" />
+                60fps Interactive Stage
               </span>
             </div>
 
-            {heroMode === 'polar' ? (
-              <TopicVisualCanvas topicId="pc-polar" compact heightClass="h-[350px] sm:h-[410px]" />
-            ) : (
-              <MathVortexCanvas
-                lockedMode={heroMode as VortexMode}
-                compact
-                heightClass="h-[350px] sm:h-[410px]"
-              />
+            {heroMode === 'orbital' && (
+              <OrbitalSignalTorus3D compact heightClass="h-[360px] sm:h-[430px]" />
+            )}
+            {heroMode === 'calabi' && (
+              <CalabiYauManifold3D compact heightClass="h-[360px] sm:h-[430px]" />
+            )}
+            {heroMode === 'vortex' && (
+              <MathVortexCanvas compact heightClass="h-[360px] sm:h-[430px]" />
             )}
 
-            <div className="flex flex-wrap items-center justify-between gap-2 px-1 text-[11px] font-mono-data text-[#6F7F99]">
-              <span>
-                Active Simulation:{' '}
-                <strong style={{ color: activeTab.accent }}>{activeTab.label}</strong> · Interactive canvas
+            <div className="flex flex-wrap items-center justify-between gap-2 px-1 text-[11px] font-mono-data text-[#A8B2C6]">
+              <span className="flex items-center gap-2 flex-wrap">
+                <strong style={{ color: activeHeroTab.accent }}>{activeHeroTab.label}:</strong>
+                <span>{activeHeroTab.caption}</span>
               </span>
-              <Link to="/neural" className="text-[#38D9FF] hover:underline">
-                Open Full Dynamical Systems Controls →
-              </Link>
+              <div className="flex items-center gap-3">
+                <MathTex tex={activeHeroTab.formulaTex} className="text-[#FFE29E] hidden sm:inline" />
+                <Link to="/frontier" className="text-[#F4C46C] hover:underline shrink-0">
+                  Full String Frontier →
+                </Link>
+              </div>
             </div>
           </motion.div>
         </section>
 
-        {/* SECTION 2: THE MAIN GENERAL ATLAS — 36-SYMBOL NEURAL CONSTELLATION */}
-        <section id="neural-atlas" className="space-y-5 scroll-mt-24">
-          <div className="flex flex-wrap items-end justify-between gap-4 border-b hairline-rule pb-4">
+        {/* SECTION B: FULL-BLEED GOLDEN HARMONIC SPINE */}
+        <section className="space-y-5">
+          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[rgba(244,196,108,0.16)] pb-4">
             <div className="space-y-1">
-              <span className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-[#38D9FF]">
-                General Atlas · 36 Living Neural Math Connectors
+              <span className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-[#F4C46C]">
+                Golden Harmonic Spine · 24 Foundations Connected to Modern Physics
               </span>
-              <h2 className="font-serif-editorial text-3xl sm:text-4xl text-[#F4F3EE]">
-                Touch Any Glowing Symbol to Launch Its Complete 7-Layer Lesson
+              <h2 className="font-serif-editorial text-3xl sm:text-4xl text-[#F7F4EC]">
+                How High School Math Weaves Directly Into String Theory
+              </h2>
+            </div>
+            <Link
+              to="/neural"
+              className="inline-flex items-center gap-1.5 text-xs font-mono-data text-[#FFE29E] hover:underline"
+            >
+              Open Neural Matrix &amp; Harmonic Studio <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          <GoldenHarmonicSpine />
+        </section>
+
+        {/* SECTION C: 3D STRING THEORY, CALABI-YAU & APOLLONIUS CONICS SPOTLIGHT */}
+        <section className="space-y-6">
+          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[rgba(244,196,108,0.16)] pb-4">
+            <div className="space-y-1">
+              <span className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-[#FFE29E]">
+                Interactive 3D Geometry &amp; Frontier Laboratories
+              </span>
+              <h2 className="font-serif-editorial text-3xl sm:text-4xl text-[#F7F4EC]">
+                Calabi-Yau Manifolds, String Harmonics &amp; Apollonius Conics in 3D
+              </h2>
+            </div>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <Link
+                to="/frontier"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono-data bg-[#F4C46C]/15 border border-[#F4C46C]/45 text-[#FFE29E] hover:bg-[#F4C46C]/25 transition-colors"
+              >
+                <Atom className="w-3.5 h-3.5" />
+                Explore /frontier
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+              <Link
+                to="/instruments"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono-data bg-[#11131C] border border-[#46D6E8]/40 text-[#46D6E8] hover:bg-[#46D6E8]/15 transition-colors"
+              >
+                <Compass className="w-3.5 h-3.5" />
+                All /instruments Labs
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+
+          <div className="space-y-8">
+            {/* Spotlight 1: Calabi-Yau, Hopf Fibration & Worldsheet */}
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+                <div className="space-y-0.5">
+                  <span className="font-mono-data text-[10.5px] uppercase tracking-[0.18em] text-[#F4C46C]">
+                    01 · String Theory &amp; Complex Roots of Unity
+                  </span>
+                  <h3 className="font-serif-editorial text-2xl text-[#F7F4EC]">
+                    Calabi-Yau Hypersurfaces, Hopf Fibers &amp; Vibrating Strings
+                  </h3>
+                </div>
+                <Link
+                  to="/frontier"
+                  className="inline-flex items-center gap-1.5 text-xs font-mono-data text-[#FFE29E] hover:underline"
+                >
+                  Open String Theory 3D Challenges <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+              <CalabiYauManifold3D />
+            </div>
+
+            {/* Spotlight 2: Apollonius Double-Nappe Cone Slicer */}
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+                <div className="space-y-0.5">
+                  <span className="font-mono-data text-[10.5px] uppercase tracking-[0.18em] text-[#46D6E8]">
+                    02 · Precalculus &amp; Classical Conic Geometry
+                  </span>
+                  <h3 className="font-serif-editorial text-2xl text-[#F7F4EC]">
+                    One Double Cone, Four Curves: Circle, Ellipse, Parabola &amp; Hyperbola
+                  </h3>
+                </div>
+                <Link
+                  to="/instruments"
+                  className="inline-flex items-center gap-1.5 text-xs font-mono-data text-[#46D6E8] hover:underline"
+                >
+                  Launch Full 3D &amp; Math Lab Bank <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+              <ApolloniusCone3D />
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION D: INTERACTIVE 36-NODE CONSTELLATION ATLAS */}
+        <section id="constellation" className="space-y-5 scroll-mt-24">
+          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[rgba(244,196,108,0.16)] pb-4">
+            <div className="space-y-1">
+              <span className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-[#46D6E8]">
+                Constellation Atlas · 36 Interconnected Prerequisite Nodes
+              </span>
+              <h2 className="font-serif-editorial text-3xl sm:text-4xl text-[#F7F4EC]">
+                Click Any Glowing Node to Inspect Prerequisites &amp; Launch Its 7-Layer Lesson
               </h2>
             </div>
             <Link
               to="/map"
-              className="inline-flex items-center gap-1.5 text-xs font-mono-data text-[#38D9FF] hover:underline"
+              className="inline-flex items-center gap-1.5 text-xs font-mono-data text-[#46D6E8] hover:underline"
             >
-              Open Fullscreen Neural Atlas <ArrowRight className="w-3.5 h-3.5" />
+              Open Fullscreen Constellation Atlas <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
           <NeuralAtlasMap heightClass="h-[540px] sm:h-[600px]" />
         </section>
 
-        {/* SECTION 3: SIGNATURE VISUAL EQUATIONS GALLERY */}
-        <section className="space-y-5">
-          <div className="flex flex-wrap items-end justify-between gap-4 border-b hairline-rule pb-4">
-            <div className="space-y-1">
-              <span className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-[#F5BC5E]">
-                Visualized Equations · Every Formula Illustrated Geometrically
-              </span>
-              <h2 className="font-serif-editorial text-3xl sm:text-4xl text-[#F4F3EE]">
-                Signature High School Equations — Seen, Never Blindly Memorized
-              </h2>
-            </div>
-            <span className="font-mono-data text-xs text-[#A5B4CC]">
-              Every axiom across all 36 lessons carries its own visual proof
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {SIGNATURE_VISUAL_EQUATIONS.map((eq) => (
-              <Link
-                key={eq.title}
-                to={eq.route}
-                className="instrument-frame p-4 flex flex-col justify-between gap-3 hover:border-white/25 transition-all group"
-                style={{ borderTop: `2px solid ${eq.accent}` }}
-              >
-                <div className="space-y-2.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono-data text-[10px]" style={{ color: eq.accent }}>
-                      {eq.course}
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 text-[#6F7F99] group-hover:text-[#F4F3EE] transition-colors" />
-                  </div>
-                  <EquationMiniVisual kind={eq.kind} accent={eq.accent} heightClass="h-[112px]" />
-                  <h3 className="font-serif-editorial text-lg text-[#F4F3EE] group-hover:underline">
-                    {eq.title}
-                  </h3>
-                  <div className="instrument-panel px-2.5 py-1.5 overflow-x-auto">
-                    <MathTex tex={eq.tex} className="text-xs text-[#F4F3EE]" />
-                  </div>
-                </div>
-                <p className="text-[11px] text-[#A5B4CC] leading-relaxed">{eq.insight}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* SECTION 4: LIVE EMBEDDED NEURAL NETWORK & BACKPROPAGATION ENGINE */}
-        <section className="space-y-4">
-          <div className="flex flex-wrap items-end justify-between gap-4 border-b hairline-rule pb-4">
-            <div className="space-y-1">
-              <span className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-[#36EBA8]">
-                Live Matrix Calculus Engine · Auto-Training &amp; Firing Photons
-              </span>
-              <h2 className="font-serif-editorial text-3xl sm:text-4xl text-[#F4F3EE]">
-                Interactive Neural Network &amp; Real-Time Backpropagation
-              </h2>
-            </div>
-            <Link
-              to="/neural"
-              className="inline-flex items-center gap-1.5 text-xs font-mono-data text-[#36EBA8] hover:underline"
-            >
-              Full Neural Theory &amp; Vortex Theater <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          <NeuralMathEngine />
-        </section>
-
-        {/* SECTION 5: 4-COURSE INTERACTIVE LIVE GALLERY */}
+        {/* SECTION E: FLORIDA B.E.S.T. 4-YEAR CURRICULUM & 28-CHAPTER TEXTBOOK DIRECTORY */}
         <section className="space-y-6">
-          <div className="flex flex-wrap items-end justify-between gap-4 border-b hairline-rule pb-4">
+          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[rgba(244,196,108,0.16)] pb-4">
             <div className="space-y-1">
-              <span className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-[#F5BC5E]">
-                Four Complete Courses · Multi-Simulation Live Showcase
+              <span className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-[#F4C46C]">
+                Florida B.E.S.T. Curriculum &amp; Interactive Textbook
               </span>
-              <h2 className="font-serif-editorial text-3xl sm:text-4xl text-[#F4F3EE]">
-                Watch Every Branch of High School Math Transform at 60fps
-              </h2>
-            </div>
-            <Link
-              to="/instruments"
-              className="inline-flex items-center gap-1.5 text-xs font-mono-data text-[#F5BC5E] hover:underline"
-            >
-              Open All 16 Standalone Laboratories <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* ALGEBRA 1 LIVE CARD */}
-            <div className="instrument-frame p-5 space-y-4" style={{ borderTop: '2px solid #F5BC5E' }}>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <span className="font-mono-data text-[10px] tracking-wider text-[#F5BC5E]">
-                    ALGEBRA 1 · CPALMS 1200310 · 9 COMPLETE UNITS
-                  </span>
-                  <h3 className="font-serif-editorial text-2xl text-[#F4F3EE]">
-                    Parabolas, Regression, Absolute Value &amp; Half-Planes
-                  </h3>
-                </div>
-                <Link
-                  to="/course/algebra-1"
-                  className="px-3.5 py-1.5 rounded-full text-[11px] font-mono-data bg-[#F5BC5E] text-[#03050A] font-semibold"
-                >
-                  Algebra 1 →
-                </Link>
-              </div>
-
-              <div className="flex flex-wrap gap-1.5">
-                {(
-                  [
-                    ['parabola', 'Parabola Sweep'],
-                    ['a1-statistics', 'Regression Squares'],
-                    ['a1-abs-piecewise', 'Absolute Value V'],
-                    ['a1-inequalities', 'Feasible Half-Planes'],
-                  ] as const
-                ).map(([id, lbl]) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setAlg1Tab(id)}
-                    className={`px-2.5 py-1 rounded-full text-[10px] font-mono-data border ${
-                      alg1Tab === id
-                        ? 'bg-[#F5BC5E]/20 border-[#F5BC5E] text-[#F5BC5E]'
-                        : 'border-white/12 text-[#A5B4CC]'
-                    }`}
-                  >
-                    {lbl}
-                  </button>
-                ))}
-              </div>
-
-              {alg1Tab === 'parabola' ? (
-                <LiveParabolaShowcase />
-              ) : (
-                <TopicVisualCanvas topicId={alg1Tab} compact heightClass="h-[312px]" />
-              )}
-            </div>
-
-            {/* GEOMETRY LIVE CARD */}
-            <div className="instrument-frame p-5 space-y-4" style={{ borderTop: '2px solid #38D9FF' }}>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <span className="font-mono-data text-[10px] tracking-wider text-[#38D9FF]">
-                    GEOMETRY · CPALMS 1206310 · 9 COMPLETE UNITS
-                  </span>
-                  <h3 className="font-serif-editorial text-2xl text-[#F4F3EE]">
-                    Transversals, Similarity k², Quadrilaterals &amp; 3D Nets
-                  </h3>
-                </div>
-                <Link
-                  to="/lesson/solids-3d"
-                  className="px-3.5 py-1.5 rounded-full text-[11px] font-mono-data bg-[#38D9FF] text-[#03050A] font-semibold"
-                >
-                  3D Solids WebGL →
-                </Link>
-              </div>
-
-              <div className="flex flex-wrap gap-1.5">
-                {(
-                  [
-                    ['g-parallel-angles', 'Parallel Transversal'],
-                    ['g-similarity', 'Similarity k²'],
-                    ['g-quadrilaterals', 'Quadrilateral Morph'],
-                    ['g-right-trig', 'Pythagoras Proof'],
-                  ] as [TopicVisualId, string][]
-                ).map(([id, lbl]) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setGeomTab(id)}
-                    className={`px-2.5 py-1 rounded-full text-[10px] font-mono-data border ${
-                      geomTab === id
-                        ? 'bg-[#38D9FF]/20 border-[#38D9FF] text-[#38D9FF]'
-                        : 'border-white/12 text-[#A5B4CC]'
-                    }`}
-                  >
-                    {lbl}
-                  </button>
-                ))}
-              </div>
-
-              <TopicVisualCanvas topicId={geomTab} compact heightClass="h-[312px]" />
-            </div>
-
-            {/* ALGEBRA 2 LIVE CARD */}
-            <div className="instrument-frame p-5 space-y-4" style={{ borderTop: '2px solid #36EBA8' }}>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <span className="font-mono-data text-[10px] tracking-wider text-[#36EBA8]">
-                    ALGEBRA 2 · CPALMS 1200330 · 9 COMPLETE UNITS
-                  </span>
-                  <h3 className="font-serif-editorial text-2xl text-[#F4F3EE]">
-                    Pascal Binomial, Nonlinear Systems, Inverses &amp; Normal Bell
-                  </h3>
-                </div>
-                <Link
-                  to="/lesson/logarithms"
-                  className="px-3.5 py-1.5 rounded-full text-[11px] font-mono-data bg-[#36EBA8] text-[#03050A] font-semibold"
-                >
-                  Logarithms Lab →
-                </Link>
-              </div>
-
-              <div className="flex flex-wrap gap-1.5">
-                {(
-                  [
-                    ['a2-combinatorics', 'Pascal Binomial'],
-                    ['a2-quad-systems', 'Nonlinear Intersections'],
-                    ['a2-radicals', 'Inverse Mirror'],
-                    ['a2-probability', 'Normal Bell Curve'],
-                  ] as [TopicVisualId, string][]
-                ).map(([id, lbl]) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setAlg2Tab(id)}
-                    className={`px-2.5 py-1 rounded-full text-[10px] font-mono-data border ${
-                      alg2Tab === id
-                        ? 'bg-[#36EBA8]/20 border-[#36EBA8] text-[#36EBA8]'
-                        : 'border-white/12 text-[#A5B4CC]'
-                    }`}
-                  >
-                    {lbl}
-                  </button>
-                ))}
-              </div>
-
-              <TopicVisualCanvas topicId={alg2Tab} compact heightClass="h-[312px]" />
-            </div>
-
-            {/* PRECALCULUS HONORS LIVE CARD */}
-            <div className="instrument-frame p-5 space-y-4" style={{ borderTop: '2px solid #FF7A5C' }}>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <span className="font-mono-data text-[10px] tracking-wider text-[#FF7A5C]">
-                    PRECALCULUS HONORS · CPALMS 1202340 · 9 COMPLETE UNITS
-                  </span>
-                  <h3 className="font-serif-editorial text-2xl text-[#F4F3EE]">
-                    Waves, Trig Identities, Law of Sines, Lissajous &amp; Limits
-                  </h3>
-                </div>
-                <Link
-                  to="/course/precalculus"
-                  className="px-3.5 py-1.5 rounded-full text-[11px] font-mono-data bg-[#FF7A5C] text-[#03050A] font-semibold"
-                >
-                  Precalculus →
-                </Link>
-              </div>
-
-              <div className="flex flex-wrap gap-1.5">
-                {(
-                  [
-                    ['unit', 'Unit Circle Waves'],
-                    ['pc-parametric', 'Lissajous Orbit'],
-                    ['pc-trig-identities', 'sin²+cos² = 1'],
-                    ['pc-law-sines', 'Law of Sines 2R'],
-                    ['pc-limits', 'Tangent Limit'],
-                  ] as const
-                ).map(([id, lbl]) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setPcTab(id)}
-                    className={`px-2.5 py-1 rounded-full text-[10px] font-mono-data border ${
-                      pcTab === id
-                        ? 'bg-[#FF7A5C]/20 border-[#FF7A5C] text-[#FF7A5C]'
-                        : 'border-white/12 text-[#A5B4CC]'
-                    }`}
-                  >
-                    {lbl}
-                  </button>
-                ))}
-              </div>
-
-              {pcTab === 'unit' ? (
-                <UnitCircleWaveCanvas compact heightClass="h-[312px]" />
-              ) : (
-                <TopicVisualCanvas topicId={pcTab} compact heightClass="h-[312px]" />
-              )}
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 6: FILTERABLE COMPLETE 36-TOPIC CURRICULUM DIRECTORY */}
-        <section className="space-y-5">
-          <div className="flex flex-wrap items-end justify-between gap-4 border-b hairline-rule pb-4">
-            <div className="space-y-1">
-              <span className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-[#A5B4CC]">
-                Complete 4-Year Curriculum Library · 36 Interactive 7-Layer Lessons
-              </span>
-              <h2 className="font-serif-editorial text-3xl sm:text-4xl text-[#F4F3EE]">
-                Every Full-Year Unit Equipped With Visualized Equations &amp; Drills
+              <h2 className="font-serif-editorial text-3xl sm:text-4xl text-[#F7F4EC]">
+                4 Full-Year Courses · 28 Textbook Chapters &amp; 36 Interactive Lessons
               </h2>
             </div>
 
-            <div className="flex flex-wrap items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => setDirFilter('all')}
-                className={`px-3 py-1 rounded-full text-[11px] font-mono-data border ${
-                  dirFilter === 'all'
-                    ? 'bg-white/12 border-white/30 text-[#F4F3EE]'
-                    : 'border-white/12 text-[#A5B4CC]'
-                }`}
-              >
-                All 36
-              </button>
-              {COURSE_ORDER.map((cid) => {
-                const c = COURSES[cid];
-                const active = dirFilter === cid;
-                return (
-                  <button
-                    key={cid}
-                    type="button"
-                    onClick={() => setDirFilter(cid)}
-                    className="px-3 py-1 rounded-full text-[11px] font-mono-data border transition-all"
-                    style={{
-                      borderColor: active ? c.accent : 'rgba(255,255,255,0.12)',
-                      backgroundColor: active ? `${c.accent}20` : 'transparent',
-                      color: active ? c.accent : '#A5B4CC',
-                    }}
-                  >
-                    {c.shortTitle} (9)
-                  </button>
-                );
-              })}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setDirFilter('all')}
+                  className={`px-3 py-1 rounded-full text-[11px] font-mono-data border transition-all ${
+                    dirFilter === 'all'
+                      ? 'bg-[#F4C46C]/20 border-[#F4C46C] text-[#FFE29E]'
+                      : 'border-[rgba(244,196,108,0.18)] text-[#A8B2C6] hover:text-[#F7F4EC]'
+                  }`}
+                >
+                  All 4 Courses
+                </button>
+                {COURSE_ORDER.map((cid) => {
+                  const c = COURSES[cid];
+                  const active = dirFilter === cid;
+                  return (
+                    <button
+                      key={cid}
+                      type="button"
+                      onClick={() => setDirFilter(cid)}
+                      className="px-3 py-1 rounded-full text-[11px] font-mono-data border transition-all"
+                      style={{
+                        borderColor: active ? c.accent : 'rgba(244,196,108,0.18)',
+                        backgroundColor: active ? `${c.accent}22` : 'transparent',
+                        color: active ? c.accent : '#A8B2C6',
+                      }}
+                    >
+                      {c.title}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="flex items-center gap-1 rounded-full p-0.5 bg-[#0B0C12] border border-[rgba(244,196,108,0.18)]">
+                {(
+                  [
+                    ['both', 'Chapters + Lessons'],
+                    ['textbook', '28 Chapters'],
+                    ['lessons', '36 Lessons'],
+                  ] as const
+                ).map(([modeId, modeLabel]) => {
+                  const active = dirView === modeId;
+                  return (
+                    <button
+                      key={modeId}
+                      type="button"
+                      onClick={() => setDirView(modeId)}
+                      className={`px-2.5 py-1 rounded-full text-[10.5px] font-mono-data transition-colors ${
+                        active
+                          ? 'bg-[#F4C46C] text-[#060609] font-semibold'
+                          : 'text-[#A8B2C6] hover:text-[#F7F4EC]'
+                      }`}
+                    >
+                      {modeLabel}
+                    </button>
+                  );
+                })}
+              </div>
+
               <a
                 href={FLDOE_SOURCES.bestIndex.url}
                 target="_blank"
                 rel="noreferrer"
-                className="ml-2 inline-flex items-center gap-1 text-[11px] font-mono-data text-[#6F7F99] hover:text-[#F4F3EE]"
+                className="inline-flex items-center gap-1 text-[11px] font-mono-data text-[#727D94] hover:text-[#FFE29E]"
               >
                 FLDOE B.E.S.T. <ExternalLink className="w-3 h-3" />
               </a>
@@ -691,126 +435,210 @@ export function HomePage() {
 
           <div
             className={`grid grid-cols-1 ${
-              dirFilter === 'all' ? 'md:grid-cols-2 lg:grid-cols-4' : 'max-w-4xl'
-            } gap-4`}
+              dirFilter === 'all' ? 'lg:grid-cols-2' : 'max-w-5xl'
+            } gap-6`}
           >
             {visibleDirectoryCourses.map((cid) => {
               const c = COURSES[cid];
+              const tbMeta = FLORIDA_COURSE_TEXTBOOK_META[cid];
+              const chapters = FLORIDA_TEXTBOOK_CHAPTERS.filter((ch) => ch.courseId === cid).sort(
+                (a, b) => a.chapterNumber - b.chapterNumber
+              );
               const nodes = CURRICULUM_NODES.filter((n) => n.courseId === cid);
 
               return (
-                <div
+                <article
                   key={cid}
-                  className="instrument-frame p-4 flex flex-col justify-between gap-4"
+                  className="instrument-frame p-5 sm:p-6 flex flex-col justify-between gap-5"
                   style={{ borderTop: `2px solid ${c.accent}` }}
                 >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Link
-                        to={`/course/${cid}`}
-                        className="font-serif-editorial text-xl text-[#F4F3EE] hover:underline"
-                      >
-                        {c.title}
-                      </Link>
-                      <span
-                        className="font-mono-data text-[10px] px-2 py-0.5 rounded-full"
-                        style={{ backgroundColor: `${c.accent}20`, color: c.accent }}
-                      >
-                        {nodes.length} Live
-                      </span>
+                  <div className="space-y-4">
+                    {/* Course Header */}
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="space-y-1">
+                        <div className="flex flex-wrap items-center gap-2 font-mono-data text-[10px]">
+                          <span style={{ color: c.accent }}>
+                            {c.shortTitle} · CPALMS {c.cpalmsCode}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-full bg-[#11131C] border border-[rgba(244,196,108,0.18)] text-[#A8B2C6]">
+                            {tbMeta.eocBadge}
+                          </span>
+                        </div>
+                        <Link
+                          to={`/course/${cid}`}
+                          className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC] hover:underline block"
+                        >
+                          {c.title}
+                        </Link>
+                        <p className="text-xs text-[#A8B2C6] leading-relaxed">{tbMeta.overview}</p>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Link
+                          to={`/textbook?course=${cid}`}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-mono-data border border-[rgba(244,196,108,0.28)] bg-[#11131C] text-[#FFE29E] hover:border-[#F4C46C]"
+                        >
+                          <BookOpen className="w-3 h-3" />7 Chapters
+                        </Link>
+                        <Link
+                          to={`/course/${cid}`}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-mono-data text-[#060609] font-semibold"
+                          style={{ backgroundColor: c.accent }}
+                        >
+                          Course Hub →
+                        </Link>
+                      </div>
                     </div>
 
-                    <div
-                      className={
-                        dirFilter === 'all'
-                          ? 'space-y-2'
-                          : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5'
-                      }
-                    >
-                      {nodes.map((node) => (
-                        <Link
-                          key={node.id}
-                          to={node.route}
-                          className="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#070B14]/90 border border-white/[0.08] hover:border-white/25 transition-all group"
-                        >
-                          <span
-                            className="w-9 h-9 rounded-lg shrink-0 flex items-center justify-center font-mono-data text-[9.5px] font-semibold border"
-                            style={{
-                              borderColor: `${c.accent}44`,
-                              backgroundColor: `${c.accent}14`,
-                              color: c.accent,
-                            }}
+                    {/* 7 Florida B.E.S.T. Textbook Chapters */}
+                    {(dirView === 'both' || dirView === 'textbook') && (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between font-mono-data text-[10px] uppercase tracking-wider text-[#F4C46C]">
+                          <span>Florida B.E.S.T. Textbook Chapters (7)</span>
+                          <Link to={`/textbook?course=${cid}`} className="hover:underline">
+                            Open Book →
+                          </Link>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {chapters.map((ch) => (
+                            <Link
+                              key={ch.id}
+                              to={`/textbook?course=${cid}&chapter=${ch.id}`}
+                              className="p-2.5 rounded-xl bg-[#0B0C12] border border-[rgba(244,196,108,0.14)] hover:border-[rgba(244,196,108,0.4)] transition-all group"
+                            >
+                              <div className="flex items-center justify-between gap-2 font-mono-data text-[10px]">
+                                <span style={{ color: c.accent }}>CH 0{ch.chapterNumber}</span>
+                                <span className="text-[#727D94] truncate">{ch.benchmarks[0]}</span>
+                              </div>
+                              <div className="text-xs font-medium text-[#F7F4EC] truncate mt-0.5 group-hover:underline">
+                                {ch.title}
+                              </div>
+                              <div className="text-[10.5px] text-[#A8B2C6] truncate">
+                                {ch.subtitle}
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 9 Interactive 7-Layer Lessons */}
+                    {(dirView === 'both' || dirView === 'lessons') && (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between font-mono-data text-[10px] uppercase tracking-wider text-[#A8B2C6]">
+                          <span>Interactive 7-Layer Lessons ({nodes.length})</span>
+                          <Link
+                            to={`/course/${cid}`}
+                            className="hover:underline"
+                            style={{ color: c.accent }}
                           >
-                            {node.symbol}
-                          </span>
-                          <div className="min-w-0">
-                            <div className="text-xs font-medium text-[#F4F3EE] truncate group-hover:underline">
-                              {node.title}
-                            </div>
-                            <div className="text-[10px] font-mono-data text-[#6F7F99] truncate">
-                              {node.code} · {node.instrumentTag}
-                            </div>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
+                            All {c.shortTitle} Units →
+                          </Link>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                          {nodes.map((node) => (
+                            <Link
+                              key={node.id}
+                              to={node.route}
+                              className="flex items-center gap-2 p-2 rounded-xl bg-[#060609]/85 border border-[rgba(244,196,108,0.12)] hover:border-[rgba(244,196,108,0.38)] transition-all group"
+                            >
+                              <span
+                                className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center font-mono-data text-[9px] font-semibold border"
+                                style={{
+                                  borderColor: `${c.accent}44`,
+                                  backgroundColor: `${c.accent}14`,
+                                  color: c.accent,
+                                }}
+                              >
+                                {node.symbol}
+                              </span>
+                              <div className="min-w-0">
+                                <div className="text-[11.5px] font-medium text-[#F7F4EC] truncate group-hover:underline">
+                                  {node.title}
+                                </div>
+                                <div className="text-[9.5px] font-mono-data text-[#727D94] truncate">
+                                  {node.code}
+                                </div>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  <Link
-                    to={`/course/${cid}`}
-                    className="pt-2 border-t hairline-rule flex items-center justify-between text-xs font-mono-data hover:underline"
-                    style={{ color: c.accent }}
-                  >
-                    <span>Open Full {c.title} Hub</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
+                  <div className="pt-3 border-t border-[rgba(244,196,108,0.14)] flex flex-wrap items-center justify-between gap-2 text-xs font-mono-data">
+                    <span className="text-[#727D94] text-[11px]">{tbMeta.audience}</span>
+                    <Link
+                      to={`/course/${cid}`}
+                      className="inline-flex items-center gap-1 hover:underline"
+                      style={{ color: c.accent }}
+                    >
+                      Open {c.title} Hub <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </article>
               );
             })}
           </div>
         </section>
 
-        {/* SECTION 7: STANDALONE LABS & GRADE PLANNER CALLOUTS */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {/* SECTION F: OBSERVATORY SUITE PORTALS */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Link
+            to="/frontier"
+            className="instrument-frame p-5 space-y-2.5 hover:border-[#F4C46C]/60 transition-all"
+          >
+            <div className="flex items-center justify-between text-[#FFE29E]">
+              <span className="font-mono-data text-[10px] uppercase tracking-wider">10D Frontier</span>
+              <Orbit className="w-4 h-4" />
+            </div>
+            <h3 className="font-serif-editorial text-xl text-[#F7F4EC]">String Theory 3D</h3>
+            <p className="text-xs text-[#A8B2C6] leading-relaxed">
+              Calabi-Yau manifolds, Hopf rings, worldsheet vibrations, and 60,000-particle flux.
+            </p>
+          </Link>
+
+          <Link
+            to="/textbook"
+            className="instrument-frame p-5 space-y-2.5 hover:border-[#46D6E8]/60 transition-all"
+          >
+            <div className="flex items-center justify-between text-[#46D6E8]">
+              <span className="font-mono-data text-[10px] uppercase tracking-wider">28 Chapters</span>
+              <Layers className="w-4 h-4" />
+            </div>
+            <h3 className="font-serif-editorial text-xl text-[#F7F4EC]">Florida B.E.S.T. Book</h3>
+            <p className="text-xs text-[#A8B2C6] leading-relaxed">
+              Interactive examples, EOC trap alerts, MTR habits, and live checks for all 4 courses.
+            </p>
+          </Link>
+
           <Link
             to="/instruments"
-            className="instrument-frame p-6 space-y-3 hover:border-[#36EBA8]/55 transition-all"
+            className="instrument-frame p-5 space-y-2.5 hover:border-[#45E6A6]/60 transition-all"
           >
-            <div className="flex items-center justify-between">
-              <span className="font-mono-data text-xs text-[#36EBA8]">UNIFIED WORKBENCH BANK</span>
-              <Cpu className="w-4 h-4 text-[#36EBA8]" />
+            <div className="flex items-center justify-between text-[#45E6A6]">
+              <span className="font-mono-data text-[10px] uppercase tracking-wider">Lab Workbench</span>
+              <Cpu className="w-4 h-4" />
             </div>
-            <h3 className="font-serif-editorial text-2xl text-[#F4F3EE]">
-              16 Standalone Precision Laboratories (36 Engines)
-            </h3>
-            <p className="text-xs text-[#A5B4CC] leading-relaxed">
-              Launch the Neural Matrix Lab, Vortex &amp; Lorenz Theater, Quadratic Solver, Linear
-              Regression Residual Lab, 3D Hinged Net Lab, Parallel Transversals, Similarity k²,
-              Pascal Binomial Engine, Trig Identity Conservation, Law of Sines, or Lissajous Studio.
+            <h3 className="font-serif-editorial text-xl text-[#F7F4EC]">All 3D &amp; Math Labs</h3>
+            <p className="text-xs text-[#A8B2C6] leading-relaxed">
+              Every standalone 3D manifold, conic slicer, solid net, neural engine, and topic lab.
             </p>
-            <span className="inline-flex items-center gap-1.5 text-xs font-mono-data text-[#36EBA8]">
-              Open All 16 Laboratories <ArrowRight className="w-3.5 h-3.5" />
-            </span>
           </Link>
 
           <Link
             to="/planner"
-            className="instrument-frame p-6 space-y-3 hover:border-[#F5BC5E]/55 transition-all"
+            className="instrument-frame p-5 space-y-2.5 hover:border-[#FF8563]/60 transition-all"
           >
-            <div className="flex items-center justify-between">
-              <span className="font-mono-data text-xs text-[#F5BC5E]">LINEAR SENSITIVITY OBSERVATORY</span>
-              <Calculator className="w-4 h-4 text-[#F5BC5E]" />
+            <div className="flex items-center justify-between text-[#FF8563]">
+              <span className="font-mono-data text-[10px] uppercase tracking-wider">Target Gauge</span>
+              <Calculator className="w-4 h-4" />
             </div>
-            <h3 className="font-serif-editorial text-2xl text-[#F4F3EE]">
-              Syllabus Grade Planner &amp; Radial Target Gauge
-            </h3>
-            <p className="text-xs text-[#A5B4CC] leading-relaxed">
-              Visualize syllabus category weights, inspect your radial Final Exam Target Gauge, and
-              watch the live linear sensitivity curve G(F) compute the exact final exam score needed.
+            <h3 className="font-serif-editorial text-xl text-[#F7F4EC]">Syllabus Grade Planner</h3>
+            <p className="text-xs text-[#A8B2C6] leading-relaxed">
+              Simulate category weights and compute the exact final exam score needed for your goal.
             </p>
-            <span className="inline-flex items-center gap-1.5 text-xs font-mono-data text-[#F5BC5E]">
-              Open Grade Planner <ArrowRight className="w-3.5 h-3.5" />
-            </span>
           </Link>
         </section>
       </div>

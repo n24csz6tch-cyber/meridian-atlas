@@ -1,11 +1,24 @@
 import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, ExternalLink, Layers, Pause, Play, Sparkles } from 'lucide-react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import {
+  AlertTriangle,
+  ArrowRight,
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  Layers,
+  Orbit,
+  Pause,
+  Play,
+  Sparkles,
+} from 'lucide-react';
 import { AtlasShell } from '../components/AtlasShell';
 import { LessonNavHeader } from '../components/LessonNavHeader';
 import { MathTex } from '../components/MathTex';
 import { PracticeEngine, PracticeQuestion } from '../components/PracticeEngine';
+import { CURRICULUM_NODES } from '../data/curriculumGraph';
 import { FLDOE_SOURCES, VERIFIED_STANDARDS } from '../data/standards';
 import { SolidNetLab } from '../instruments/SolidNetLab';
 import { EquationMiniVisual } from '../visuals/equations/EquationMiniVisual';
@@ -24,7 +37,7 @@ const WORKED_3D_STEPS: {
   {
     title: 'Step 1 · Inspect Internal Right Triangle',
     tex: '\\text{Base } s = 6\\text{ cm} \\implies \\text{apothem } \\frac{s}{2} = 3\\text{ cm},\\quad h = 4\\text{ cm}',
-    note: 'Look inside the closed pyramid: the vertical altitude h (coral) and half-base apothem s/2 (amber) meet at 90°.',
+    note: 'Look inside the closed pyramid: the vertical altitude h (coral) and half-base apothem s/2 (gold) meet at 90°.',
     unfold: 0,
     highlight: 'all',
     internalTriangle: true,
@@ -32,7 +45,7 @@ const WORKED_3D_STEPS: {
   {
     title: 'Step 2 · Solve Slant Height via Pythagoras',
     tex: 'l = \\sqrt{h^2 + \\left(\\frac{s}{2}\\right)^2} = \\sqrt{4^2 + 3^2} = \\sqrt{25} = 5\\text{ cm}',
-    note: 'The green hypotenuse l = 5 cm is the true height of each triangular lateral wall.',
+    note: 'The jade hypotenuse l = 5 cm is the true height of each triangular lateral wall.',
     unfold: 0,
     highlight: 'lateral',
     internalTriangle: true,
@@ -141,7 +154,8 @@ const GEOMETRY_QUESTIONS: PracticeQuestion[] = [
 const LESSON_STANDARD_CODES = ['MA.912.GR.4.1', 'MA.912.GR.4.5', 'MA.912.GR.4.6'];
 
 export function SolidsLessonPage() {
-  // Layer 3 synced step + lazy mount second WebGL context only when scrolled near Layer 3
+  const reducedMotion = useReducedMotion();
+
   const [stepIdx, setStepIdx] = useState(0);
   const [autoPlaySteps, setAutoPlaySteps] = useState(false);
   const [mountWorked3D, setMountWorked3D] = useState(false);
@@ -187,6 +201,8 @@ export function SolidsLessonPage() {
   const atriumVol = (1 / 3) * atriumSide * atriumSide * atriumHeight;
 
   const activeStep = WORKED_3D_STEPS[stepIdx];
+  const stepPct = Math.round(((stepIdx + 1) / WORKED_3D_STEPS.length) * 100);
+  const nextBridgeNode = CURRICULUM_NODES.find((n) => n.id === 'a2-complex');
 
   return (
     <AtlasShell activeCourse="geometry">
@@ -194,11 +210,31 @@ export function SolidsLessonPage() {
         <LessonNavHeader courseId="geometry" activeNodeId="g-solids" code="G-09" />
 
         {/* Header */}
-        <header className="space-y-3 max-w-4xl">
-          <h1 className="font-serif-editorial text-4xl sm:text-5xl text-[#F4F3EE] leading-tight">
+        <header className="instrument-frame fiducial-frame p-6 sm:p-7 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="font-mono-data text-[11px] uppercase tracking-[0.2em] text-[#46D6E8]">
+              Geometry 3D Flagship · Hinged Nets &amp; Planar Slicing
+            </span>
+            <div className="flex flex-wrap items-center gap-2 font-mono-data text-[11px]">
+              <Link
+                to="/textbook"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#F4C46C]/25 bg-[#0B0C12] text-[#FFE29E] hover:border-[#F4C46C]/55 transition-colors"
+              >
+                <BookOpen className="w-3 h-3 text-[#F4C46C]" /> FL Textbook
+              </Link>
+              <Link
+                to="/frontier"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#F4C46C]/25 bg-[#0B0C12] text-[#F4C46C] hover:border-[#FFE29E]/55 transition-colors"
+              >
+                <Orbit className="w-3 h-3" /> String 3D
+              </Link>
+            </div>
+          </div>
+
+          <h1 className="font-serif-editorial text-4xl sm:text-5xl text-[#F7F4EC] leading-tight">
             3D Solids, Articulated Nets &amp; Cross-Sections
           </h1>
-          <p className="text-sm sm:text-base text-[#A5B4CC] leading-relaxed">
+          <p className="text-sm sm:text-base text-[#A8B2C6] leading-relaxed max-w-4xl">
             Surface area is not a formula to memorize — it is literally the 2D skin of a solid
             hinged open onto a flat plane. Unfold, orbit, resize, and slice three-dimensional
             solids directly below.
@@ -209,18 +245,18 @@ export function SolidsLessonPage() {
         <section id="layer-1" className="space-y-4 scroll-mt-24">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#38BDF8]">
+              <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#46D6E8]">
                 Layer 01 · Interactive 3D Visual Intuition
               </span>
-              <h2 className="font-serif-editorial text-2xl text-[#EDEBE4]">
+              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
                 Unfold 3D Hinges Into Planar 2D Nets
               </h2>
             </div>
             <Link
               to="/instruments"
-              className="inline-flex items-center gap-1.5 text-xs font-mono-data text-[#38BDF8] hover:underline"
+              className="inline-flex items-center gap-1.5 text-xs font-mono-data text-[#46D6E8] hover:underline"
             >
-              <Sparkles className="w-3.5 h-3.5" /> Open in Instruments Lab
+              <Sparkles className="w-3.5 h-3.5" /> Open in 3D Labs
             </Link>
           </div>
           <SolidNetLab />
@@ -229,42 +265,56 @@ export function SolidsLessonPage() {
         {/* LAYER 2: Clean Formalization */}
         <section id="layer-2" className="space-y-4 scroll-mt-24">
           <div>
-            <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#38D9FF]">
+            <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#46D6E8]">
               Layer 02 · Visualized 3D Surface &amp; Volume Equations
             </span>
-            <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F4F3EE]">
+            <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
               Surface Area via Unfolded Nets &amp; Volume Conservation
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div className="instrument-frame p-5 space-y-3">
-              <span className="font-mono-data text-[10.5px] text-[#38D9FF] uppercase tracking-wider block">
-                Right Prisms
-              </span>
-              <EquationMiniVisual kind="prism-net" accent="#38D9FF" caption="Unfolded Prism Net" />
-              <div className="instrument-panel px-3 py-2">
-                <MathTex tex="SA = 2B + Ph \qquad V = Bh" displayMode className="text-[#F4F3EE]" />
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-mono-data text-[10.5px] text-[#46D6E8] uppercase tracking-wider">
+                  Right Prisms
+                </span>
+                <span className="font-mono-data text-[9.5px] px-2 py-0.5 rounded-full border border-[#F4C46C]/20 bg-[#0B0C12] text-[#F4C46C]">
+                  EQ 01
+                </span>
               </div>
-              <p className="text-xs text-[#A5B4CC] leading-relaxed">
+              <div aria-label="Unfolded prism net preview">
+                <EquationMiniVisual kind="prism-net" accent="#46D6E8" />
+              </div>
+              <div className="instrument-panel px-3 py-2 overflow-x-auto">
+                <MathTex tex="SA = 2B + Ph \qquad V = Bh" displayMode className="text-[#F7F4EC]" />
+              </div>
+              <p className="text-xs text-[#A8B2C6] leading-relaxed">
                 Two congruent bases (<MathTex tex="2B" />) plus one unwrapped rectangular lateral
                 band of width <MathTex tex="P" /> (base perimeter) and height <MathTex tex="h" />.
               </p>
             </div>
 
             <div className="instrument-frame p-5 space-y-3">
-              <span className="font-mono-data text-[10.5px] text-[#F5BC5E] uppercase tracking-wider block">
-                Regular Pyramids &amp; Slant Height
-              </span>
-              <EquationMiniVisual kind="pyramid-slant" accent="#F5BC5E" caption="Pyramid Net & Slant l" />
-              <div className="instrument-panel px-3 py-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-mono-data text-[10.5px] text-[#F4C46C] uppercase tracking-wider">
+                  Regular Pyramids &amp; Slant Height
+                </span>
+                <span className="font-mono-data text-[9.5px] px-2 py-0.5 rounded-full border border-[#F4C46C]/20 bg-[#0B0C12] text-[#F4C46C]">
+                  EQ 02
+                </span>
+              </div>
+              <div aria-label="Pyramid net and slant height l preview">
+                <EquationMiniVisual kind="pyramid-slant" accent="#F4C46C" />
+              </div>
+              <div className="instrument-panel px-3 py-2 overflow-x-auto">
                 <MathTex
                   tex="SA = B + \tfrac{1}{2}Pl \qquad V = \tfrac{1}{3}Bh"
                   displayMode
-                  className="text-[#F4F3EE]"
+                  className="text-[#F7F4EC]"
                 />
               </div>
-              <p className="text-xs text-[#A5B4CC] leading-relaxed">
+              <p className="text-xs text-[#A8B2C6] leading-relaxed">
                 Lateral triangles taper to an apex along slant height{' '}
                 <MathTex tex="l = \sqrt{h^2 + a^2}" />, while volume occupies one-third of its
                 parent prism.
@@ -272,18 +322,25 @@ export function SolidsLessonPage() {
             </div>
 
             <div className="instrument-frame p-5 space-y-3">
-              <span className="font-mono-data text-[10.5px] text-[#36EBA8] uppercase tracking-wider block">
-                Cylinders &amp; Scaling Laws
-              </span>
-              <EquationMiniVisual kind="cylinder-unroll" accent="#36EBA8" caption="Unrolled 2πr × h Band" />
-              <div className="instrument-panel px-3 py-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-mono-data text-[10.5px] text-[#45E6A6] uppercase tracking-wider">
+                  Cylinders &amp; Scaling Laws
+                </span>
+                <span className="font-mono-data text-[9.5px] px-2 py-0.5 rounded-full border border-[#F4C46C]/20 bg-[#0B0C12] text-[#F4C46C]">
+                  EQ 03
+                </span>
+              </div>
+              <div aria-label="Unrolled cylinder 2pi r by h band preview">
+                <EquationMiniVisual kind="cylinder-unroll" accent="#45E6A6" />
+              </div>
+              <div className="instrument-panel px-3 py-2 overflow-x-auto">
                 <MathTex
                   tex="SA' = k^2 SA \qquad V' = k^3 V"
                   displayMode
-                  className="text-[#F4F3EE]"
+                  className="text-[#F7F4EC]"
                 />
               </div>
-              <p className="text-xs text-[#A5B4CC] leading-relaxed">
+              <p className="text-xs text-[#A8B2C6] leading-relaxed">
                 Dilating linear dimensions by <MathTex tex="k" /> scales 2D net area by{' '}
                 <MathTex tex="k^2" /> and 3D volume by <MathTex tex="k^3" />.
               </p>
@@ -292,15 +349,15 @@ export function SolidsLessonPage() {
         </section>
 
         {/* LAYER 3: Synchronized 3D Guided Worked Example */}
-        <section id="layer-3" className="space-y-4 scroll-mt-24">
+        <section id="layer-3" className="instrument-frame fiducial-frame p-5 sm:p-7 space-y-5 scroll-mt-24">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <Layers className="w-4 h-4 text-[#38BDF8]" />
+            <div className="flex items-center gap-2.5">
+              <Layers className="w-4 h-4 text-[#46D6E8]" />
               <div>
-                <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#38BDF8]">
+                <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#46D6E8] block">
                   Layer 03 · Synchronized 3D Worked Example
                 </span>
-                <h2 className="font-serif-editorial text-2xl text-[#EDEBE4]">
+                <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
                   Square Pyramid (<MathTex tex="s = 6\text{ cm},\; h = 4\text{ cm}" />)
                 </h2>
               </div>
@@ -314,7 +371,7 @@ export function SolidsLessonPage() {
                   setStepIdx((prev) => (prev - 1 + WORKED_3D_STEPS.length) % WORKED_3D_STEPS.length);
                 }}
                 aria-label="Previous 3D step"
-                className="p-1.5 rounded-full border border-white/15 bg-white/[0.03] text-[#A5B4CC] hover:text-[#F4F3EE] transition-colors"
+                className="p-1.5 rounded-full border border-[#F4C46C]/25 bg-[#0B0C12] text-[#A8B2C6] hover:text-[#F7F4EC] hover:border-[#F4C46C]/50 transition-colors"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
@@ -323,9 +380,9 @@ export function SolidsLessonPage() {
                 onClick={() => setAutoPlaySteps((p) => !p)}
                 className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono-data border transition-all"
                 style={{
-                  borderColor: autoPlaySteps ? '#38BDF8' : 'rgba(255,255,255,0.16)',
-                  backgroundColor: autoPlaySteps ? 'rgba(56,189,248,0.18)' : 'rgba(255,255,255,0.03)',
-                  color: autoPlaySteps ? '#38BDF8' : '#A5B4CC',
+                  borderColor: autoPlaySteps ? '#46D6E8' : 'rgba(244, 196, 108, 0.28)',
+                  backgroundColor: autoPlaySteps ? 'rgba(70, 214, 232, 0.18)' : '#0B0C12',
+                  color: autoPlaySteps ? '#46D6E8' : '#F7F4EC',
                 }}
               >
                 {autoPlaySteps ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
@@ -338,36 +395,52 @@ export function SolidsLessonPage() {
                   setStepIdx((prev) => (prev + 1) % WORKED_3D_STEPS.length);
                 }}
                 aria-label="Next 3D step"
-                className="p-1.5 rounded-full border border-white/15 bg-white/[0.03] text-[#A5B4CC] hover:text-[#F4F3EE] transition-colors"
+                className="p-1.5 rounded-full border border-[#F4C46C]/25 bg-[#0B0C12] text-[#A8B2C6] hover:text-[#F7F4EC] hover:border-[#F4C46C]/50 transition-colors"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
 
+          <div className="h-1 w-full rounded-full bg-[#060609] border border-[#F4C46C]/15 overflow-hidden">
+            <motion.div
+              className="h-full rounded-full"
+              style={{
+                background: 'linear-gradient(90deg, #F4C46C, #46D6E8)',
+                boxShadow: '0 0 10px #46D6E8',
+              }}
+              initial={false}
+              animate={{ width: `${stepPct}%` }}
+              transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 260, damping: 28 }}
+            />
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             <div className="lg:col-span-5 space-y-2.5">
-              {WORKED_3D_STEPS.map((st, idx) => {
-                const active = stepIdx === idx;
+              {WORKED_3D_STEPS.map((st, idxStep) => {
+                const active = stepIdx === idxStep;
                 return (
-                  <button
+                  <motion.button
                     key={st.title}
                     type="button"
+                    whileTap={reducedMotion ? undefined : { scale: 0.99 }}
                     onClick={() => {
                       setAutoPlaySteps(false);
-                      setStepIdx(idx);
+                      setStepIdx(idxStep);
                     }}
-                    className="w-full text-left p-4 rounded border transition-all space-y-1.5"
+                    className="w-full text-left p-4 rounded-xl border transition-all space-y-1.5"
                     style={{
-                      backgroundColor: active ? '#161D29' : '#111620',
-                      borderColor: active ? '#38BDF8' : 'rgba(237, 235, 228, 0.1)',
-                      boxShadow: active ? '0 0 22px -10px rgba(56,189,248,0.85)' : undefined,
+                      backgroundColor: active ? 'rgba(70, 214, 232, 0.1)' : '#0B0C12',
+                      borderColor: active ? '#46D6E8' : 'rgba(244, 196, 108, 0.16)',
+                      boxShadow: active ? '0 0 22px -10px rgba(70, 214, 232, 0.85)' : undefined,
                     }}
                   >
-                    <p className="font-mono-data text-[11px] text-[#38BDF8]">{st.title}</p>
-                    <MathTex tex={st.tex} displayMode className="text-sm text-[#EDEBE4]" />
-                    <p className="text-xs text-[#9CA6B8] leading-relaxed">{st.note}</p>
-                  </button>
+                    <p className="font-mono-data text-[11px] text-[#46D6E8]">{st.title}</p>
+                    <div className="overflow-x-auto">
+                      <MathTex tex={st.tex} displayMode className="text-sm text-[#F7F4EC]" />
+                    </div>
+                    <p className="text-xs text-[#A8B2C6] leading-relaxed">{st.note}</p>
+                  </motion.button>
                 );
               })}
             </div>
@@ -376,53 +449,55 @@ export function SolidsLessonPage() {
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={stepIdx}
-                  initial={{ opacity: 0, y: 6 }}
+                  initial={reducedMotion ? false : { opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
+                  exit={reducedMotion ? undefined : { opacity: 0, y: -6 }}
                   transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-                  className="instrument-panel px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 border-[#38BDF8]/30"
+                  className="instrument-panel px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 border-[#46D6E8]/35"
                 >
-                  <span className="font-mono-data text-[11px] text-[#38BDF8]">
+                  <span className="font-mono-data text-[11px] text-[#46D6E8]">
                     3D STAGE · 0{stepIdx + 1} / 0{WORKED_3D_STEPS.length}
                   </span>
-                  <span className="text-xs text-[#EDEBE4]">
+                  <span className="text-xs text-[#F7F4EC]">
                     {activeStep.unfold === 1 ? 'Unfolded 2D Planar Net' : 'Folded 3D Solid'}
                   </span>
                 </motion.div>
               </AnimatePresence>
 
               <div className="instrument-frame overflow-hidden">
-              {mountWorked3D ? (
-                <Suspense
-                  fallback={
-                    <div className="h-[380px] flex items-center justify-center bg-[#0B1018] font-mono-data text-xs text-[#9CA6B8]">
-                      Loading 3D Worked Example…
-                    </div>
-                  }
-                >
-                  <LazySolidNetScene
-                    solid="square-pyramid"
-                    width={3.0}
-                    depth={3.0}
-                    height={2.0}
-                    unfold={activeStep.unfold}
-                    highlightPart={activeStep.highlight}
-                    showInternalTriangle={activeStep.internalTriangle}
-                    heightClass="h-[380px] sm:h-[420px]"
-                  />
-                </Suspense>
-              ) : (
-                <div className="h-[380px] sm:h-[420px] flex flex-col items-center justify-center gap-3 bg-[#080C15] p-6 text-center">
-                  <EquationMiniVisual kind="pyramid-slant" accent="#38D9FF" heightClass="h-[170px]" />
-                  <button
-                    type="button"
-                    onClick={() => setMountWorked3D(true)}
-                    className="px-4 py-2 rounded-full text-xs font-mono-data bg-[#38D9FF]/15 text-[#38D9FF] border border-[#38D9FF]/45"
+                {mountWorked3D ? (
+                  <Suspense
+                    fallback={
+                      <div className="h-[380px] flex items-center justify-center bg-[#0B0C12] font-mono-data text-xs text-[#A8B2C6]">
+                        Loading 3D Worked Example…
+                      </div>
+                    }
                   >
-                    Activate 3D Interactive Worked Pyramid
-                  </button>
-                </div>
-              )}
+                    <LazySolidNetScene
+                      solid="square-pyramid"
+                      width={3.0}
+                      depth={3.0}
+                      height={2.0}
+                      unfold={activeStep.unfold}
+                      highlightPart={activeStep.highlight}
+                      showInternalTriangle={activeStep.internalTriangle}
+                      heightClass="h-[380px] sm:h-[420px]"
+                    />
+                  </Suspense>
+                ) : (
+                  <div className="h-[380px] sm:h-[420px] flex flex-col items-center justify-center gap-3 bg-[#060609] p-6 text-center">
+                    <div className="w-full max-w-sm" aria-label="Pyramid net preview">
+                      <EquationMiniVisual kind="pyramid-slant" accent="#46D6E8" heightClass="h-[170px]" />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setMountWorked3D(true)}
+                      className="px-4 py-2 rounded-full text-xs font-mono-data bg-[#46D6E8]/15 text-[#46D6E8] border border-[#46D6E8]/45 hover:bg-[#46D6E8]/25 transition-colors"
+                    >
+                      Activate 3D Interactive Worked Pyramid
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -431,74 +506,84 @@ export function SolidsLessonPage() {
         {/* LAYER 4: Interactive Practice */}
         <section id="layer-4" className="space-y-4 scroll-mt-24">
           <div>
-            <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#38BDF8]">
+            <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#46D6E8]">
               Layer 04 · Interactive Mastery Practice
             </span>
-            <h2 className="font-serif-editorial text-2xl text-[#EDEBE4]">
+            <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
               Calculate Nets, Slant Heights &amp; Cross-Sections
             </h2>
           </div>
           <PracticeEngine
             questions={GEOMETRY_QUESTIONS}
-            accentColor="#38BDF8"
+            accentColor="#46D6E8"
             visualKinds={['prism-net', 'pyramid-slant', 'area-scale-k2', 'cylinder-unroll']}
           />
         </section>
 
         {/* LAYER 5: Visualized Misconception (Altitude h vs Slant Height l) */}
-        <section id="layer-5" className="space-y-4 scroll-mt-24">
-          <div>
-            <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#F9735B]">
-              Layer 05 · Visualized Common Misconception
-            </span>
-            <h2 className="font-serif-editorial text-2xl text-[#EDEBE4]">
-              Vertical Altitude (<MathTex tex="h" />) Is NOT Triangle Slant Height (<MathTex tex="l" />)
-            </h2>
+        <motion.section
+          id="layer-5"
+          initial={reducedMotion ? false : { opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className="instrument-frame p-5 sm:p-7 space-y-5 border-[#FF8563]/40 scroll-mt-24"
+        >
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-[#FF8563] shrink-0 mt-1" />
+            <div>
+              <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#FF8563]">
+                Layer 05 · Visualized Common Misconception
+              </span>
+              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
+                Vertical Altitude (<MathTex tex="h" />) Is NOT Triangle Slant Height (<MathTex tex="l" />)
+              </h2>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
-            <div className="lg:col-span-6 instrument-frame p-5 bg-[#0D121A]">
-              <svg viewBox="0 0 420 260" className="w-full h-auto" role="img" aria-label="Cross-section right triangle showing altitude h, apothem s/2, and slant height l">
+            <div className="lg:col-span-6 instrument-panel p-4 sm:p-5 bg-[#060609]">
+              <svg
+                viewBox="0 0 420 260"
+                className="w-full h-auto"
+                role="img"
+                aria-label="Cross-section right triangle showing altitude h, apothem s/2, and slant height l"
+              >
                 <defs>
-                  <pattern id="smallGrid" width="20" height="20" patternUnits="userSpaceOnUse">
-                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(237,235,228,0.05)" strokeWidth="1" />
+                  <pattern id="aureaSolidsGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(244,196,108,0.06)" strokeWidth="1" />
                   </pattern>
                 </defs>
-                <rect width="420" height="260" fill="url(#smallGrid)" />
+                <rect width="420" height="260" fill="url(#aureaSolidsGrid)" />
 
-                {/* Pyramid cross section triangle */}
                 <polygon
                   points="80,215 340,215 210,45"
-                  fill="rgba(56, 189, 248, 0.08)"
-                  stroke="rgba(56, 189, 248, 0.4)"
+                  fill="rgba(70, 214, 232, 0.08)"
+                  stroke="rgba(70, 214, 232, 0.45)"
                   strokeWidth="1.5"
                 />
-                {/* Vertical Altitude h */}
-                <line x1="210" y1="45" x2="210" y2="215" stroke="#F9735B" strokeWidth="3" />
-                {/* Apothem s/2 */}
-                <line x1="210" y1="215" x2="340" y2="215" stroke="#E5A94C" strokeWidth="3" />
-                {/* Slant Height l */}
-                <line x1="210" y1="45" x2="340" y2="215" stroke="#34D399" strokeWidth="3.2" />
-                {/* Right angle */}
-                <polyline points="210,197 228,197 228,215" fill="none" stroke="#EDEBE4" strokeWidth="1.5" />
+                <line x1="210" y1="45" x2="210" y2="215" stroke="#FF8563" strokeWidth="3" />
+                <line x1="210" y1="215" x2="340" y2="215" stroke="#F4C46C" strokeWidth="3" />
+                <line x1="210" y1="45" x2="340" y2="215" stroke="#45E6A6" strokeWidth="3.2" />
+                <polyline points="210,197 228,197 228,215" fill="none" stroke="#F7F4EC" strokeWidth="1.5" />
 
-                <text x="195" y="135" fill="#F9735B" fontSize="13" fontFamily="JetBrains Mono, monospace" textAnchor="end">
+                <text x="195" y="135" fill="#FF8563" fontSize="13" fontFamily="JetBrains Mono, monospace" textAnchor="end">
                   h = {misHeight}
                 </text>
-                <text x="275" y="236" fill="#E5A94C" fontSize="13" fontFamily="JetBrains Mono, monospace" textAnchor="middle">
+                <text x="275" y="236" fill="#F4C46C" fontSize="13" fontFamily="JetBrains Mono, monospace" textAnchor="middle">
                   s/2 = {(misSide / 2).toFixed(1)}
                 </text>
-                <text x="292" y="122" fill="#34D399" fontSize="13" fontFamily="JetBrains Mono, monospace" textAnchor="start">
+                <text x="292" y="122" fill="#45E6A6" fontSize="13" fontFamily="JetBrains Mono, monospace" textAnchor="start">
                   l = {slantVal.toFixed(2)}
                 </text>
-                <text x="210" y="24" fill="#9CA6B8" fontSize="11" fontFamily="JetBrains Mono, monospace" textAnchor="middle">
+                <text x="210" y="24" fill="#A8B2C6" fontSize="11" fontFamily="JetBrains Mono, monospace" textAnchor="middle">
                   Cross-Section Slice Through Pyramid Apex
                 </text>
               </svg>
             </div>
 
-            <div className="lg:col-span-6 instrument-frame p-5 space-y-4">
-              <p className="text-sm text-[#9CA6B8] leading-relaxed">
+            <div className="lg:col-span-6 instrument-panel p-5 space-y-4">
+              <p className="text-sm text-[#A8B2C6] leading-relaxed">
                 Using vertical altitude <MathTex tex="h" /> inside{' '}
                 <MathTex tex="\frac{1}{2} P (\cdot)" /> always <strong>underestimates</strong>{' '}
                 surface area because a tilted triangle face is the hypotenuse{' '}
@@ -508,8 +593,8 @@ export function SolidsLessonPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <label className="space-y-1 text-xs">
                   <div className="flex justify-between font-mono-data">
-                    <span className="text-[#E5A94C]">Base Side (s)</span>
-                    <span>{misSide}</span>
+                    <span className="text-[#F4C46C]">Base Side (s)</span>
+                    <span className="text-[#F7F4EC]">{misSide}</span>
                   </div>
                   <input
                     type="range"
@@ -519,13 +604,13 @@ export function SolidsLessonPage() {
                     value={misSide}
                     onChange={(e) => setMisSide(parseFloat(e.target.value))}
                     className="meridian-slider"
-                    style={{ ['--slider-accent' as string]: '#E5A94C' }}
+                    style={{ ['--slider-accent' as string]: '#F4C46C' }}
                   />
                 </label>
                 <label className="space-y-1 text-xs">
                   <div className="flex justify-between font-mono-data">
-                    <span className="text-[#F9735B]">Altitude (h)</span>
-                    <span>{misHeight}</span>
+                    <span className="text-[#FF8563]">Altitude (h)</span>
+                    <span className="text-[#F7F4EC]">{misHeight}</span>
                   </div>
                   <input
                     type="range"
@@ -535,51 +620,73 @@ export function SolidsLessonPage() {
                     value={misHeight}
                     onChange={(e) => setMisHeight(parseFloat(e.target.value))}
                     className="meridian-slider"
-                    style={{ ['--slider-accent' as string]: '#F9735B' }}
+                    style={{ ['--slider-accent' as string]: '#FF8563' }}
                   />
                 </label>
               </div>
 
-              <div className="p-3.5 rounded bg-[#0D121A] border border-[rgba(237,235,228,0.1)] space-y-1.5 font-mono-data text-xs">
-                <div className="flex justify-between">
-                  <span className="text-[#34D399]">True Lateral Area (½·P·l):</span>
-                  <span className="text-[#34D399]">{trueLateral.toFixed(1)} u²</span>
+              <div className="p-4 rounded-xl bg-[#060609] border border-[#F4C46C]/20 space-y-2.5 font-mono-data text-xs">
+                <div className="space-y-1">
+                  <div className="flex justify-between">
+                    <span className="text-[#45E6A6]">True Lateral Area (½·P·l):</span>
+                    <span className="text-[#45E6A6]">{trueLateral.toFixed(1)} u²</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-[#11131C] overflow-hidden">
+                    <motion.div
+                      className="h-full rounded-full bg-[#45E6A6]"
+                      initial={false}
+                      animate={{ width: `${Math.min(100, (trueLateral / 420) * 100)}%` }}
+                      transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 250, damping: 24 }}
+                    />
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-[#F9735B]">Erroneous (½·P·h):</span>
-                  <span className="text-[#F9735B]">{wrongLateral.toFixed(1)} u²</span>
+
+                <div className="space-y-1">
+                  <div className="flex justify-between">
+                    <span className="text-[#FF8563]">Erroneous (½·P·h):</span>
+                    <span className="text-[#FF8563]">{wrongLateral.toFixed(1)} u²</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-[#11131C] overflow-hidden">
+                    <motion.div
+                      className="h-full rounded-full bg-[#FF8563]"
+                      initial={false}
+                      animate={{ width: `${Math.min(100, (wrongLateral / 420) * 100)}%` }}
+                      transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 250, damping: 24 }}
+                    />
+                  </div>
                 </div>
-                <div className="flex justify-between border-t hairline-rule pt-1.5">
-                  <span className="text-[#EDEBE4]">Missing Material Error:</span>
-                  <span className="text-[#E5A94C]">−{errorGap.toFixed(1)} u²</span>
+
+                <div className="flex justify-between border-t hairline-rule pt-2">
+                  <span className="text-[#F7F4EC]">Missing Material Error:</span>
+                  <span className="text-[#F4C46C]">−{errorGap.toFixed(1)} u²</span>
                 </div>
               </div>
             </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* LAYER 6: Real-World Application */}
-        <section className="space-y-4">
+        <section id="layer-6" className="space-y-4 scroll-mt-24">
           <div>
-            <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#38BDF8]">
+            <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#46D6E8]">
               Layer 06 · Real-World Engineering Application
             </span>
-            <h2 className="font-serif-editorial text-2xl text-[#EDEBE4]">
+            <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
               Architectural Glass Pyramid Atrium Estimator
             </h2>
           </div>
 
-          <div className="instrument-frame p-5 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+          <div className="instrument-frame p-5 sm:p-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
             <div className="md:col-span-6 space-y-3">
-              <p className="text-sm text-[#9CA6B8] leading-relaxed">
+              <p className="text-sm text-[#A8B2C6] leading-relaxed">
                 Structural glazing engineers compute <strong>lateral surface area</strong> to order
                 tempered glass panels, and <strong>interior volume</strong> to size HVAC air
                 exchange.
               </p>
               <label className="block space-y-1 text-xs">
                 <div className="flex justify-between font-mono-data">
-                  <span className="text-[#38BDF8]">Atrium Base Span (s)</span>
-                  <span>{atriumSide} m</span>
+                  <span className="text-[#46D6E8]">Atrium Base Span (s)</span>
+                  <span className="text-[#F7F4EC]">{atriumSide} m</span>
                 </div>
                 <input
                   type="range"
@@ -589,13 +696,13 @@ export function SolidsLessonPage() {
                   value={atriumSide}
                   onChange={(e) => setAtriumSide(parseFloat(e.target.value))}
                   className="meridian-slider"
-                  style={{ ['--slider-accent' as string]: '#38BDF8' }}
+                  style={{ ['--slider-accent' as string]: '#46D6E8' }}
                 />
               </label>
               <label className="block space-y-1 text-xs">
                 <div className="flex justify-between font-mono-data">
-                  <span className="text-[#38BDF8]">Apex Height (h)</span>
-                  <span>{atriumHeight} m</span>
+                  <span className="text-[#F4C46C]">Apex Height (h)</span>
+                  <span className="text-[#F7F4EC]">{atriumHeight} m</span>
                 </div>
                 <input
                   type="range"
@@ -605,33 +712,33 @@ export function SolidsLessonPage() {
                   value={atriumHeight}
                   onChange={(e) => setAtriumHeight(parseFloat(e.target.value))}
                   className="meridian-slider"
-                  style={{ ['--slider-accent' as string]: '#38BDF8' }}
+                  style={{ ['--slider-accent' as string]: '#F4C46C' }}
                 />
               </label>
             </div>
 
             <div className="md:col-span-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="p-4 rounded bg-[#0D121A] border border-[rgba(237,235,228,0.1)]">
-                <span className="font-mono-data text-[10px] uppercase text-[#6C7689] block">
+              <div className="instrument-panel p-4">
+                <span className="font-mono-data text-[10px] uppercase text-[#727D94] block">
                   Beam Slant (l)
                 </span>
-                <span className="font-mono-data text-xl text-[#34D399]">
+                <span className="font-mono-data text-xl text-[#45E6A6]">
                   {atriumSlant.toFixed(1)} m
                 </span>
               </div>
-              <div className="p-4 rounded bg-[#0D121A] border border-[rgba(56,189,248,0.3)]">
-                <span className="font-mono-data text-[10px] uppercase text-[#6C7689] block">
+              <div className="instrument-panel p-4 border-[#46D6E8]/35">
+                <span className="font-mono-data text-[10px] uppercase text-[#727D94] block">
                   Glass Cladding (L)
                 </span>
-                <span className="font-mono-data text-xl text-[#38BDF8]">
+                <span className="font-mono-data text-xl text-[#46D6E8]">
                   {atriumGlass.toFixed(0)} m²
                 </span>
               </div>
-              <div className="p-4 rounded bg-[#0D121A] border border-[rgba(237,235,228,0.1)]">
-                <span className="font-mono-data text-[10px] uppercase text-[#6C7689] block">
+              <div className="instrument-panel p-4">
+                <span className="font-mono-data text-[10px] uppercase text-[#727D94] block">
                   HVAC Volume (V)
                 </span>
-                <span className="font-mono-data text-xl text-[#EDEBE4]">
+                <span className="font-mono-data text-xl text-[#FFE29E]">
                   {atriumVol.toFixed(0)} m³
                 </span>
               </div>
@@ -639,36 +746,44 @@ export function SolidsLessonPage() {
           </div>
         </section>
 
-        {/* LAYER 7: Verified Standards & Sources */}
-        <section id="layer-7" className="space-y-4 border-t hairline-rule pt-8 scroll-mt-24">
-          <div>
-            <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#9CA6B8]">
-              Layer 07 · Verified Standards &amp; Official Sources
-            </span>
-            <h2 className="font-serif-editorial text-2xl text-[#EDEBE4]">
-              Florida B.E.S.T. / CPALMS Alignment
-            </h2>
-            <p className="text-xs text-[#9CA6B8] mt-1">
-              Geometry Course Code{' '}
-              <a
-                href={FLDOE_SOURCES.cpalmsGeom.url}
-                target="_blank"
-                rel="noreferrer"
-                className="text-[#38BDF8] underline underline-offset-2"
-              >
-                1206310 (CPALMS)
-              </a>{' '}
-              · Official{' '}
-              <a
-                href={FLDOE_SOURCES.bestPdf.url}
-                target="_blank"
-                rel="noreferrer"
-                className="text-[#EDEBE4] underline underline-offset-2"
-              >
-                FLDOE B.E.S.T. Mathematics PDF
-              </a>{' '}
-              · Consulted November 22, 2026.
-            </p>
+        {/* LAYER 7: Verified Standards & Next Lesson */}
+        <section id="layer-7" className="instrument-frame p-5 sm:p-6 space-y-5 scroll-mt-24">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#46D6E8]">
+                Layer 07 · Verified Standards &amp; Official Sources
+              </span>
+              <h2 className="font-serif-editorial text-2xl text-[#F7F4EC]">
+                Florida B.E.S.T. / CPALMS Alignment
+              </h2>
+              <p className="text-xs text-[#A8B2C6] mt-1">
+                Geometry Course Code{' '}
+                <a
+                  href={FLDOE_SOURCES.cpalmsGeom.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[#46D6E8] underline underline-offset-2"
+                >
+                  1206310 (CPALMS)
+                </a>{' '}
+                · Official{' '}
+                <a
+                  href={FLDOE_SOURCES.bestPdf.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[#F7F4EC] underline underline-offset-2"
+                >
+                  FLDOE B.E.S.T. Mathematics PDF
+                </a>{' '}
+                · Consulted November 22, 2026.
+              </p>
+            </div>
+            <Link
+              to="/textbook"
+              className="inline-flex items-center gap-1.5 font-mono-data text-[11px] text-[#FFE29E] hover:underline"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-[#F4C46C]" /> View in FL Textbook Hub
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -676,26 +791,57 @@ export function SolidsLessonPage() {
               const std = VERIFIED_STANDARDS[code];
               if (!std) return null;
               return (
-                <div key={code} className="instrument-frame p-4 space-y-1.5">
+                <div key={code} className="instrument-panel p-4 space-y-1.5">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono-data text-xs text-[#38BDF8]">{std.code}</span>
+                    <span className="font-mono-data text-xs text-[#46D6E8]">{std.code}</span>
                     <a
                       href={std.sourceUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1 font-mono-data text-[11px] text-[#9CA6B8] hover:text-[#EDEBE4]"
+                      className="inline-flex items-center gap-1 font-mono-data text-[11px] text-[#A8B2C6] hover:text-[#FFE29E]"
                     >
                       CPALMS <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>
-                  <p className="text-xs text-[#EDEBE4] leading-relaxed">{std.description}</p>
+                  <p className="text-xs text-[#F7F4EC] leading-relaxed">{std.description}</p>
                   {std.clarification && (
-                    <p className="text-[11px] text-[#6C7689] leading-snug">{std.clarification}</p>
+                    <p className="text-[11px] text-[#727D94] leading-snug">{std.clarification}</p>
                   )}
                 </div>
               );
             })}
           </div>
+
+          {nextBridgeNode && (
+            <div className="pt-4 border-t hairline-rule flex flex-wrap items-center justify-between gap-3">
+              <div className="text-xs text-[#A8B2C6]">
+                <span className="font-mono-data text-[10px] uppercase text-[#727D94] block">
+                  Advance Into Algebra 2 Sequence
+                </span>
+                <strong className="text-[#F7F4EC] font-serif-editorial text-lg">
+                  {nextBridgeNode.code} · {nextBridgeNode.title}
+                </strong>
+              </div>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <Link
+                  to="/frontier"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-mono-data border border-[#F4C46C]/35 bg-[#0B0C12] text-[#FFE29E] hover:border-[#FFE29E]/65 transition-colors"
+                >
+                  <Orbit className="w-3.5 h-3.5 text-[#F4C46C]" />
+                  Calabi-Yau 3D Bridge
+                </Link>
+                <Link
+                  to={nextBridgeNode.route}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold text-[#060609] hover:brightness-110 transition-all shadow-[0_0_22px_-6px_rgba(70,214,232,0.55)]"
+                  style={{ background: 'linear-gradient(135deg, #46D6E8, #FFE29E)' }}
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Next Visual Lesson
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+          )}
         </section>
       </div>
     </AtlasShell>

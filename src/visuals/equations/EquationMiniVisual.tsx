@@ -206,7 +206,7 @@ function GlowCurve({
           fill="none"
           stroke={color}
           strokeWidth={width + 4.5}
-          strokeOpacity={0.18}
+          strokeOpacity={0.16}
           strokeLinecap="round"
           strokeLinejoin="round"
           initial={{ opacity: 0 }}
@@ -221,9 +221,12 @@ function GlowCurve({
           strokeDasharray="5 4"
           strokeLinecap="round"
           strokeLinejoin="round"
-          initial={{ opacity: 0, strokeDashoffset: 28 }}
-          animate={{ opacity: 1, strokeDashoffset: 0 }}
-          transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, strokeDashoffset: 18 }}
+          animate={{ opacity: 1, strokeDashoffset: [0, -18] }}
+          transition={{
+            opacity: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+            strokeDashoffset: { duration: 3.2, repeat: Infinity, ease: 'linear' },
+          }}
         />
       </>
     );
@@ -238,10 +241,10 @@ function GlowCurve({
         fill="none"
         stroke={color}
         strokeWidth={width + 4.5}
-        strokeOpacity={0.18}
+        strokeOpacity={0.2}
         strokeLinecap="round"
         strokeLinejoin="round"
-        initial={{ strokeDashoffset: 1, opacity: 0.25 }}
+        initial={{ strokeDashoffset: 1, opacity: 0.22 }}
         animate={{ strokeDashoffset: 0, opacity: 1 }}
         transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
       />
@@ -258,19 +261,62 @@ function GlowCurve({
         animate={{ strokeDashoffset: 0, opacity: 1 }}
         transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
       />
+      {/* Subtle traveling starlight phase pulse */}
+      <motion.path
+        d={d}
+        pathLength={1}
+        strokeDasharray="0.16 0.84"
+        fill="none"
+        stroke="#FFE29E"
+        strokeWidth={width + 1.1}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        initial={{ strokeDashoffset: 1, opacity: 0 }}
+        animate={{ strokeDashoffset: 0, opacity: [0, 0.68, 0.68, 0] }}
+        transition={{ duration: 3.4, delay: 0.8, repeat: Infinity, ease: 'linear' }}
+      />
     </>
   );
 }
 
 function Axes({ xMin, xMax, yMin, yMax }: { xMin: number; xMax: number; yMin: number; yMax: number }) {
   const [zx, zy] = mapPt(0, 0, xMin, xMax, yMin, yMax);
+  const hasY = zx >= 16 && zx <= W - 16;
+  const hasX = zy >= 10 && zy <= H - 10;
+
   return (
     <g>
-      {zx >= 16 && zx <= W - 16 && (
-        <line x1={zx} y1={10} x2={zx} y2={H - 10} stroke="rgba(255,255,255,0.18)" strokeWidth={1} />
+      {hasY && (
+        <>
+          <line x1={zx} y1={10} x2={zx} y2={H - 10} stroke="rgba(244,196,108,0.22)" strokeWidth={1} />
+          {[0.25, 0.5, 0.75].map((f, i) => (
+            <line
+              key={`yt-${i}`}
+              x1={zx - 2.5}
+              y1={14 + f * (H - 28)}
+              x2={zx + 2.5}
+              y2={14 + f * (H - 28)}
+              stroke="rgba(244,196,108,0.28)"
+              strokeWidth={1}
+            />
+          ))}
+        </>
       )}
-      {zy >= 10 && zy <= H - 10 && (
-        <line x1={14} y1={zy} x2={W - 14} y2={zy} stroke="rgba(255,255,255,0.18)" strokeWidth={1} />
+      {hasX && (
+        <>
+          <line x1={14} y1={zy} x2={W - 14} y2={zy} stroke="rgba(244,196,108,0.22)" strokeWidth={1} />
+          {[0.2, 0.4, 0.6, 0.8].map((f, i) => (
+            <line
+              key={`xt-${i}`}
+              x1={18 + f * (W - 36)}
+              y1={zy - 2.5}
+              x2={18 + f * (W - 36)}
+              y2={zy + 2.5}
+              stroke="rgba(244,196,108,0.28)"
+              strokeWidth={1}
+            />
+          ))}
+        </>
       )}
     </g>
   );
@@ -283,7 +329,7 @@ function Dot({ x, y, color, r = 3.6 }: { x: number; y: number; color: string; r?
     return (
       <g>
         <circle cx={x} cy={y} r={r + 4} fill={color} fillOpacity={0.22} />
-        <circle cx={x} cy={y} r={r} fill={color} stroke="#060A13" strokeWidth={1.2} />
+        <circle cx={x} cy={y} r={r} fill={color} stroke="#06070B" strokeWidth={1.2} />
       </g>
     );
   }
@@ -292,11 +338,19 @@ function Dot({ x, y, color, r = 3.6 }: { x: number; y: number; color: string; r?
     <motion.g
       initial={{ opacity: 0, scale: 0.4 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ type: 'spring', stiffness: 320, damping: 22, delay: 0.38 }}
+      transition={{ type: 'spring', stiffness: 320, damping: 22, delay: 0.35 }}
       style={{ transformOrigin: `${x}px ${y}px` }}
     >
-      <circle cx={x} cy={y} r={r + 4} fill={color} fillOpacity={0.22} />
-      <circle cx={x} cy={y} r={r} fill={color} stroke="#060A13" strokeWidth={1.2} />
+      <motion.circle
+        cx={x}
+        cy={y}
+        r={r + 4.2}
+        fill={color}
+        animate={{ scale: [1, 1.55, 1], opacity: [0.3, 0.06, 0.3] }}
+        transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+        style={{ transformOrigin: `${x}px ${y}px` }}
+      />
+      <circle cx={x} cy={y} r={r} fill={color} stroke="#06070B" strokeWidth={1.2} />
     </motion.g>
   );
 }
@@ -313,7 +367,7 @@ interface EquationMiniVisualProps {
 
 export function EquationMiniVisual({
   kind,
-  accent = '#F5BC5E',
+  accent = '#F4C46C',
   heightClass = 'h-[126px]',
   caption,
   replayKey,
@@ -322,15 +376,19 @@ export function EquationMiniVisual({
 }: EquationMiniVisualProps) {
   const uid = useId().replace(/:/g, '');
   const gridId = `grid-${kind}-${uid}`;
+  const glowId = `glow-${kind}-${uid}`;
   const reducedMotion = useReducedMotion();
   const [localReplay, setLocalReplay] = useState(0);
   const shouldAnimate = animated && !reducedMotion;
+
   const content = useMemo(() => {
-    const cyan = '#38D9FF';
-    const gold = '#F5BC5E';
-    const emerald = '#36EBA8';
-    const coral = '#FF7A5C';
-    const ink = '#F4F3EE';
+    const cyan = '#46D6E8';
+    const gold = '#F4C46C';
+    const starGold = '#FFE29E';
+    const emerald = '#45E6A6';
+    const coral = '#FF8563';
+    const ink = '#F7F4EC';
+    const muted = '#A8B2C6';
 
     switch (kind) {
       case 'area-factor':
@@ -340,7 +398,8 @@ export function EquationMiniVisual({
             <rect x={144} y={24} width={64} height={52} fill={`${cyan}22`} stroke={cyan} strokeWidth={1.4} />
             <rect x={68} y={76} width={76} height={36} fill={`${emerald}22`} stroke={emerald} strokeWidth={1.4} />
             <rect x={144} y={76} width={64} height={36} fill={`${coral}26`} stroke={coral} strokeWidth={1.4} />
-            <text x={106} y={54} fill={gold} fontSize={11} textAnchor="middle" fontFamily="JetBrains Mono">x²</text>
+            <Dot x={144} y={76} color={starGold} r={2.8} />
+            <text x={106} y={54} fill={starGold} fontSize={11} textAnchor="middle" fontFamily="JetBrains Mono">x²</text>
             <text x={176} y={54} fill={cyan} fontSize={10.5} textAnchor="middle" fontFamily="JetBrains Mono">p·x</text>
             <text x={106} y={98} fill={emerald} fontSize={10.5} textAnchor="middle" fontFamily="JetBrains Mono">q·x</text>
             <text x={176} y={98} fill={coral} fontSize={10.5} textAnchor="middle" fontFamily="JetBrains Mono">p·q</text>
@@ -355,12 +414,12 @@ export function EquationMiniVisual({
         return (
           <g>
             <rect x={44} y={22} width={82} height={82} fill={`${gold}22`} stroke={gold} strokeWidth={1.6} />
-            <rect x={96} y={22} width={30} height={30} fill="#060A13" stroke={coral} strokeWidth={1.4} strokeDasharray="3 2" />
-            <text x={72} y={78} fill={gold} fontSize={10.5} fontFamily="JetBrains Mono">a²−b²</text>
+            <rect x={96} y={22} width={30} height={30} fill="#06070B" stroke={coral} strokeWidth={1.4} strokeDasharray="3 2" />
+            <text x={72} y={78} fill={starGold} fontSize={10.5} fontFamily="JetBrains Mono">a²−b²</text>
             <text x={111} y={40} fill={coral} fontSize={9} textAnchor="middle" fontFamily="JetBrains Mono">−b²</text>
-            <path d="M138,63 L156,63" stroke={ink} strokeWidth={1.4} />
-            <polygon points="156,59 163,63 156,67" fill={ink} />
-            <rect x={172} y={38} width={84} height={50} fill={`${cyan}24`} stroke={cyan} strokeWidth={1.6} />
+            <GlowCurve d="M136,63 L158,63" color={starGold} width={1.6} />
+            <polygon points="157,59 164,63 157,67" fill={starGold} />
+            <rect x={172} y={38} width={84} height={50} fill={`${cyan}22`} stroke={cyan} strokeWidth={1.6} />
             <text x={214} y={32} fill={cyan} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">a + b</text>
             <text x={214} y={67} fill={ink} fontSize={10} textAnchor="middle" fontFamily="JetBrains Mono">(a−b)(a+b)</text>
           </g>
@@ -369,15 +428,16 @@ export function EquationMiniVisual({
       case 'perfect-square':
         return (
           <g>
-            <rect x={82} y={20} width={58} height={58} fill={`${gold}26`} stroke={gold} strokeWidth={1.6} />
-            <rect x={140} y={20} width={36} height={58} fill={`${cyan}22`} stroke={cyan} strokeWidth={1.4} />
-            <rect x={82} y={78} width={58} height={36} fill={`${cyan}22`} stroke={cyan} strokeWidth={1.4} />
-            <rect x={140} y={78} width={36} height={36} fill={`${emerald}28`} stroke={emerald} strokeWidth={1.4} />
-            <text x={111} y={53} fill={gold} fontSize={11} textAnchor="middle" fontFamily="JetBrains Mono">x²</text>
-            <text x={158} y={53} fill={cyan} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">px</text>
-            <text x={111} y={100} fill={cyan} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">px</text>
-            <text x={158} y={100} fill={emerald} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">p²</text>
-            <text x={218} y={66} fill={cyan} fontSize={9.5} fontFamily="JetBrains Mono">2 wings = 2px</text>
+            <rect x={76} y={20} width={58} height={58} fill={`${gold}26`} stroke={gold} strokeWidth={1.6} />
+            <rect x={134} y={20} width={36} height={58} fill={`${cyan}22`} stroke={cyan} strokeWidth={1.4} />
+            <rect x={76} y={78} width={58} height={36} fill={`${cyan}22`} stroke={cyan} strokeWidth={1.4} />
+            <rect x={134} y={78} width={36} height={36} fill={`${emerald}28`} stroke={emerald} strokeWidth={1.4} />
+            <Dot x={134} y={78} color={starGold} r={2.8} />
+            <text x={105} y={53} fill={starGold} fontSize={11} textAnchor="middle" fontFamily="JetBrains Mono">x²</text>
+            <text x={152} y={53} fill={cyan} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">px</text>
+            <text x={105} y={100} fill={cyan} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">px</text>
+            <text x={152} y={100} fill={emerald} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">p²</text>
+            <text x={222} y={66} fill={cyan} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">2 wings = 2px</text>
           </g>
         );
 
@@ -393,8 +453,8 @@ export function EquationMiniVisual({
             <GlowCurve d={d} color={accent} />
             {kind === 'slope-triangle' && (
               <>
-                <line x1={x1} y1={y1} x2={x2} y2={y1} stroke={cyan} strokeWidth={1.5} strokeDasharray="3 2" />
-                <line x1={x2} y1={y1} x2={x2} y2={y2} stroke={emerald} strokeWidth={1.6} />
+                <GlowCurve d={`M${x1},${y1} L${x2},${y1}`} color={cyan} width={1.5} dashed />
+                <GlowCurve d={`M${x2},${y1} L${x2},${y2}`} color={emerald} width={1.6} />
                 <text x={(x1 + x2) / 2} y={y1 + 13} fill={cyan} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">Δx</text>
                 <text x={x2 + 12} y={(y1 + y2) / 2 + 3} fill={emerald} fontSize={9.5} fontFamily="JetBrains Mono">Δy</text>
               </>
@@ -413,16 +473,16 @@ export function EquationMiniVisual({
         return (
           <g>
             <rect x={28} y={32} width={70} height={36} rx={8} fill={`${gold}1C`} stroke={gold} strokeWidth={1.4} />
-            <text x={63} y={54} fill={gold} fontSize={12} textAnchor="middle" fontFamily="JetBrains Mono">
+            <text x={63} y={54} fill={starGold} fontSize={12} textAnchor="middle" fontFamily="JetBrains Mono">
               {kind === 'exponent-product' ? 'aᵐ · aⁿ' : 'x^(m/n)'}
             </text>
-            <path d="M106,50 L146,50" stroke={cyan} strokeWidth={1.8} />
+            <GlowCurve d="M106,50 L146,50" color={cyan} width={1.8} />
             <polygon points="146,46 154,50 146,54" fill={cyan} />
             <rect x={162} y={32} width={90} height={36} rx={8} fill={`${emerald}1C`} stroke={emerald} strokeWidth={1.5} />
             <text x={207} y={54} fill={emerald} fontSize={12} textAnchor="middle" fontFamily="JetBrains Mono">
               {kind === 'exponent-product' ? 'a^(m+n)' : 'ⁿ√(xᵐ)'}
             </text>
-            <text x={140} y={96} fill="#A5B4CC" fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">
+            <text x={140} y={96} fill={muted} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">
               {kind === 'exponent-product'
                 ? 'Multiplication of bases → Addition of exponents'
                 : 'Numerator m = power · Denominator n = root index'}
@@ -488,9 +548,9 @@ export function EquationMiniVisual({
           <g>
             <Axes xMin={-3} xMax={4} yMin={-2} yMax={4} />
             {kind === 'feasible-wedge' ? (
-              <polygon points={`${ax},${ay} ${ix},${iy} ${cx},${cy}`} fill={`${emerald}2A`} />
+              <polygon points={`${ax},${ay} ${ix},${iy} ${cx},${cy}`} fill={`${emerald}26`} />
             ) : (
-              <polygon points={`${ax},${ay} ${bx},${by} ${bx},12 ${ax},12`} fill={`${gold}24`} />
+              <polygon points={`${ax},${ay} ${bx},${by} ${bx},12 ${ax},12`} fill={`${gold}22`} />
             )}
             <GlowCurve d={`M${ax},${ay} L${bx},${by}`} color={gold} dashed={kind === 'boundary-dashed'} />
             {kind === 'feasible-wedge' && <GlowCurve d={`M${cx},${cy} L${dx},${dy}`} color={cyan} dashed />}
@@ -525,7 +585,7 @@ export function EquationMiniVisual({
             <Axes xMin={-3} xMax={4} yMin={-2} yMax={4} />
             <GlowCurve d={p1} color={gold} />
             <GlowCurve d={p2} color={cyan} />
-            <circle cx={ox} cy={oy} r={4} fill="#060A13" stroke={gold} strokeWidth={1.8} />
+            <circle cx={ox} cy={oy} r={4} fill="#06070B" stroke={gold} strokeWidth={1.8} />
             <Dot x={cx} y={cy} color={cyan} />
             <text x={cx + 9} y={cy + 3} fill={cyan} fontSize={9} fontFamily="JetBrains Mono">x ≥ 0</text>
           </g>
@@ -661,7 +721,7 @@ export function EquationMiniVisual({
           <g>
             <line x1={26} y1={42} x2={254} y2={42} stroke={cyan} strokeWidth={1.8} />
             <line x1={26} y1={92} x2={254} y2={92} stroke={cyan} strokeWidth={1.8} />
-            <line x1={96} y1={14} x2={186} y2={118} stroke={gold} strokeWidth={2} />
+            <GlowCurve d="M96,14 L186,118" color={gold} width={2} />
             <path d="M120,42 A18,18 0 0,1 131,55" fill={`${emerald}33`} stroke={emerald} strokeWidth={1.6} />
             {kind === 'transversal-alt' && (
               <path d="M164,92 A18,18 0 0,1 153,79" fill={`${emerald}33`} stroke={emerald} strokeWidth={1.6} />
@@ -672,6 +732,8 @@ export function EquationMiniVisual({
             {kind === 'linear-pair' && (
               <path d="M100,42 A18,18 0 0,1 120,42" fill={`${coral}33`} stroke={coral} strokeWidth={1.6} />
             )}
+            <Dot x={120} y={42} color={starGold} r={2.8} />
+            <Dot x={164} y={92} color={starGold} r={2.8} />
             <text x={198} y={36} fill={cyan} fontSize={9} fontFamily="JetBrains Mono">ℓ₁ ∥ ℓ₂</text>
             <text x={198} y={114} fill={emerald} fontSize={9} fontFamily="JetBrains Mono">
               {kind === 'linear-pair' ? 'α + β = 180°' : 'Congruent ≅'}
@@ -686,8 +748,10 @@ export function EquationMiniVisual({
           <g>
             <polygon points="44,98 112,98 76,32" fill={`${cyan}22`} stroke={cyan} strokeWidth={1.8} />
             <polygon points="164,98 232,98 196,32" fill={`${gold}22`} stroke={gold} strokeWidth={1.8} />
-            <path d="M112,56 Q140,34 166,56" fill="none" stroke={emerald} strokeDasharray="3 3" strokeWidth={1.5} />
-            <text x={140} y={32} fill={emerald} fontSize={9} textAnchor="middle" fontFamily="JetBrains Mono">
+            <GlowCurve d="M112,56 Q140,34 166,56" color={emerald} width={1.5} dashed />
+            <Dot x={76} y={32} color={cyan} r={2.6} />
+            <Dot x={196} y={32} color={gold} r={2.6} />
+            <text x={140} y={28} fill={emerald} fontSize={9} textAnchor="middle" fontFamily="JetBrains Mono">
               {kind === 'triangle-sum' ? 'α+β+γ = 180°' : 'SAS · SSS ≅'}
             </text>
           </g>
@@ -698,19 +762,20 @@ export function EquationMiniVisual({
       case 'side-splitter':
         return (
           <g>
-            <line x1={32} y1={104} x2={236} y2={28} stroke="rgba(255,255,255,0.22)" strokeDasharray="3 3" />
-            <line x1={32} y1={104} x2={244} y2={104} stroke="rgba(255,255,255,0.22)" strokeDasharray="3 3" />
-            <polygon points="32,104 118,104 118,72" fill={`${cyan}2C`} stroke={cyan} strokeWidth={1.8} />
+            <line x1={32} y1={104} x2={236} y2={28} stroke="rgba(244,196,108,0.28)" strokeDasharray="3 3" />
+            <line x1={32} y1={104} x2={244} y2={104} stroke="rgba(244,196,108,0.28)" strokeDasharray="3 3" />
+            <polygon points="32,104 118,104 118,72" fill={`${cyan}2A`} stroke={cyan} strokeWidth={1.8} />
             <polygon points="32,104 226,104 226,32" fill={`${gold}18`} stroke={gold} strokeWidth={1.6} />
+            <Dot x={32} y={104} color={emerald} r={3} />
             <text x={82} y={97} fill={cyan} fontSize={9} fontFamily="JetBrains Mono">A</text>
-            <text x={175} y={84} fill={gold} fontSize={9.5} fontFamily="JetBrains Mono">k²·A</text>
+            <text x={175} y={84} fill={starGold} fontSize={9.5} fontFamily="JetBrains Mono">k²·A</text>
             <text x={128} y={118} fill={emerald} fontSize={9} fontFamily="JetBrains Mono">Scale factor k</text>
           </g>
         );
 
       case 'reflection-axis':
       case 'rotation-arc':
-      case 'dilation-rays': {
+      case 'dilation-rays':
         return (
           <g>
             <line x1={140} y1={14} x2={140} y2={118} stroke={coral} strokeDasharray="4 3" strokeWidth={1.3} />
@@ -721,13 +786,12 @@ export function EquationMiniVisual({
               stroke={gold}
               strokeWidth={1.7}
             />
-            <path d="M104,54 Q140,28 176,54" fill="none" stroke={emerald} strokeWidth={1.4} />
+            <GlowCurve d="M104,54 Q140,28 176,54" color={emerald} width={1.5} />
             <text x={140} y={24} fill={emerald} fontSize={9} textAnchor="middle" fontFamily="JetBrains Mono">
               {kind === 'rotation-arc' ? 'R(θ)' : kind === 'dilation-rays' ? 'k · (x, y)' : 'Reflect'}
             </text>
           </g>
         );
-      }
 
       case 'polygon-angles':
       case 'quad-diagonals':
@@ -739,13 +803,14 @@ export function EquationMiniVisual({
                 <polygon points="140,18 202,48 182,106 98,106 78,48" fill={`${cyan}1C`} stroke={cyan} strokeWidth={1.8} />
                 <line x1={140} y1={18} x2={98} y2={106} stroke={gold} strokeDasharray="3 2" strokeWidth={1.3} />
                 <line x1={140} y1={18} x2={182} y2={106} stroke={gold} strokeDasharray="3 2" strokeWidth={1.3} />
-                <text x={140} y={76} fill={gold} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">(n−2)·180°</text>
+                <Dot x={140} y={18} color={starGold} r={3} />
+                <text x={140} y={76} fill={starGold} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">(n−2)·180°</text>
               </>
             ) : (
               <>
                 <polygon points="88,28 214,28 192,104 66,104" fill={`${cyan}20`} stroke={cyan} strokeWidth={1.8} />
-                <line x1={88} y1={28} x2={192} y2={104} stroke={gold} strokeWidth={1.4} />
-                <line x1={214} y1={28} x2={66} y2={104} stroke={emerald} strokeWidth={1.4} />
+                <GlowCurve d="M88,28 L192,104" color={gold} width={1.5} />
+                <GlowCurve d="M214,28 L66,104" color={emerald} width={1.5} />
                 <Dot x={140} y={66} color={coral} r={3.5} />
                 <text x={140} y={120} fill={ink} fontSize={8.5} textAnchor="middle" fontFamily="JetBrains Mono">Diagonals bisect at M</text>
               </>
@@ -763,13 +828,15 @@ export function EquationMiniVisual({
                 <rect x={68} y={60} width={34} height={34} fill={`${gold}28`} stroke={gold} strokeWidth={1.4} />
                 <rect x={102} y={94} width={48} height={24} fill={`${cyan}24`} stroke={cyan} strokeWidth={1.4} />
                 <polygon points="102,60 102,94 150,94" fill={`${emerald}26`} stroke={emerald} strokeWidth={1.8} />
-                <text x={85} y={80} fill={gold} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">a²</text>
+                <Dot x={102} y={94} color={starGold} r={2.8} />
+                <text x={85} y={80} fill={starGold} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">a²</text>
                 <text x={126} y={110} fill={cyan} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">b²</text>
                 <text x={142} y={68} fill={emerald} fontSize={10} fontFamily="JetBrains Mono">c² = a²+b²</text>
               </>
             ) : (
               <>
                 <polygon points="62,104 198,104 198,32" fill={`${cyan}20`} stroke={cyan} strokeWidth={1.8} />
+                <GlowCurve d="M62,104 L198,32" color={coral} width={1.9} />
                 <rect x={186} y={92} width={12} height={12} fill="none" stroke={gold} strokeWidth={1.2} />
                 <text x={130} y={118} fill={gold} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">adj (cos)</text>
                 <text x={208} y={70} fill={emerald} fontSize={9.5} fontFamily="JetBrains Mono">opp</text>
@@ -807,18 +874,17 @@ export function EquationMiniVisual({
       case 'chord-tangent':
         return (
           <g>
-            <circle cx={140} cy={66} r={46} fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth={1.4} />
+            <circle cx={140} cy={66} r={46} fill="none" stroke="rgba(244,196,108,0.28)" strokeWidth={1.4} />
             {kind === 'circle-sector' ? (
               <>
-                <path d="M140,66 L186,66 A46,46 0 0,0 156,23 Z" fill={`${cyan}36`} stroke={cyan} strokeWidth={1.8} />
-                <text x={198} y={54} fill={gold} fontSize={9.5} fontFamily="JetBrains Mono">s = rθ</text>
+                <path d="M140,66 L186,66 A46,46 0 0,0 156,23 Z" fill={`${cyan}32`} stroke={cyan} strokeWidth={1.8} />
+                <Dot x={140} y={66} color={gold} r={3} />
+                <text x={198} y={54} fill={starGold} fontSize={9.5} fontFamily="JetBrains Mono">s = rθ</text>
               </>
             ) : (
               <>
-                <line x1={140} y1={66} x2={182} y2={84} stroke={gold} strokeWidth={1.6} />
-                <line x1={140} y1={66} x2={172} y2={33} stroke={gold} strokeWidth={1.6} />
-                <line x1={96} y1={52} x2={182} y2={84} stroke={cyan} strokeWidth={1.5} />
-                <line x1={96} y1={52} x2={172} y2={33} stroke={cyan} strokeWidth={1.5} />
+                <GlowCurve d="M182,84 L140,66 L172,33" color={gold} width={1.6} />
+                <GlowCurve d="M182,84 L96,52 L172,33" color={cyan} width={1.5} />
                 <Dot x={140} y={66} color={gold} r={3.2} />
                 <Dot x={96} y={52} color={cyan} r={3.2} />
                 <text x={200} y={64} fill={emerald} fontSize={9} fontFamily="JetBrains Mono">θ = ½(2θ)</text>
@@ -839,8 +905,9 @@ export function EquationMiniVisual({
                 <polygon points="162,52 162,92 204,72" fill={`${gold}24`} stroke={gold} strokeWidth={1.4} />
                 <polygon points="118,92 162,92 140,124" fill={`${gold}24`} stroke={gold} strokeWidth={1.4} />
                 <polygon points="118,52 118,92 76,72" fill={`${gold}24`} stroke={gold} strokeWidth={1.4} />
-                <line x1={140} y1={52} x2={140} y2={14} stroke={emerald} strokeWidth={1.6} />
-                <text x={146} y={36} fill={emerald} fontSize={9.5} fontFamily="JetBrains Mono">l</text>
+                <GlowCurve d="M140,52 L140,14" color={emerald} width={1.7} />
+                <Dot x={140} y={14} color={starGold} r={2.6} />
+                <text x={148} y={36} fill={emerald} fontSize={9.5} fontFamily="JetBrains Mono">l</text>
               </>
             ) : kind === 'cylinder-unroll' ? (
               <>
@@ -857,6 +924,7 @@ export function EquationMiniVisual({
                 <rect x={186} y={46} width={44} height={44} fill={`${cyan}22`} stroke={cyan} strokeWidth={1.4} />
                 <rect x={98} y={14} width={44} height={32} fill={`${emerald}24`} stroke={emerald} strokeWidth={1.4} />
                 <rect x={98} y={90} width={44} height={32} fill={`${emerald}24`} stroke={emerald} strokeWidth={1.4} />
+                <Dot x={120} y={68} color={starGold} r={2.5} />
               </>
             )}
           </g>
@@ -868,7 +936,7 @@ export function EquationMiniVisual({
         return (
           <g>
             <Axes xMin={-3} xMax={3} yMin={-2} yMax={2} />
-            <circle cx={140} cy={66} r={42} fill="none" stroke="rgba(255,255,255,0.16)" strokeDasharray="3 3" />
+            <circle cx={140} cy={66} r={42} fill="none" stroke="rgba(244,196,108,0.22)" strokeDasharray="3 3" />
             <GlowCurve d="M140,66 L174,38" color={emerald} />
             <Dot x={174} y={38} color={emerald} />
             <text x={182} y={36} fill={emerald} fontSize={9.5} fontFamily="JetBrains Mono">a+bi</text>
@@ -912,11 +980,11 @@ export function EquationMiniVisual({
           return (
             <g>
               <rect x={22} y={46} width={44} height={34} rx={8} fill={`${gold}22`} stroke={gold} />
-              <text x={44} y={67} fill={gold} fontSize={11} textAnchor="middle" fontFamily="JetBrains Mono">x</text>
-              <line x1={66} y1={63} x2={92} y2={63} stroke={cyan} strokeWidth={1.6} />
+              <text x={44} y={67} fill={starGold} fontSize={11} textAnchor="middle" fontFamily="JetBrains Mono">x</text>
+              <GlowCurve d="M66,63 L92,63" color={cyan} width={1.8} />
               <rect x={92} y={40} width={58} height={46} rx={10} fill={`${cyan}22`} stroke={cyan} />
               <text x={121} y={67} fill={cyan} fontSize={11} textAnchor="middle" fontFamily="JetBrains Mono">g(x)</text>
-              <line x1={150} y1={63} x2={176} y2={63} stroke={emerald} strokeWidth={1.6} />
+              <GlowCurve d="M150,63 L176,63" color={emerald} width={1.8} />
               <rect x={176} y={40} width={82} height={46} rx={10} fill={`${emerald}22`} stroke={emerald} />
               <text x={217} y={67} fill={emerald} fontSize={10.5} textAnchor="middle" fontFamily="JetBrains Mono">f(g(x))</text>
             </g>
@@ -928,7 +996,7 @@ export function EquationMiniVisual({
         return (
           <g>
             <Axes xMin={-1} xMax={4} yMin={-1} yMax={4} />
-            <GlowCurve d={mir} color="rgba(255,255,255,0.45)" width={1.2} dashed />
+            <GlowCurve d={mir} color="rgba(244,196,108,0.45)" width={1.2} dashed />
             <GlowCurve d={f1} color={gold} />
             <GlowCurve d={f2} color={emerald} />
             <text x={208} y={28} fill={ink} fontSize={8.5} fontFamily="JetBrains Mono">y = x</text>
@@ -946,7 +1014,7 @@ export function EquationMiniVisual({
         return (
           <g>
             <Axes xMin={-2.5} xMax={3.2} yMin={-2.5} yMax={4} />
-            <GlowCurve d={mir} color="rgba(255,255,255,0.35)" width={1.1} dashed />
+            <GlowCurve d={mir} color="rgba(244,196,108,0.4)" width={1.1} dashed />
             <GlowCurve d={exp} color={gold} />
             <GlowCurve d={log} color={emerald} />
             <Dot x={mapPt(0, 1, -2.5, 3.2, -2.5, 4)[0]} y={mapPt(0, 1, -2.5, 3.2, -2.5, 4)[1]} color={gold} r={3} />
@@ -982,6 +1050,7 @@ export function EquationMiniVisual({
             <g>
               <Axes xMin={-3} xMax={3} yMin={-1} yMax={3.2} />
               <GlowCurve d={d} color={emerald} />
+              <Dot x={mapPt(0, 0, -3, 3, -1, 3.2)[0]} y={mapPt(0, 0, -3, 3, -1, 3.2)[1]} color={gold} r={3.2} />
               <text x={180} y={36} fill={emerald} fontSize={9.5} fontFamily="JetBrains Mono">ReLU(z)=max(0,z)</text>
             </g>
           );
@@ -998,12 +1067,12 @@ export function EquationMiniVisual({
             )}
             {L2.map((y2, i) =>
               L3.map((y3, j) => (
-                <line key={`b-${i}-${j}`} x1={146} y1={y2} x2={224} y2={y3} stroke={emerald} strokeWidth={1.6} />
+                <GlowCurve key={`b-${i}-${j}`} d={`M146,${y2} L224,${y3}`} color={emerald} width={1.6} />
               ))
             )}
-            {L1.map((y, i) => <Dot key={`a${i}`} x={64} y={y} color={gold} r={4.5} />)}
-            {L2.map((y, i) => <Dot key={`b${i}`} x={146} y={y} color={cyan} r={4.5} />)}
-            <Dot x={224} y={64} color={emerald} r={5} />
+            {L1.map((y, i) => <Dot key={`a${i}`} x={64} y={y} color={gold} r={4.2} />)}
+            {L2.map((y, i) => <Dot key={`b${i}`} x={146} y={y} color={cyan} r={4.2} />)}
+            <Dot x={224} y={64} color={emerald} r={4.8} />
           </g>
         );
       }
@@ -1045,7 +1114,7 @@ export function EquationMiniVisual({
             <line x1={18} y1={hy} x2={W - 18} y2={hy} stroke={gold} strokeDasharray="4 3" strokeWidth={1.1} />
             <GlowCurve d={d1} color={emerald} />
             <GlowCurve d={d2} color={emerald} />
-            {kind === 'rational-hole' && <circle cx={px + 26} cy={hy - 18} r={4} fill="#060A13" stroke={cyan} strokeWidth={1.8} />}
+            {kind === 'rational-hole' && <circle cx={px + 26} cy={hy - 18} r={4} fill="#06070B" stroke={cyan} strokeWidth={1.8} />}
           </g>
         );
       }
@@ -1060,9 +1129,9 @@ export function EquationMiniVisual({
         return (
           <g>
             <Axes xMin={-3.5} xMax={3.5} yMin={-0.1} yMax={1.2} />
-            <path d={`${band} L${rx},${by} L${lx},${by} Z`} fill={`${emerald}2E`} />
+            <path d={`${band} L${rx},${by} L${lx},${by} Z`} fill={`${emerald}2A`} />
             <GlowCurve d={bell} color={emerald} />
-            <text x={140} y={88} fill={gold} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">68.3% (±1σ)</text>
+            <text x={140} y={88} fill={starGold} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">68.3% (±1σ)</text>
           </g>
         );
       }
@@ -1072,8 +1141,8 @@ export function EquationMiniVisual({
         const wave = plotPath((x) => Math.sin(x), 0, 6.28, -1.35, 1.35);
         return (
           <g>
-            <circle cx={58} cy={66} r={34} fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth={1.3} />
-            <line x1={58} y1={66} x2={82} y2={42} stroke={gold} strokeWidth={1.8} />
+            <circle cx={58} cy={66} r={34} fill="none" stroke="rgba(244,196,108,0.28)" strokeWidth={1.3} />
+            <GlowCurve d="M58,66 L82,42" color={gold} width={1.8} />
             <line x1={82} y1={42} x2={132} y2={42} stroke={coral} strokeDasharray="3 2" strokeWidth={1.2} />
             <Dot x={82} y={42} color={coral} r={3.4} />
             <g transform="translate(86,0) scale(0.68,1)">
@@ -1105,7 +1174,7 @@ export function EquationMiniVisual({
       case 'matrix-det-area':
         return (
           <g>
-            <polygon points="56,100 144,96 208,42 120,46" fill={`${cyan}20`} stroke="rgba(255,255,255,0.22)" strokeDasharray="3 2" />
+            <polygon points="56,100 144,96 208,42 120,46" fill={`${cyan}1E`} stroke="rgba(244,196,108,0.28)" strokeDasharray="3 2" />
             <GlowCurve d="M56,100 L144,96" color={gold} />
             <GlowCurve d="M56,100 L120,46" color={cyan} />
             <GlowCurve d="M56,100 L208,42" color={emerald} width={2.4} />
@@ -1123,6 +1192,9 @@ export function EquationMiniVisual({
               <circle cx={140} cy={66} r={48} fill="none" stroke={`${cyan}55`} strokeDasharray="4 3" strokeWidth={1.3} />
             )}
             <polygon points="96,94 186,92 154,22" fill={`${coral}20`} stroke={coral} strokeWidth={1.8} />
+            <Dot x={154} y={22} color={starGold} r={2.8} />
+            <Dot x={96} y={94} color={cyan} r={2.8} />
+            <Dot x={186} y={92} color={emerald} r={2.8} />
             <text x={140} y={108} fill={gold} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">c</text>
             <text x={115} y={56} fill={cyan} fontSize={9.5} fontFamily="JetBrains Mono">b</text>
             <text x={176} y={56} fill={emerald} fontSize={9.5} fontFamily="JetBrains Mono">a</text>
@@ -1170,8 +1242,8 @@ export function EquationMiniVisual({
         }
         return (
           <g>
-            <circle cx={140} cy={66} r={44} fill="none" stroke="rgba(255,255,255,0.12)" />
-            <circle cx={140} cy={66} r={22} fill="none" stroke="rgba(255,255,255,0.1)" />
+            <circle cx={140} cy={66} r={44} fill="none" stroke="rgba(244,196,108,0.16)" />
+            <circle cx={140} cy={66} r={22} fill="none" stroke="rgba(244,196,108,0.12)" />
             <GlowCurve d={pts.join(' ')} color={coral} width={1.8} />
             <Dot x={184} y={66} color={gold} r={3.4} />
           </g>
@@ -1184,20 +1256,20 @@ export function EquationMiniVisual({
         return kind === 'hyperbola-asym' ? (
           <g>
             <Axes xMin={-3} xMax={3} yMin={-2} yMax={2} />
-            <line x1={38} y1={16} x2={242} y2={116} stroke="rgba(255,255,255,0.22)" strokeDasharray="3 3" />
-            <line x1={38} y1={116} x2={242} y2={16} stroke="rgba(255,255,255,0.22)" strokeDasharray="3 3" />
+            <line x1={38} y1={16} x2={242} y2={116} stroke="rgba(244,196,108,0.24)" strokeDasharray="3 3" />
+            <line x1={38} y1={116} x2={242} y2={16} stroke="rgba(244,196,108,0.24)" strokeDasharray="3 3" />
             <GlowCurve d="M72,18 Q112,66 72,114" color={coral} />
             <GlowCurve d="M208,18 Q168,66 208,114" color={coral} />
           </g>
         ) : (
           <g>
             <ellipse cx={140} cy={66} rx={78} ry={40} fill="none" stroke={coral} strokeWidth={2} />
-            <line x1={84} y1={66} x2={164} y2={28} stroke={cyan} strokeWidth={1.4} />
-            <line x1={196} y1={66} x2={164} y2={28} stroke={gold} strokeWidth={1.4} />
+            <GlowCurve d="M84,66 L164,28" color={cyan} width={1.4} />
+            <GlowCurve d="M196,66 L164,28" color={gold} width={1.4} />
             <Dot x={84} y={66} color={emerald} r={3.2} />
             <Dot x={196} y={66} color={emerald} r={3.2} />
             <Dot x={164} y={28} color={ink} r={3.2} />
-            <text x={140} y={82} fill={gold} fontSize={8.5} textAnchor="middle" fontFamily="JetBrains Mono">d₁ + d₂ = 2a</text>
+            <text x={140} y={82} fill={starGold} fontSize={8.5} textAnchor="middle" fontFamily="JetBrains Mono">d₁ + d₂ = 2a</text>
           </g>
         );
 
@@ -1206,11 +1278,12 @@ export function EquationMiniVisual({
       case 'series-diverge':
         return (
           <g>
-            <rect x={80} y={18} width={120} height={96} fill="none" stroke="rgba(255,255,255,0.25)" />
-            <rect x={80} y={18} width={60} height={96} fill={`${coral}34`} stroke={coral} />
-            <rect x={140} y={18} width={60} height={48} fill={`${gold}32`} stroke={gold} />
-            <rect x={140} y={66} width={30} height={48} fill={`${cyan}32`} stroke={cyan} />
-            <rect x={170} y={66} width={30} height={24} fill={`${emerald}32`} stroke={emerald} />
+            <rect x={80} y={18} width={120} height={96} fill="none" stroke="rgba(244,196,108,0.32)" />
+            <rect x={80} y={18} width={60} height={96} fill={`${coral}32`} stroke={coral} />
+            <rect x={140} y={18} width={60} height={48} fill={`${gold}30`} stroke={gold} />
+            <rect x={140} y={66} width={30} height={48} fill={`${cyan}30`} stroke={cyan} />
+            <rect x={170} y={66} width={30} height={24} fill={`${emerald}30`} stroke={emerald} />
+            <Dot x={200} y={114} color={starGold} r={2.6} />
             <text x={110} y={70} fill={ink} fontSize={10} textAnchor="middle" fontFamily="JetBrains Mono">½</text>
             <text x={170} y={45} fill={ink} fontSize={9.5} textAnchor="middle" fontFamily="JetBrains Mono">¼</text>
             <text x={155} y={94} fill={ink} fontSize={8.5} textAnchor="middle" fontFamily="JetBrains Mono">⅛</text>
@@ -1232,12 +1305,12 @@ export function EquationMiniVisual({
             <GlowCurve d={tan} color={emerald} width={1.5} dashed />
             <GlowCurve d={sec} color={coral} width={1.7} />
             {kind === 'continuity-hole' ? (
-              <circle cx={p1x} cy={p1y} r={4.2} fill="#060A13" stroke={gold} strokeWidth={1.8} />
+              <circle cx={p1x} cy={p1y} r={4.2} fill="#06070B" stroke={gold} strokeWidth={1.8} />
             ) : (
               <Dot x={p1x} y={p1y} color={emerald} />
             )}
             <Dot x={p2x} y={p2y} color={gold} />
-            <text x={p2x - 20} y={p2y - 10} fill={gold} fontSize={8.5} fontFamily="JetBrains Mono">h → 0</text>
+            <text x={p2x - 20} y={p2y - 10} fill={starGold} fontSize={8.5} fontFamily="JetBrains Mono">h → 0</text>
           </g>
         );
       }
@@ -1250,14 +1323,19 @@ export function EquationMiniVisual({
   return (
     <VisualAnimContext.Provider value={shouldAnimate}>
       <div
-        className={`relative w-full ${heightClass} rounded-xl bg-[#050811] border border-white/[0.08] overflow-hidden flex items-center justify-center group`}
+        className={`relative w-full ${heightClass} rounded-xl bg-[#06070B] border border-[rgba(244,196,108,0.17)] hover:border-[rgba(244,196,108,0.34)] transition-colors overflow-hidden flex items-center justify-center group`}
       >
         <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-full" role="img" aria-label={caption ?? kind}>
           <defs>
             <pattern id={gridId} width="24" height="24" patternUnits="userSpaceOnUse">
-              <path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(255,255,255,0.035)" strokeWidth="1" />
+              <path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(244, 196, 108, 0.055)" strokeWidth="1" />
             </pattern>
+            <radialGradient id={glowId} cx="50%" cy="50%" r="65%">
+              <stop offset="0%" stopColor="rgba(244, 196, 108, 0.08)" />
+              <stop offset="100%" stopColor="rgba(6, 7, 11, 0)" />
+            </radialGradient>
           </defs>
+          <rect x={0} y={0} width={W} height={H} fill={`url(#${glowId})`} />
           <rect x={0} y={0} width={W} height={H} fill={`url(#${gridId})`} />
           <motion.g
             key={`${kind}-${replayKey ?? 'base'}-${localReplay}`}
@@ -1274,15 +1352,10 @@ export function EquationMiniVisual({
             onClick={() => setLocalReplay((n) => n + 1)}
             aria-label="Replay equation drawing animation"
             title="Replay animation"
-            className="absolute top-1.5 right-1.5 p-1 rounded-md bg-[#090F1D]/85 border border-white/10 text-[#8B9BB4] hover:text-[#F4F3EE] hover:border-white/25 transition-colors"
+            className="absolute top-1.5 right-1.5 p-1 rounded-md bg-[#0B0C12]/90 border border-[rgba(244,196,108,0.22)] text-[#A8B2C6] hover:text-[#FFE29E] hover:border-[#F4C46C]/50 transition-colors"
           >
             <RotateCcw className="w-3 h-3" />
           </button>
-        )}
-        {caption && (
-          <span className="pointer-events-none absolute bottom-1.5 right-2.5 font-mono-data text-[9px] uppercase tracking-wider text-[#6F7F99]">
-            {caption}
-          </span>
         )}
       </div>
     </VisualAnimContext.Provider>

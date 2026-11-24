@@ -14,12 +14,16 @@ import {
 import { MathTex } from '../components/MathTex';
 import { COURSES } from '../data/curriculumGraph';
 import { DerivationStepVisual } from '../visuals/equations/LessonLayerVisuals';
+import { CalabiYauManifold3D } from '../visuals/frontier/CalabiYauManifold3D';
+import { OrbitalSignalTorus3D } from '../visuals/frontier/OrbitalSignalTorus3D';
+import { GoldenHarmonicSpine } from '../visuals/harmony/GoldenHarmonicSpine';
 import { NeuralAtlasMap } from '../visuals/map/NeuralAtlasMap';
 import { NeuralMathEngine } from '../visuals/neural/NeuralMathEngine';
 import { ParabolaCanvas } from '../visuals/parabola/ParabolaCanvas';
 import { UnitCircleWaveCanvas } from '../visuals/trig/UnitCircleWaveCanvas';
 import { MathVortexCanvas } from '../visuals/vortex/MathVortexCanvas';
 import {
+  FRONTIER_KEYFRAMES,
   MAP_FLIGHT_KEYFRAMES,
   PARABOLA_KEYFRAMES,
   PROOF_KEYFRAMES,
@@ -34,10 +38,10 @@ interface StageModeProps {
 }
 
 const COURSE_SWEEP = [
-  { id: 'algebra-1' as const, label: 'Algebra 1 · Warm Brass' },
-  { id: 'geometry' as const, label: 'Geometry · Cartographic Cyan' },
-  { id: 'algebra-2' as const, label: 'Algebra 2 · Oscilloscope Emerald' },
-  { id: 'precalculus' as const, label: 'Precalculus · Solar Coral' },
+  { id: 'algebra-1' as const, label: 'Algebra 1 · Solar Gold' },
+  { id: 'geometry' as const, label: 'Geometry · Starlight Cyan' },
+  { id: 'algebra-2' as const, label: 'Algebra 2 · Jade Signal' },
+  { id: 'precalculus' as const, label: 'Precalculus · Amber-Coral' },
 ];
 
 export function StageMode({ onExit }: StageModeProps) {
@@ -125,6 +129,15 @@ export function StageMode({ onExit }: StageModeProps) {
     setActIndex(clamped);
   };
 
+  const seekToSecond = (sec: number) => {
+    elapsedRef.current = sec;
+    setElapsedTick(sec);
+    if (progressBarRef.current) {
+      const pct = Math.min(100, (sec / act.durationSec) * 100);
+      progressBarRef.current.style.width = `${pct}%`;
+    }
+  };
+
   useEffect(() => {
     const flashNotice = (msg: string) => {
       setHudNotice(msg);
@@ -158,7 +171,7 @@ export function StageMode({ onExit }: StageModeProps) {
       } else if (e.key === 'f' || e.key === 'F') {
         e.preventDefault();
         toggleFullscreen();
-      } else if (e.key >= '1' && e.key <= '7') {
+      } else if (e.key >= '1' && e.key <= '8') {
         const idx = Number(e.key) - 1;
         if (idx >= 0 && idx < STAGE_ACTS.length) {
           e.preventDefault();
@@ -176,13 +189,15 @@ export function StageMode({ onExit }: StageModeProps) {
 
   const sweepIndex = Math.max(0, Math.min(3, Math.floor((elapsedTick / act.durationSec) * 4)));
 
+  const showConstellationPhase = actIndex === 1 && elapsedTick >= 10;
   const mapFrame = useMemo(() => {
+    const relSec = showConstellationPhase ? Math.max(0, elapsedTick - 10) : 0;
     let chosen = MAP_FLIGHT_KEYFRAMES[0];
     for (const kf of MAP_FLIGHT_KEYFRAMES) {
-      if (elapsedTick >= kf.atSec) chosen = kf;
+      if (relSec >= kf.atSec) chosen = kf;
     }
     return chosen;
-  }, [elapsedTick]);
+  }, [elapsedTick, showConstellationPhase]);
 
   const parabolaFrame = useMemo(() => {
     let chosen = PARABOLA_KEYFRAMES[0];
@@ -204,6 +219,14 @@ export function StageMode({ onExit }: StageModeProps) {
     return { ...chosen, sliceAnim };
   }, [elapsedTick]);
 
+  const frontierFrame = useMemo(() => {
+    let chosen = FRONTIER_KEYFRAMES[0];
+    for (const kf of FRONTIER_KEYFRAMES) {
+      if (elapsedTick >= kf.atSec) chosen = kf;
+    }
+    return chosen;
+  }, [elapsedTick]);
+
   const proofFrame = useMemo(() => {
     let chosen = PROOF_KEYFRAMES[0];
     for (const kf of PROOF_KEYFRAMES) {
@@ -213,52 +236,53 @@ export function StageMode({ onExit }: StageModeProps) {
   }, [elapsedTick]);
 
   const showNeuralPhase = actIndex === 4 && elapsedTick >= 10;
-  const showClosingMeridian = actIndex === 6 && elapsedTick >= 10;
+  const showClosingAurea = actIndex === 7 && elapsedTick >= 10;
 
   return (
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Meridian Stage Mode Presentation"
-      className="fixed inset-0 z-50 bg-[#05070C] text-[#F2F0E8] flex flex-col justify-between select-none overflow-hidden"
+      aria-label="AUREA Stage Mode Presentation"
+      className="fixed inset-0 z-50 bg-[#060609] text-[#F7F4EC] flex flex-col justify-between select-none overflow-hidden"
     >
-      {/* Top editorial header */}
-      <div className="px-6 sm:px-8 pt-5 pb-3 flex items-center justify-between gap-4 border-b border-[rgba(237,235,228,0.08)]">
+      {/* Top AUREA Editorial Header */}
+      <div className="px-6 sm:px-8 pt-4 pb-3 flex items-center justify-between gap-4 border-b border-[rgba(244,196,108,0.16)] bg-[#0B0C12]/80">
         <div className="flex items-center gap-3 min-w-0">
           <span
             className="font-mono-data text-xs uppercase tracking-[0.22em] px-2.5 py-0.5 rounded border shrink-0"
             style={{
               color: act.accent,
-              borderColor: `${act.accent}55`,
-              backgroundColor: `${act.accent}14`,
+              borderColor: `${act.accent}66`,
+              backgroundColor: `${act.accent}18`,
             }}
           >
             {act.number}
           </span>
-          <h2 className="font-serif-editorial text-xl sm:text-2xl text-[#F2F0E8] truncate">
+          <h2 className="font-serif-editorial text-xl sm:text-2xl text-[#F7F4EC] truncate">
             {act.title}
           </h2>
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
-          <span className="hidden lg:inline font-mono-data text-[11px] text-[#707D94]">
+          <span className="hidden lg:inline font-mono-data text-[11px] text-[#A8B2C6]">
             {act.subtitle}
           </span>
           <button
             type="button"
             onClick={onExit}
             aria-label="Close Stage Mode"
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono-data border border-white/15 bg-white/[0.04] text-[#A7B3C7] hover:text-[#F2F0E8] hover:border-[#FF785A]/55 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono-data border border-[rgba(244,196,108,0.22)] bg-[#11131C] text-[#A8B2C6] hover:text-[#F7F4EC] hover:border-[#FF8563]/60 transition-colors"
           >
-            <X className="w-3.5 h-3.5 text-[#FF785A]" />
+            <X className="w-3.5 h-3.5 text-[#FF8563]" />
             <span>Exit</span>
           </button>
         </div>
       </div>
 
       {/* Main Stage Viewport */}
-      <div className="flex-1 relative px-6 sm:px-10 py-4 flex items-center justify-center overflow-hidden">
+      <div className="flex-1 relative px-6 sm:px-10 py-4 flex items-center justify-center overflow-y-auto">
         <AnimatePresence mode="wait" initial={false}>
+          {/* ACT I: OVERTURE WITH ORBITAL SIGNAL TORUS 3D */}
           {actIndex === 0 && (
             <motion.div
               key="act-overture"
@@ -266,40 +290,42 @@ export function StageMode({ onExit }: StageModeProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.28 }}
-              className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
+              className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-7 items-center"
             >
-              <div className="lg:col-span-5 space-y-6">
-                <p className="font-mono-data text-xs uppercase tracking-[0.25em] text-[#F4B956]">
-                  MERIDIAN · OBSERVATORY PRESENTATION
+              <div className="lg:col-span-5 space-y-5">
+                <p className="font-mono-data text-xs uppercase tracking-[0.24em] text-[#F4C46C]">
+                  AUREA · GOLDEN OBSERVATORY KEYNOTE
                 </p>
-                <h1 className="font-serif-editorial text-5xl sm:text-6xl text-[#F2F0E8] leading-[1.06]">
-                  See High School Mathematics Move.
+                <h1 className="font-serif-editorial text-4xl sm:text-5xl lg:text-6xl text-[#F7F4EC] leading-[1.04]">
+                  See Mathematics Move in{' '}
+                  <em className="italic text-[#FFE29E]">3D Dimensions.</em>
                 </h1>
-                <p className="text-base text-[#A7B3C7] leading-relaxed">
-                  A tactile nocturnal atlas spanning Algebra 1, Geometry, Algebra 2, and Precalculus
-                  Honors — powered by live flow manifolds, neural matrices, and WebGL nets.
+                <p className="text-sm sm:text-base text-[#A8B2C6] leading-relaxed">
+                  A complete four-year Florida B.E.S.T. mathematical observatory spanning Algebra 1,
+                  Geometry, Algebra 2, and Precalculus Honors—powered by 60,000-particle 3D
+                  manifolds, neural matrices, and String Theory geometry.
                 </p>
 
-                <div className="grid grid-cols-2 gap-2.5 pt-2">
+                <div className="grid grid-cols-2 gap-2.5 pt-1">
                   {COURSE_SWEEP.map((item, idx) => {
                     const c = COURSES[item.id];
                     const active = idx === sweepIndex;
                     return (
                       <div
                         key={item.id}
-                        className="p-3 rounded border transition-all duration-300"
+                        className="p-3 rounded-xl border transition-all duration-300"
                         style={{
-                          backgroundColor: active ? `${c.accent}1E` : '#0C111C',
-                          borderColor: active ? c.accent : 'rgba(237,235,228,0.1)',
+                          backgroundColor: active ? `${c.accent}1E` : '#0B0C12',
+                          borderColor: active ? c.accent : 'rgba(244,196,108,0.16)',
                         }}
                       >
                         <span
-                          className="font-mono-data text-xs block"
+                          className="font-mono-data text-[11px] block"
                           style={{ color: c.accent }}
                         >
                           {c.shortTitle} · {c.cpalmsCode}
                         </span>
-                        <span className="font-serif-editorial text-lg text-[#F2F0E8]">
+                        <span className="font-serif-editorial text-lg text-[#F7F4EC]">
                           {c.title}
                         </span>
                       </div>
@@ -309,71 +335,108 @@ export function StageMode({ onExit }: StageModeProps) {
               </div>
 
               <div className="lg:col-span-7">
-                <MathVortexCanvas
-                  lockedMode="vortex"
-                  compact
-                  interactive={false}
-                  heightClass="h-[420px] sm:h-[460px]"
-                />
+                <OrbitalSignalTorus3D compact heightClass="h-[400px] sm:h-[450px]" />
               </div>
             </motion.div>
           )}
 
+          {/* ACT II: GOLDEN HARMONIC SPINE + CONSTELLATION ATLAS */}
           {actIndex === 1 && (
             <motion.div
-              key="act-map"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              key="act-harmonic-spine"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.28 }}
               className="w-full max-w-6xl space-y-3"
             >
-              <NeuralAtlasMap
-                compact
-                forcedSelectedId={mapFrame.selectedId}
-                heightClass="h-[420px] sm:h-[460px]"
-              />
-              <div className="px-4 py-2.5 rounded-xl bg-[#090E18] border border-white/12 flex items-center justify-between gap-4">
-                <span className="font-mono-data text-xs text-[#38D9FF]">
-                  NEURAL CONSTELLATION FLIGHT · {mapFrame.selectedId.toUpperCase()}
+              <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => seekToSecond(0)}
+                    className={`px-3 py-1 rounded-full font-mono-data text-[11px] border transition-all ${
+                      !showConstellationPhase
+                        ? 'bg-[#F4C46C] text-[#060609] border-[#FFE29E] font-semibold'
+                        : 'bg-[#0B0C12] text-[#A8B2C6] border-[rgba(244,196,108,0.18)]'
+                    }`}
+                  >
+                    Phase A · Golden Harmonic Spine (24 Strands)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => seekToSecond(10)}
+                    className={`px-3 py-1 rounded-full font-mono-data text-[11px] border transition-all ${
+                      showConstellationPhase
+                        ? 'bg-[#46D6E8] text-[#060609] border-[#46D6E8] font-semibold'
+                        : 'bg-[#0B0C12] text-[#A8B2C6] border-[rgba(244,196,108,0.18)]'
+                    }`}
+                  >
+                    Phase B · 36-Node Prerequisite Flight
+                  </button>
+                </div>
+                <span className="font-mono-data text-[11px] text-[#FFE29E]">
+                  {!showConstellationPhase
+                    ? 'High School Foundations ⇄ Physics & String Theory'
+                    : mapFrame.selectedId.toUpperCase()}
                 </span>
-                <p className="text-sm text-[#F4F3EE]">{mapFrame.caption}</p>
               </div>
+
+              {!showConstellationPhase ? (
+                <GoldenHarmonicSpine compact heightClass="h-[400px] sm:h-[440px]" />
+              ) : (
+                <div className="space-y-2.5">
+                  <NeuralAtlasMap
+                    compact
+                    forcedSelectedId={mapFrame.selectedId}
+                    heightClass="h-[390px] sm:h-[420px]"
+                  />
+                  <div className="px-4 py-2.5 rounded-xl bg-[#0B0C12] border border-[rgba(244,196,108,0.2)] flex flex-wrap items-center justify-between gap-3">
+                    <span className="font-mono-data text-xs text-[#46D6E8]">
+                      CONSTELLATION FLIGHT · {mapFrame.selectedId.toUpperCase()}
+                    </span>
+                    <p className="text-xs sm:text-sm text-[#F7F4EC]">{mapFrame.caption}</p>
+                  </div>
+                </div>
+              )}
             </motion.div>
           )}
 
+          {/* ACT III: ALGEBRA IN MOTION · PARABOLA */}
           {actIndex === 2 && (
             <motion.div
               key="act-parabola"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.45 }}
+              transition={{ duration: 0.35 }}
               className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-center"
             >
               <div className="lg:col-span-5 space-y-4">
-                <span className="font-mono-data text-xs uppercase tracking-wider text-[#E5A94C]">
+                <span className="font-mono-data text-xs uppercase tracking-wider text-[#F5C25B]">
                   {parabolaFrame.badge}
                 </span>
-                <div className="instrument-frame p-5 bg-[#111620] border-[#E5A94C]/40 space-y-3">
-                  <MathTex tex={parabolaFrame.tex} displayMode className="text-2xl text-[#EDEBE4]" />
-                  <p className="text-sm text-[#9CA6B8] leading-relaxed">{parabolaFrame.note}</p>
+                <div className="instrument-frame p-5 border-[#F5C25B]/40 space-y-3">
+                  <MathTex tex={parabolaFrame.tex} displayMode className="text-2xl text-[#F7F4EC]" />
+                  <p className="text-sm text-[#A8B2C6] leading-relaxed">{parabolaFrame.note}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   {PARABOLA_KEYFRAMES.map((kf) => (
-                    <div
+                    <button
                       key={kf.badge}
-                      className="p-2.5 rounded border text-xs font-mono-data transition-colors"
+                      type="button"
+                      onClick={() => seekToSecond(kf.atSec)}
+                      className="p-2.5 rounded-lg border text-left text-xs font-mono-data transition-colors"
                       style={{
                         borderColor:
-                          kf.badge === parabolaFrame.badge ? '#E5A94C' : 'rgba(237,235,228,0.08)',
+                          kf.badge === parabolaFrame.badge ? '#F5C25B' : 'rgba(244,196,108,0.14)',
                         backgroundColor:
-                          kf.badge === parabolaFrame.badge ? 'rgba(229,169,76,0.12)' : '#0D121A',
-                        color: kf.badge === parabolaFrame.badge ? '#EDEBE4' : '#6C7689',
+                          kf.badge === parabolaFrame.badge ? 'rgba(245,194,91,0.14)' : '#0B0C12',
+                        color: kf.badge === parabolaFrame.badge ? '#F7F4EC' : '#727D94',
                       }}
                     >
                       {kf.badge.split('·')[0]}
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -386,35 +449,55 @@ export function StageMode({ onExit }: StageModeProps) {
                   highlightFeature={parabolaFrame.highlight}
                   interactive={false}
                   showParentCurve
-                  heightClass="h-[460px]"
+                  heightClass="h-[440px]"
                 />
               </div>
             </motion.div>
           )}
 
+          {/* ACT IV: GEOMETRY UNFOLDED · 3D SOLIDS */}
           {actIndex === 3 && (
             <motion.div
               key="act-solids"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.45 }}
+              transition={{ duration: 0.35 }}
               className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-center"
             >
               <div className="lg:col-span-4 space-y-4">
-                <span className="font-mono-data text-xs uppercase tracking-wider text-[#38BDF8]">
+                <span className="font-mono-data text-xs uppercase tracking-wider text-[#46D6E8]">
                   {solidFrame.badge}
                 </span>
-                <div className="instrument-frame p-5 bg-[#111620] border-[#38BDF8]/40 space-y-3">
-                  <MathTex tex={solidFrame.tex} displayMode className="text-xl text-[#EDEBE4]" />
-                  <p className="text-sm text-[#9CA6B8] leading-relaxed">{solidFrame.note}</p>
+                <div className="instrument-frame p-5 border-[#46D6E8]/40 space-y-3">
+                  <MathTex tex={solidFrame.tex} displayMode className="text-xl text-[#F7F4EC]" />
+                  <p className="text-sm text-[#A8B2C6] leading-relaxed">{solidFrame.note}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {SOLIDS_KEYFRAMES.map((kf) => (
+                    <button
+                      key={kf.badge}
+                      type="button"
+                      onClick={() => seekToSecond(kf.atSec)}
+                      className="p-2 rounded-lg border text-left text-[11px] font-mono-data transition-colors"
+                      style={{
+                        borderColor:
+                          kf.badge === solidFrame.badge ? '#46D6E8' : 'rgba(244,196,108,0.14)',
+                        backgroundColor:
+                          kf.badge === solidFrame.badge ? 'rgba(70,214,232,0.14)' : '#0B0C12',
+                        color: kf.badge === solidFrame.badge ? '#F7F4EC' : '#727D94',
+                      }}
+                    >
+                      {kf.badge.split('·')[0]}
+                    </button>
+                  ))}
                 </div>
               </div>
 
               <div className="lg:col-span-8 instrument-frame overflow-hidden">
                 <Suspense
                   fallback={
-                    <div className="h-[480px] flex items-center justify-center font-mono-data text-xs text-[#9CA6B8]">
+                    <div className="h-[460px] flex items-center justify-center font-mono-data text-xs text-[#A8B2C6]">
                       Initializing 3D Pyramid Stage…
                     </div>
                   }
@@ -429,7 +512,7 @@ export function StageMode({ onExit }: StageModeProps) {
                     showInternalTriangle={solidFrame.internalTriangle}
                     sliceHeight={solidFrame.sliceAnim}
                     autoOrbitSpeed={0.95}
-                    heightClass="h-[480px]"
+                    heightClass="h-[460px]"
                     showControlsHint={false}
                   />
                 </Suspense>
@@ -437,6 +520,7 @@ export function StageMode({ onExit }: StageModeProps) {
             </motion.div>
           )}
 
+          {/* ACT V: HARMONIC WAVES & NEURAL MATRIX */}
           {actIndex === 4 && (
             <motion.div
               key="act-neural-wave"
@@ -444,37 +528,106 @@ export function StageMode({ onExit }: StageModeProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.28 }}
-              className="w-full max-w-6xl space-y-4"
+              className="w-full max-w-6xl space-y-3"
             >
+              <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => seekToSecond(0)}
+                    className={`px-3 py-1 rounded-full font-mono-data text-[11px] border transition-all ${
+                      !showNeuralPhase
+                        ? 'bg-[#FF8563] text-[#060609] border-[#FF8563] font-semibold'
+                        : 'bg-[#0B0C12] text-[#A8B2C6] border-[rgba(244,196,108,0.18)]'
+                    }`}
+                  >
+                    Phase A · Unit Circle Waves
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => seekToSecond(10)}
+                    className={`px-3 py-1 rounded-full font-mono-data text-[11px] border transition-all ${
+                      showNeuralPhase
+                        ? 'bg-[#45E6A6] text-[#060609] border-[#45E6A6] font-semibold'
+                        : 'bg-[#0B0C12] text-[#A8B2C6] border-[rgba(244,196,108,0.18)]'
+                    }`}
+                  >
+                    Phase B · Neural Matrix Engine
+                  </button>
+                </div>
+                <span className="font-mono-data text-[11px] text-[#FFE29E]">
+                  {!showNeuralPhase
+                    ? 'PC-01 · P(θ) = (cos θ, sin θ)'
+                    : 'A2-07 · a⁽ˡ⁾ = σ(W⁽ˡ⁾a⁽ˡ⁻¹⁾ + b⁽ˡ⁾)'}
+                </span>
+              </div>
+
               {!showNeuralPhase ? (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between px-1">
-                    <span className="font-mono-data text-xs uppercase tracking-wider text-[#FF785A]">
-                      Phase A · Circular Rotation Unwrapped Into Sinusoidal Oscillation
-                    </span>
-                    <span className="font-mono-data text-[11px] text-[#A7B3C7]">
-                      PC-01 · P(θ) = (cos θ, sin θ)
-                    </span>
-                  </div>
-                  <UnitCircleWaveCanvas compact heightClass="h-[430px]" />
-                </div>
+                <UnitCircleWaveCanvas compact heightClass="h-[420px]" />
               ) : (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between px-1">
-                    <span className="font-mono-data text-xs uppercase tracking-wider text-[#38D4FF]">
-                      Phase B · Layered Matrix Transformations Across 224 Weighted Synapses
-                    </span>
-                    <span className="font-mono-data text-[11px] text-[#34E8A5]">
-                      A2-05 · a⁽ˡ⁾ = σ(W⁽ˡ⁾a⁽ˡ⁻¹⁾ + b⁽ˡ⁾)
-                    </span>
-                  </div>
-                  <NeuralMathEngine compact heightClass="h-[430px]" />
-                </div>
+                <NeuralMathEngine compact heightClass="h-[420px]" />
               )}
             </motion.div>
           )}
 
+          {/* ACT VI: STRING THEORY & CALABI-YAU MANIFOLDS 3D */}
           {actIndex === 5 && (
+            <motion.div
+              key="act-string-calabi-yau"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-center"
+            >
+              <div className="lg:col-span-5 space-y-4">
+                <div className="space-y-1">
+                  <span className="font-mono-data text-[11px] uppercase tracking-[0.2em] text-[#F4C46C] block">
+                    {frontierFrame.badge}
+                  </span>
+                  <span className="font-mono-data text-[11px] text-[#46D6E8] block">
+                    {frontierFrame.courseBridge}
+                  </span>
+                </div>
+
+                <div className="instrument-frame p-5 border-[#F4C46C]/45 space-y-3">
+                  <div className="overflow-x-auto">
+                    <MathTex tex={frontierFrame.tex} displayMode className="text-lg text-[#FFE29E]" />
+                  </div>
+                  <p className="text-xs sm:text-sm text-[#A8B2C6] leading-relaxed">
+                    {frontierFrame.note}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  {FRONTIER_KEYFRAMES.map((kf) => (
+                    <button
+                      key={kf.badge}
+                      type="button"
+                      onClick={() => seekToSecond(kf.atSec)}
+                      className="p-2.5 rounded-xl border text-left text-[11px] font-mono-data transition-all"
+                      style={{
+                        borderColor:
+                          kf.badge === frontierFrame.badge ? '#F4C46C' : 'rgba(244,196,108,0.16)',
+                        backgroundColor:
+                          kf.badge === frontierFrame.badge ? 'rgba(244,196,108,0.14)' : '#0B0C12',
+                        color: kf.badge === frontierFrame.badge ? '#FFE29E' : '#727D94',
+                      }}
+                    >
+                      {kf.badge}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="lg:col-span-7">
+                <CalabiYauManifold3D compact heightClass="h-[410px] sm:h-[450px]" />
+              </div>
+            </motion.div>
+          )}
+
+          {/* ACT VII: ANIMATED PROOFS & WORKED SOLUTIONS */}
+          {actIndex === 6 && (
             <motion.div
               key="act-animated-proofs"
               initial={{ opacity: 0, y: 10 }}
@@ -484,7 +637,7 @@ export function StageMode({ onExit }: StageModeProps) {
               className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-center"
             >
               <div className="lg:col-span-6 space-y-3">
-                <span className="font-mono-data text-xs uppercase tracking-wider text-[#36EBA8]">
+                <span className="font-mono-data text-xs uppercase tracking-wider text-[#45E6A6]">
                   Synchronized Derivation &amp; Worked Solutions
                 </span>
                 <div className="space-y-2">
@@ -495,27 +648,24 @@ export function StageMode({ onExit }: StageModeProps) {
                       <button
                         key={kf.stage}
                         type="button"
-                        onClick={() => {
-                          elapsedRef.current = kf.atSec;
-                          setElapsedTick(kf.atSec);
-                        }}
+                        onClick={() => seekToSecond(kf.atSec)}
                         className="w-full text-left p-3.5 rounded-xl border transition-all"
                         style={{
-                          backgroundColor: active ? 'rgba(54, 235, 168, 0.11)' : '#0B101A',
+                          backgroundColor: active ? 'rgba(69, 230, 166, 0.12)' : '#0B0C12',
                           borderColor: active
-                            ? '#36EBA8'
+                            ? '#45E6A6'
                             : unlocked
-                              ? 'rgba(54, 235, 168, 0.3)'
-                              : 'rgba(237, 235, 228, 0.08)',
+                              ? 'rgba(69, 230, 166, 0.32)'
+                              : 'rgba(244, 196, 108, 0.14)',
                           opacity: unlocked ? 1 : 0.55,
                         }}
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-mono-data text-[11px] text-[#36EBA8]">{kf.stage}</span>
-                          {unlocked && <CheckCircle2 className="w-3.5 h-3.5 text-[#36EBA8]" />}
+                          <span className="font-mono-data text-[11px] text-[#45E6A6]">{kf.stage}</span>
+                          {unlocked && <CheckCircle2 className="w-3.5 h-3.5 text-[#45E6A6]" />}
                         </div>
                         <div className="overflow-x-auto pt-1">
-                          <MathTex tex={kf.tex} className="text-xs text-[#F4F3EE]" />
+                          <MathTex tex={kf.tex} className="text-xs text-[#F7F4EC]" />
                         </div>
                       </button>
                     );
@@ -524,29 +674,30 @@ export function StageMode({ onExit }: StageModeProps) {
               </div>
 
               <div className="lg:col-span-6 space-y-4">
-                <div className="instrument-frame p-4 border-[#36EBA8]/35">
+                <div className="instrument-frame p-4 border-[#45E6A6]/35">
                   <DerivationStepVisual
                     visualKinds={PROOF_KEYFRAMES.map((k) => k.eqVisual)}
                     stepIndex={proofFrame.stepIdx}
                     totalSteps={PROOF_KEYFRAMES.length}
                     stepTitle={proofFrame.stage}
-                    accent="#36EBA8"
+                    accent="#45E6A6"
                   />
                 </div>
-                <div className="instrument-frame p-4 bg-[#0C141F] border-[#F5BC5E]/40 space-y-1.5">
-                  <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#F5BC5E]">
+                <div className="instrument-frame p-4 border-[#F4C46C]/40 space-y-1.5">
+                  <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#F4C46C]">
                     {proofFrame.solvedBadge}
                   </span>
                   <div className="overflow-x-auto">
-                    <MathTex tex={proofFrame.solvedTex} displayMode className="text-[#F4F3EE]" />
+                    <MathTex tex={proofFrame.solvedTex} displayMode className="text-[#F7F4EC]" />
                   </div>
-                  <p className="text-xs text-[#A7B3C7] leading-relaxed">{proofFrame.note}</p>
+                  <p className="text-xs text-[#A8B2C6] leading-relaxed">{proofFrame.note}</p>
                 </div>
               </div>
             </motion.div>
           )}
 
-          {actIndex === 6 && (
+          {/* ACT VIII: LORENZ CHAOS FINALE & CLOSING AUREA */}
+          {actIndex === 7 && (
             <motion.div
               key="act-finale"
               initial={{ opacity: 0, y: 10 }}
@@ -555,13 +706,13 @@ export function StageMode({ onExit }: StageModeProps) {
               transition={{ duration: 0.28 }}
               className="w-full max-w-6xl"
             >
-              {!showClosingMeridian ? (
+              {!showClosingAurea ? (
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between px-1">
-                    <span className="font-mono-data text-xs uppercase tracking-wider text-[#FF785A]">
+                  <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+                    <span className="font-mono-data text-xs uppercase tracking-wider text-[#FF8563]">
                       Lorenz Strange Attractor · Dual Orbit Separation
                     </span>
-                    <span className="font-mono-data text-[11px] text-[#F4B956]">
+                    <span className="font-mono-data text-[11px] text-[#FFE29E]">
                       Δx₀ = 0.002 · Deterministic Chaos
                     </span>
                   </div>
@@ -578,15 +729,20 @@ export function StageMode({ onExit }: StageModeProps) {
                   animate={{ opacity: 1, scale: 1 }}
                   className="max-w-3xl mx-auto text-center space-y-6 py-12"
                 >
-                  <p className="font-mono-data text-xs uppercase tracking-[0.28em] text-[#F4B956]">
-                    MERIDIAN · LIVING ATLAS OF MATHEMATICS
+                  <p className="font-mono-data text-xs uppercase tracking-[0.28em] text-[#F4C46C]">
+                    AUREA · LIVING 3D ATLAS OF MATHEMATICS
                   </p>
-                  <h2 className="font-serif-editorial text-5xl sm:text-6xl text-[#F2F0E8] leading-tight">
-                    Intuition First. Rigor Always.
+                  <h2 className="font-serif-editorial text-5xl sm:text-6xl text-[#F7F4EC] leading-tight">
+                    Intuition First.{' '}
+                    <em className="italic text-[#FFE29E]">Rigor Always.</em>
                   </h2>
-                  <p className="text-base text-[#A7B3C7]">
-                    Press <kbd className="px-2 py-0.5 rounded bg-[#121927] text-[#F2F0E8]">Esc</kbd>{' '}
-                    to return to the interactive Atlas and explore live.
+                  <p className="text-base text-[#A8B2C6]">
+                    Press{' '}
+                    <kbd className="px-2 py-0.5 rounded bg-[#11131C] border border-[#F4C46C]/30 text-[#FFE29E]">
+                      Esc
+                    </kbd>{' '}
+                    to return to the AUREA Observatory and explore 3D String Theory, the Florida
+                    B.E.S.T. book, and all 36 live lessons.
                   </p>
                 </motion.div>
               )}
@@ -595,20 +751,20 @@ export function StageMode({ onExit }: StageModeProps) {
         </AnimatePresence>
 
         {hudNotice && (
-          <div className="pointer-events-none absolute top-6 right-8 px-3 py-1.5 rounded bg-[#161D29]/90 border border-[rgba(237,235,228,0.18)] font-mono-data text-xs text-[#EDEBE4]">
+          <div className="pointer-events-none absolute top-6 right-8 px-3 py-1.5 rounded-lg bg-[#11131C]/95 border border-[rgba(244,196,108,0.3)] font-mono-data text-xs text-[#FFE29E]">
             {hudNotice}
           </div>
         )}
       </div>
 
-      {/* Sleek Always-Accessible Bottom Control Dock */}
-      <div className="px-4 sm:px-8 pb-3 pt-2 border-t border-[rgba(237,235,228,0.08)] bg-[#060911]/95 backdrop-blur-md flex flex-wrap items-center justify-between gap-3">
+      {/* Crisp Always-Accessible Bottom Control Dock */}
+      <div className="px-4 sm:px-8 pb-3 pt-2 border-t border-[rgba(244,196,108,0.16)] bg-[#060609]/95 backdrop-blur-md flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-1.5">
           <button
             type="button"
             onClick={() => jumpToAct(actIndex - 1)}
             aria-label="Previous act"
-            className="p-2 rounded-lg border border-white/10 bg-[#0D1320] text-[#A7B3C7] hover:text-[#F2F0E8] hover:border-white/25 transition-colors"
+            className="p-2 rounded-lg border border-[rgba(244,196,108,0.18)] bg-[#0B0C12] text-[#A8B2C6] hover:text-[#F7F4EC] hover:border-[#F4C46C]/45 transition-colors"
             title="Previous Act (←)"
           >
             <SkipBack className="w-3.5 h-3.5" />
@@ -617,27 +773,27 @@ export function StageMode({ onExit }: StageModeProps) {
             type="button"
             onClick={() => setPaused((p) => !p)}
             aria-label={paused ? 'Resume presentation' : 'Pause presentation'}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/15 bg-[#0D1320] text-xs font-mono-data text-[#F2F0E8] hover:border-white/35 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[rgba(244,196,108,0.28)] bg-[#0B0C12] text-xs font-mono-data text-[#FFE29E] hover:border-[#F4C46C]/60 transition-colors"
             title="Play / Pause (Space)"
           >
-            {paused ? <Play className="w-3.5 h-3.5 text-[#36EBA8]" /> : <Pause className="w-3.5 h-3.5" />}
+            {paused ? <Play className="w-3.5 h-3.5 text-[#45E6A6]" /> : <Pause className="w-3.5 h-3.5 text-[#F4C46C]" />}
             <span>{paused ? 'Play' : 'Pause'}</span>
           </button>
           <button
             type="button"
             onClick={() => jumpToAct(actIndex + 1)}
             aria-label="Next act"
-            className="p-2 rounded-lg border border-white/10 bg-[#0D1320] text-[#A7B3C7] hover:text-[#F2F0E8] hover:border-white/25 transition-colors"
+            className="p-2 rounded-lg border border-[rgba(244,196,108,0.18)] bg-[#0B0C12] text-[#A8B2C6] hover:text-[#F7F4EC] hover:border-[#F4C46C]/45 transition-colors"
             title="Next Act (→)"
           >
             <SkipForward className="w-3.5 h-3.5" />
           </button>
-          <span className="ml-2 font-mono-data text-[11px] text-[#707D94]">
+          <span className="ml-2 font-mono-data text-[11px] text-[#727D94]">
             {String(Math.floor(elapsedTick)).padStart(2, '0')}s / {act.durationSec}s
           </span>
         </div>
 
-        {/* Act Selector Pills (I - VII) */}
+        {/* Act Selector Pills (I - VIII) */}
         <div className="flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Presentation acts">
           {STAGE_ACTS.map((item, idx) => {
             const active = idx === actIndex;
@@ -652,9 +808,9 @@ export function StageMode({ onExit }: StageModeProps) {
                 title={`${item.number}: ${item.title} (Key ${idx + 1})`}
                 className="px-2.5 py-1 rounded-full font-mono-data text-[11px] border transition-all"
                 style={{
-                  borderColor: active ? item.accent : 'rgba(237,235,228,0.12)',
-                  backgroundColor: active ? `${item.accent}22` : '#0B101A',
-                  color: active ? item.accent : '#8E9BB2',
+                  borderColor: active ? item.accent : 'rgba(244,196,108,0.18)',
+                  backgroundColor: active ? `${item.accent}26` : '#0B0C12',
+                  color: active ? item.accent : '#A8B2C6',
                 }}
               >
                 {numeral}
@@ -670,8 +826,8 @@ export function StageMode({ onExit }: StageModeProps) {
             aria-label="Toggle act index drawer"
             className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-mono-data transition-colors ${
               showIndex
-                ? 'border-[#38D9FF]/60 bg-[#38D9FF]/15 text-[#38D9FF]'
-                : 'border-white/10 bg-[#0D1320] text-[#A7B3C7] hover:text-[#F2F0E8]'
+                ? 'border-[#F4C46C]/60 bg-[#F4C46C]/15 text-[#FFE29E]'
+                : 'border-[rgba(244,196,108,0.18)] bg-[#0B0C12] text-[#A8B2C6] hover:text-[#F7F4EC]'
             }`}
             title="Act Index (I)"
           >
@@ -683,7 +839,7 @@ export function StageMode({ onExit }: StageModeProps) {
             type="button"
             onClick={toggleFullscreen}
             aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-white/10 bg-[#0D1320] text-xs font-mono-data text-[#A7B3C7] hover:text-[#F2F0E8] transition-colors"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[rgba(244,196,108,0.18)] bg-[#0B0C12] text-xs font-mono-data text-[#A8B2C6] hover:text-[#F7F4EC] transition-colors"
             title="Fullscreen (F)"
           >
             {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
@@ -694,7 +850,7 @@ export function StageMode({ onExit }: StageModeProps) {
             type="button"
             onClick={onExit}
             aria-label="Exit presentation mode"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#FF785A]/45 bg-[#FF785A]/15 text-xs font-mono-data text-[#FF785A] hover:bg-[#FF785A]/25 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#FF8563]/45 bg-[#FF8563]/15 text-xs font-mono-data text-[#FF8563] hover:bg-[#FF8563]/25 transition-colors"
             title="Exit Stage Mode (Esc)"
           >
             <X className="w-3.5 h-3.5" />
@@ -705,16 +861,16 @@ export function StageMode({ onExit }: StageModeProps) {
 
       {/* Toggleable Mini-Index Drawer */}
       {showIndex && (
-        <div className="fixed bottom-16 right-4 sm:right-8 z-50 w-80 p-3 rounded-xl bg-[#0D1320]/95 backdrop-blur-md border border-[rgba(237,235,228,0.18)] space-y-2 shadow-2xl">
-          <div className="flex items-center justify-between pb-1.5 border-b hairline-rule">
-            <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#9CA6B8]">
-              Stage Index (1–7 · Space · ←/→ · F · Esc)
+        <div className="fixed bottom-16 right-4 sm:right-8 z-50 w-80 p-3 rounded-xl bg-[#0B0C12]/95 backdrop-blur-md border border-[rgba(244,196,108,0.28)] space-y-2 shadow-2xl">
+          <div className="flex items-center justify-between pb-1.5 border-b border-[rgba(244,196,108,0.16)]">
+            <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#F4C46C]">
+              Stage Index (1–8 · Space · ←/→ · F · Esc)
             </span>
             <button
               type="button"
               onClick={() => setShowIndex(false)}
               aria-label="Close index drawer"
-              className="p-1 rounded hover:bg-[#1B2433] text-[#9CA6B8]"
+              className="p-1 rounded hover:bg-[#171A26] text-[#A8B2C6]"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -731,8 +887,8 @@ export function StageMode({ onExit }: StageModeProps) {
                 }}
                 className="w-full text-left px-2.5 py-1.5 rounded text-xs flex items-center justify-between transition-colors"
                 style={{
-                  backgroundColor: idx === actIndex ? '#1B2433' : 'transparent',
-                  color: idx === actIndex ? item.accent : '#9CA6B8',
+                  backgroundColor: idx === actIndex ? '#171A26' : 'transparent',
+                  color: idx === actIndex ? item.accent : '#A8B2C6',
                 }}
               >
                 <span className="truncate pr-2">
@@ -746,14 +902,14 @@ export function StageMode({ onExit }: StageModeProps) {
       )}
 
       {/* Ultra-subtle 2px Bottom Progress Hairline */}
-      <div className="w-full h-[2px] bg-[rgba(237,235,228,0.08)]">
+      <div className="w-full h-[2px] bg-[rgba(244,196,108,0.1)]">
         <div
           ref={progressBarRef}
           className="h-full"
           style={{
             width: '0%',
             backgroundColor: act.accent,
-            opacity: 0.78,
+            opacity: 0.85,
           }}
         />
       </div>

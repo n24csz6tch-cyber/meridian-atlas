@@ -1,11 +1,24 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, ExternalLink, Layers, Pause, Play, Sparkles } from 'lucide-react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import {
+  AlertTriangle,
+  ArrowRight,
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  Layers,
+  Orbit,
+  Pause,
+  Play,
+  Sparkles,
+} from 'lucide-react';
 import { AtlasShell } from '../components/AtlasShell';
 import { LessonNavHeader } from '../components/LessonNavHeader';
 import { MathTex } from '../components/MathTex';
 import { PracticeEngine, PracticeQuestion } from '../components/PracticeEngine';
+import { CURRICULUM_NODES } from '../data/curriculumGraph';
 import { FLDOE_SOURCES, VERIFIED_STANDARDS } from '../data/standards';
 import { QuadraticWorkbench } from '../instruments/QuadraticWorkbench';
 import { EquationMiniVisual } from '../visuals/equations/EquationMiniVisual';
@@ -161,6 +174,8 @@ const LESSON_STANDARD_CODES = [
 ];
 
 export function QuadraticLessonPage() {
+  const reducedMotion = useReducedMotion();
+
   // Layer 1 state
   const [a, setA] = useState(1);
   const [h, setH] = useState(2);
@@ -192,21 +207,49 @@ export function QuadraticLessonPage() {
     return { aJet, tLand };
   }, [launchH0, peakTime, peakHeight]);
 
+  const algNodes = CURRICULUM_NODES.filter((n) => n.courseId === 'algebra-1');
+  const idx = algNodes.findIndex((n) => n.id === 'a1-quadratics');
+  const nextNode = algNodes[(idx + 1) % algNodes.length];
+
+  const workedPct = Math.round(((workedIdx + 1) / WORKED_STEPS.length) * 100);
+  const trueVal = (probeX - 3) ** 2;
+  const trapVal = (probeX + 3) ** 2;
+
   return (
     <AtlasShell activeCourse="algebra-1">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-12">
         <LessonNavHeader courseId="algebra-1" activeNodeId="a1-quadratics" code="A1-08" />
 
         {/* Lesson Hero Header */}
-        <header className="space-y-3 max-w-4xl">
-          <h1 className="font-serif-editorial text-4xl sm:text-5xl text-[#F4F3EE] leading-tight">
+        <header className="instrument-frame fiducial-frame p-6 sm:p-7 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="font-mono-data text-[11px] uppercase tracking-[0.2em] text-[#F5C25B]">
+              Algebra 1 Flagship · Vertex &amp; Discriminant Observatory
+            </span>
+            <div className="flex flex-wrap items-center gap-2 font-mono-data text-[11px]">
+              <Link
+                to="/textbook"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#F4C46C]/25 bg-[#0B0C12] text-[#FFE29E] hover:border-[#F4C46C]/55 transition-colors"
+              >
+                <BookOpen className="w-3 h-3 text-[#F4C46C]" /> FL Textbook
+              </Link>
+              <Link
+                to="/frontier"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#F4C46C]/25 bg-[#0B0C12] text-[#F4C46C] hover:border-[#FFE29E]/55 transition-colors"
+              >
+                <Orbit className="w-3 h-3" /> String 3D
+              </Link>
+            </div>
+          </div>
+
+          <h1 className="font-serif-editorial text-4xl sm:text-5xl text-[#F7F4EC] leading-tight">
             Quadratic Functions &amp; Parabolic Geometry
           </h1>
-          <p className="text-sm sm:text-base text-[#A5B4CC] leading-relaxed">
+          <p className="text-sm sm:text-base text-[#A8B2C6] leading-relaxed max-w-4xl">
             Every quadratic curve is a geometric balance between curvature{' '}
-            <MathTex tex="a" className="text-[#F5BC5E]" />, horizontal shift{' '}
-            <MathTex tex="h" className="text-[#38D9FF]" />, and vertical elevation{' '}
-            <MathTex tex="k" className="text-[#FF7A5C]" />. Drag the curve below to see how
+            <MathTex tex="a" className="text-[#F5C25B]" />, horizontal shift{' '}
+            <MathTex tex="h" className="text-[#46D6E8]" />, and vertical elevation{' '}
+            <MathTex tex="k" className="text-[#FF8563]" />. Drag the curve below to see how
             algebraic coefficients sculpt roots and symmetry in real time.
           </p>
         </header>
@@ -215,10 +258,10 @@ export function QuadraticLessonPage() {
         <section id="layer-1" className="space-y-4 scroll-mt-24">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#E5A94C]">
+              <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#F5C25B]">
                 Layer 01 · Interactive Visual Intuition
               </span>
-              <h2 className="font-serif-editorial text-2xl text-[#EDEBE4]">
+              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
                 Touch the Vertex, Bend the Curvature
               </h2>
             </div>
@@ -232,7 +275,7 @@ export function QuadraticLessonPage() {
                     setH(p.h);
                     setK(p.k);
                   }}
-                  className="px-2.5 py-1 rounded text-xs font-mono-data bg-[#111620] border border-[rgba(237,235,228,0.14)] text-[#9CA6B8] hover:text-[#EDEBE4] hover:border-[#E5A94C]/60 transition-colors"
+                  className="px-3 py-1 rounded-full text-xs font-mono-data bg-[#0B0C12] border border-[#F4C46C]/20 text-[#A8B2C6] hover:text-[#FFE29E] hover:border-[#F5C25B]/60 transition-colors"
                 >
                   {p.label}
                 </button>
@@ -252,11 +295,11 @@ export function QuadraticLessonPage() {
             showParentCurve
           />
 
-          <div className="instrument-frame p-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="instrument-frame p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
             <label className="space-y-1.5 text-xs">
               <div className="flex justify-between font-mono-data">
-                <span className="text-[#E5A94C]">a · Curvature &amp; Opening</span>
-                <span>{a}</span>
+                <span className="text-[#F5C25B]">a · Curvature &amp; Opening</span>
+                <span className="text-[#F7F4EC]">{a}</span>
               </div>
               <input
                 type="range"
@@ -269,13 +312,13 @@ export function QuadraticLessonPage() {
                   setA(Math.abs(v) < 0.2 ? (v >= 0 ? 0.2 : -0.2) : v);
                 }}
                 className="meridian-slider"
-                style={{ ['--slider-accent' as string]: '#E5A94C' }}
+                style={{ ['--slider-accent' as string]: '#F5C25B' }}
               />
             </label>
             <label className="space-y-1.5 text-xs">
               <div className="flex justify-between font-mono-data">
-                <span className="text-[#38BDF8]">h · Horizontal Vertex Shift</span>
-                <span>{h}</span>
+                <span className="text-[#46D6E8]">h · Horizontal Vertex Shift</span>
+                <span className="text-[#F7F4EC]">{h}</span>
               </div>
               <input
                 type="range"
@@ -285,13 +328,13 @@ export function QuadraticLessonPage() {
                 value={h}
                 onChange={(e) => setH(parseFloat(e.target.value))}
                 className="meridian-slider"
-                style={{ ['--slider-accent' as string]: '#38BDF8' }}
+                style={{ ['--slider-accent' as string]: '#46D6E8' }}
               />
             </label>
             <label className="space-y-1.5 text-xs">
               <div className="flex justify-between font-mono-data">
-                <span className="text-[#F9735B]">k · Vertical Vertex Shift</span>
-                <span>{k}</span>
+                <span className="text-[#FF8563]">k · Vertical Vertex Shift</span>
+                <span className="text-[#F7F4EC]">{k}</span>
               </div>
               <input
                 type="range"
@@ -301,7 +344,7 @@ export function QuadraticLessonPage() {
                 value={k}
                 onChange={(e) => setK(parseFloat(e.target.value))}
                 className="meridian-slider"
-                style={{ ['--slider-accent' as string]: '#F9735B' }}
+                style={{ ['--slider-accent' as string]: '#FF8563' }}
               />
             </label>
           </div>
@@ -310,46 +353,60 @@ export function QuadraticLessonPage() {
         {/* LAYER 2: Clean Mathematical Formalization */}
         <section id="layer-2" className="space-y-4 scroll-mt-24">
           <div>
-            <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#F5BC5E]">
+            <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#F5C25B]">
               Layer 02 · Visualized Mathematical Equations
             </span>
-            <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F4F3EE]">
+            <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
               Three Equivalent Algebraic Representations — Seen Geometrically
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div className="instrument-frame p-5 space-y-3">
-              <span className="font-mono-data text-[10.5px] text-[#FF7A5C] uppercase tracking-wider block">
-                Vertex Form (Geometry First)
-              </span>
-              <EquationMiniVisual kind="parabola-vertex" accent="#F5BC5E" caption="Vertex V(h, k)" />
-              <div className="instrument-panel px-3 py-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-mono-data text-[10.5px] text-[#FF8563] uppercase tracking-wider">
+                  Vertex Form (Geometry First)
+                </span>
+                <span className="font-mono-data text-[9.5px] px-2 py-0.5 rounded-full border border-[#F4C46C]/20 bg-[#0B0C12] text-[#F4C46C]">
+                  EQ 01
+                </span>
+              </div>
+              <div aria-label="Vertex V(h, k) geometry preview">
+                <EquationMiniVisual kind="parabola-vertex" accent="#F5C25B" />
+              </div>
+              <div className="instrument-panel px-3 py-2 overflow-x-auto">
                 <MathTex
                   tex="f(x) = a(x - h)^2 + k"
                   displayMode
-                  className="text-lg text-[#F4F3EE]"
+                  className="text-lg text-[#F7F4EC]"
                 />
               </div>
-              <p className="text-xs text-[#A5B4CC] leading-relaxed">
+              <p className="text-xs text-[#A8B2C6] leading-relaxed">
                 Exposes the extremum <MathTex tex="(h, k)" /> and symmetry axis{' '}
                 <MathTex tex="x = h" /> immediately without extra calculation.
               </p>
             </div>
 
             <div className="instrument-frame p-5 space-y-3">
-              <span className="font-mono-data text-[10.5px] text-[#F5BC5E] uppercase tracking-wider block">
-                Standard Form &amp; Discriminant Δ
-              </span>
-              <EquationMiniVisual kind="parabola-discriminant" accent="#F5BC5E" caption="Δ < 0 · Δ = 0 · Δ > 0" />
-              <div className="instrument-panel px-3 py-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-mono-data text-[10.5px] text-[#F5C25B] uppercase tracking-wider">
+                  Standard Form &amp; Discriminant Δ
+                </span>
+                <span className="font-mono-data text-[9.5px] px-2 py-0.5 rounded-full border border-[#F4C46C]/20 bg-[#0B0C12] text-[#F4C46C]">
+                  EQ 02
+                </span>
+              </div>
+              <div aria-label="Discriminant regimes Δ < 0, Δ = 0, Δ > 0">
+                <EquationMiniVisual kind="parabola-discriminant" accent="#F5C25B" />
+              </div>
+              <div className="instrument-panel px-3 py-2 overflow-x-auto">
                 <MathTex
                   tex="f(x) = ax^2 + bx + c"
                   displayMode
-                  className="text-lg text-[#F4F3EE]"
+                  className="text-lg text-[#F7F4EC]"
                 />
               </div>
-              <p className="text-xs text-[#A5B4CC] leading-relaxed">
+              <p className="text-xs text-[#A8B2C6] leading-relaxed">
                 Reveals y-intercept <MathTex tex="(0, c)" /> directly. Vertex abscissa satisfies{' '}
                 <MathTex tex="h = -\frac{b}{2a}" /> and discriminant{' '}
                 <MathTex tex="\Delta = b^2 - 4ac" />.
@@ -357,18 +414,25 @@ export function QuadraticLessonPage() {
             </div>
 
             <div className="instrument-frame p-5 space-y-3">
-              <span className="font-mono-data text-[10.5px] text-[#36EBA8] uppercase tracking-wider block">
-                Factored Form (Roots First)
-              </span>
-              <EquationMiniVisual kind="area-factor" accent="#36EBA8" caption="Root Factorization" />
-              <div className="instrument-panel px-3 py-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-mono-data text-[10.5px] text-[#45E6A6] uppercase tracking-wider">
+                  Factored Form (Roots First)
+                </span>
+                <span className="font-mono-data text-[9.5px] px-2 py-0.5 rounded-full border border-[#F4C46C]/20 bg-[#0B0C12] text-[#F4C46C]">
+                  EQ 03
+                </span>
+              </div>
+              <div aria-label="Area model root factorization">
+                <EquationMiniVisual kind="area-factor" accent="#45E6A6" />
+              </div>
+              <div className="instrument-panel px-3 py-2 overflow-x-auto">
                 <MathTex
                   tex="f(x) = a(x - r_1)(x - r_2)"
                   displayMode
-                  className="text-lg text-[#F4F3EE]"
+                  className="text-lg text-[#F7F4EC]"
                 />
               </div>
-              <p className="text-xs text-[#A5B4CC] leading-relaxed">
+              <p className="text-xs text-[#A8B2C6] leading-relaxed">
                 Valid over ℝ when <MathTex tex="\Delta \ge 0" />. Axis of symmetry is the exact
                 midpoint <MathTex tex="h = \frac{r_1 + r_2}{2}" />.
               </p>
@@ -377,13 +441,13 @@ export function QuadraticLessonPage() {
         </section>
 
         {/* LAYER 3: Guided Step-by-Step Worked Example */}
-        <section id="layer-3" className="space-y-4 scroll-mt-24">
+        <section id="layer-3" className="instrument-frame fiducial-frame p-5 sm:p-7 space-y-5 scroll-mt-24">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#E5A94C]">
+              <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#F5C25B]">
                 Layer 03 · Synchronized Worked Example
               </span>
-              <h2 className="font-serif-editorial text-2xl text-[#EDEBE4]">
+              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
                 Deconstructing <MathTex tex="f(x) = 2x^2 - 8x + 6" />
               </h2>
             </div>
@@ -396,7 +460,7 @@ export function QuadraticLessonPage() {
                   setWorkedIdx((prev) => (prev - 1 + WORKED_STEPS.length) % WORKED_STEPS.length);
                 }}
                 aria-label="Previous worked step"
-                className="p-1.5 rounded-full border border-white/15 bg-white/[0.03] text-[#A5B4CC] hover:text-[#F4F3EE] transition-colors"
+                className="p-1.5 rounded-full border border-[#F4C46C]/25 bg-[#0B0C12] text-[#A8B2C6] hover:text-[#F7F4EC] hover:border-[#F4C46C]/50 transition-colors"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
@@ -405,9 +469,9 @@ export function QuadraticLessonPage() {
                 onClick={() => setAutoPlayWorked((p) => !p)}
                 className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono-data border transition-all"
                 style={{
-                  borderColor: autoPlayWorked ? '#E5A94C' : 'rgba(255,255,255,0.16)',
-                  backgroundColor: autoPlayWorked ? 'rgba(229,169,76,0.18)' : 'rgba(255,255,255,0.03)',
-                  color: autoPlayWorked ? '#E5A94C' : '#A5B4CC',
+                  borderColor: autoPlayWorked ? '#F5C25B' : 'rgba(244, 196, 108, 0.28)',
+                  backgroundColor: autoPlayWorked ? 'rgba(245, 194, 91, 0.18)' : '#0B0C12',
+                  color: autoPlayWorked ? '#F5C25B' : '#F7F4EC',
                 }}
               >
                 {autoPlayWorked ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
@@ -420,36 +484,52 @@ export function QuadraticLessonPage() {
                   setWorkedIdx((prev) => (prev + 1) % WORKED_STEPS.length);
                 }}
                 aria-label="Next worked step"
-                className="p-1.5 rounded-full border border-white/15 bg-white/[0.03] text-[#A5B4CC] hover:text-[#F4F3EE] transition-colors"
+                className="p-1.5 rounded-full border border-[#F4C46C]/25 bg-[#0B0C12] text-[#A8B2C6] hover:text-[#F7F4EC] hover:border-[#F4C46C]/50 transition-colors"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
 
+          <div className="h-1 w-full rounded-full bg-[#060609] border border-[#F4C46C]/15 overflow-hidden">
+            <motion.div
+              className="h-full rounded-full"
+              style={{
+                background: 'linear-gradient(90deg, #F4C46C, #F5C25B, #45E6A6)',
+                boxShadow: '0 0 10px #F5C25B',
+              }}
+              initial={false}
+              animate={{ width: `${workedPct}%` }}
+              transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 260, damping: 28 }}
+            />
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             <div className="lg:col-span-5 space-y-2.5">
-              {WORKED_STEPS.map((st, idx) => {
-                const active = workedIdx === idx;
+              {WORKED_STEPS.map((st, idxStep) => {
+                const active = workedIdx === idxStep;
                 return (
-                  <button
+                  <motion.button
                     key={st.title}
                     type="button"
+                    whileTap={reducedMotion ? undefined : { scale: 0.99 }}
                     onClick={() => {
                       setAutoPlayWorked(false);
-                      setWorkedIdx(idx);
+                      setWorkedIdx(idxStep);
                     }}
-                    className="w-full text-left p-4 rounded border transition-all space-y-1.5"
+                    className="w-full text-left p-4 rounded-xl border transition-all space-y-1.5"
                     style={{
-                      backgroundColor: active ? '#161D29' : '#111620',
-                      borderColor: active ? '#E5A94C' : 'rgba(237, 235, 228, 0.1)',
-                      boxShadow: active ? '0 0 22px -10px rgba(229,169,76,0.85)' : undefined,
+                      backgroundColor: active ? 'rgba(244, 196, 108, 0.1)' : '#0B0C12',
+                      borderColor: active ? '#F5C25B' : 'rgba(244, 196, 108, 0.16)',
+                      boxShadow: active ? '0 0 22px -10px rgba(245, 194, 91, 0.85)' : undefined,
                     }}
                   >
-                    <p className="font-mono-data text-[11px] text-[#E5A94C]">{st.title}</p>
-                    <MathTex tex={st.tex} displayMode className="text-sm text-[#EDEBE4]" />
-                    <p className="text-xs text-[#9CA6B8] leading-relaxed">{st.note}</p>
-                  </button>
+                    <p className="font-mono-data text-[11px] text-[#F5C25B]">{st.title}</p>
+                    <div className="overflow-x-auto">
+                      <MathTex tex={st.tex} displayMode className="text-sm text-[#F7F4EC]" />
+                    </div>
+                    <p className="text-xs text-[#A8B2C6] leading-relaxed">{st.note}</p>
+                  </motion.button>
                 );
               })}
             </div>
@@ -458,16 +538,16 @@ export function QuadraticLessonPage() {
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={workedIdx}
-                  initial={{ opacity: 0, y: 6 }}
+                  initial={reducedMotion ? false : { opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
+                  exit={reducedMotion ? undefined : { opacity: 0, y: -6 }}
                   transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-                  className="instrument-panel px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 border-[#E5A94C]/30"
+                  className="instrument-panel px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 border-[#F5C25B]/35"
                 >
-                  <span className="font-mono-data text-[11px] text-[#E5A94C]">
+                  <span className="font-mono-data text-[11px] text-[#F5C25B]">
                     ACTIVE FEATURE · 0{workedIdx + 1} / 0{WORKED_STEPS.length}
                   </span>
-                  <span className="text-xs text-[#EDEBE4]">
+                  <span className="text-xs text-[#F7F4EC]">
                     {WORKED_STEPS[workedIdx].title.replace(/^Step \d+ · /, '')}
                   </span>
                 </motion.div>
@@ -486,73 +566,101 @@ export function QuadraticLessonPage() {
         </section>
 
         {/* LAYER 4: Interactive Practice */}
-        <section className="space-y-4">
+        <section id="layer-4" className="space-y-4 scroll-mt-24">
           <div>
-            <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#E5A94C]">
+            <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#F5C25B]">
               Layer 04 · Interactive Mastery Practice
             </span>
-            <h2 className="font-serif-editorial text-2xl text-[#EDEBE4]">
+            <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
               Verify Concepts with Step-by-Step Solutions
             </h2>
           </div>
           <PracticeEngine
             questions={PRACTICE_QUESTIONS}
-            accentColor="#E5A94C"
+            accentColor="#F5C25B"
             visualKinds={['parabola-vertex', 'parabola-discriminant', 'area-factor', 'parabola-standard']}
           />
         </section>
 
         {/* LAYER 5: Visualized Common Misconception */}
-        <section className="space-y-4">
-          <div>
-            <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#F9735B]">
-              Layer 05 · Visualized Common Misconception
-            </span>
-            <h2 className="font-serif-editorial text-2xl text-[#EDEBE4]">
-              The Sign-Flip Trap: Why <MathTex tex="(x - 3)^2" /> Shifts Right, Not Left
-            </h2>
+        <motion.section
+          id="layer-5"
+          initial={reducedMotion ? false : { opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className="instrument-frame p-5 sm:p-7 space-y-5 border-[#FF8563]/40 scroll-mt-24"
+        >
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-[#FF8563] shrink-0 mt-1" />
+            <div>
+              <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#FF8563]">
+                Layer 05 · Visualized Common Misconception
+              </span>
+              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
+                The Sign-Flip Trap: Why <MathTex tex="(x - 3)^2" /> Shifts Right, Not Left
+              </h2>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-            <div className="lg:col-span-5 instrument-frame p-5 space-y-4">
-              <p className="text-sm text-[#9CA6B8] leading-relaxed">
+            <div className="lg:col-span-5 instrument-panel p-5 space-y-4">
+              <p className="text-sm text-[#A8B2C6] leading-relaxed">
                 Students frequently assume <MathTex tex="(x - 3)^2" /> shifts left because of the
                 minus sign. Geometry reveals the truth: the parabola touches{' '}
                 <MathTex tex="y = 0" /> wherever the expression <em>inside</em> the square vanishes!
               </p>
 
-              <div className="p-3.5 rounded bg-[#0D121A] border border-[rgba(52,211,153,0.3)] space-y-1 text-xs">
-                <span className="font-mono-data text-[#34D399]">
-                  TRUE · f(x) = (x − 3)² (Amber Curve)
-                </span>
+              <div className="p-3.5 rounded-xl bg-[#060609] border border-[#45E6A6]/35 space-y-1.5 text-xs">
+                <div className="flex items-center justify-between font-mono-data">
+                  <span className="text-[#45E6A6]">TRUE · f(x) = (x − 3)²</span>
+                  <span className="text-[#F7F4EC]">{trueVal.toFixed(2)}</span>
+                </div>
+                <div className="h-2 rounded-full bg-[#11131C] overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full bg-[#45E6A6]"
+                    initial={false}
+                    animate={{ width: `${Math.min(100, (trueVal / 64) * 100)}%` }}
+                    transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 260, damping: 24 }}
+                  />
+                </div>
                 <MathTex
-                  tex={`f(${probeX}) = (${probeX} - 3)^2 = ${(probeX - 3) ** 2}`}
+                  tex={`f(${probeX}) = (${probeX} - 3)^2 = ${trueVal}`}
                   displayMode
-                  className="text-[#EDEBE4]"
+                  className="text-[#F7F4EC]"
                 />
-                <p className="text-[#9CA6B8]">
+                <p className="text-[#A8B2C6]">
                   Needs <MathTex tex="x = +3" /> to cancel the <MathTex tex="-3" /> back to zero.
                 </p>
               </div>
 
-              <div className="p-3.5 rounded bg-[#0D121A] border border-[rgba(56,189,248,0.3)] space-y-1 text-xs">
-                <span className="font-mono-data text-[#38BDF8]">
-                  TRAP · g(x) = (x + 3)² (Dashed Blue Curve)
-                </span>
+              <div className="p-3.5 rounded-xl bg-[#060609] border border-[#46D6E8]/35 space-y-1.5 text-xs">
+                <div className="flex items-center justify-between font-mono-data">
+                  <span className="text-[#46D6E8]">TRAP · g(x) = (x + 3)²</span>
+                  <span className="text-[#F7F4EC]">{trapVal.toFixed(2)}</span>
+                </div>
+                <div className="h-2 rounded-full bg-[#11131C] overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full bg-[#46D6E8]"
+                    initial={false}
+                    animate={{ width: `${Math.min(100, (trapVal / 64) * 100)}%` }}
+                    transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 260, damping: 24 }}
+                  />
+                </div>
                 <MathTex
-                  tex={`g(${probeX}) = (${probeX} + 3)^2 = ${(probeX + 3) ** 2}`}
+                  tex={`g(${probeX}) = (${probeX} + 3)^2 = ${trapVal}`}
                   displayMode
-                  className="text-[#EDEBE4]"
+                  className="text-[#F7F4EC]"
                 />
-                <p className="text-[#9CA6B8]">
+                <p className="text-[#A8B2C6]">
                   Zeros out at <MathTex tex="x = -3" />, placing its vertex on the left.
                 </p>
               </div>
 
               <label className="block space-y-1.5 text-xs pt-1">
                 <div className="flex justify-between font-mono-data">
-                  <span className="text-[#EDEBE4]">Move Input Probe (x)</span>
-                  <span className="text-[#34D399]">x = {probeX}</span>
+                  <span className="text-[#F7F4EC]">Move Input Probe (x)</span>
+                  <span className="text-[#45E6A6]">x = {probeX}</span>
                 </div>
                 <input
                   type="range"
@@ -562,7 +670,7 @@ export function QuadraticLessonPage() {
                   value={probeX}
                   onChange={(e) => setProbeX(parseFloat(e.target.value))}
                   className="meridian-slider"
-                  style={{ ['--slider-accent' as string]: '#34D399' }}
+                  style={{ ['--slider-accent' as string]: '#45E6A6' }}
                 />
               </label>
             </div>
@@ -574,27 +682,27 @@ export function QuadraticLessonPage() {
                 k={0}
                 interactive={false}
                 probeX={probeX}
-                ghostCurve={{ a: 1, h: -3, k: 0, label: 'g(x) = (x + 3)²', color: '#38BDF8' }}
-                heightClass="h-[390px]"
+                ghostCurve={{ a: 1, h: -3, k: 0, label: 'g(x) = (x + 3)²', color: '#46D6E8' }}
+                heightClass="h-[410px]"
               />
             </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* LAYER 6: Real-World Application */}
-        <section className="space-y-4">
+        <section id="layer-6" className="space-y-4 scroll-mt-24">
           <div>
-            <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#E5A94C]">
+            <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#F5C25B]">
               Layer 06 · Real-World Telemetry Application
             </span>
-            <h2 className="font-serif-editorial text-2xl text-[#EDEBE4]">
+            <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
               Parabolic Fountain Jet &amp; Domain Constraints
             </h2>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             <div className="lg:col-span-5 instrument-frame p-5 space-y-4">
-              <p className="text-sm text-[#9CA6B8] leading-relaxed">
+              <p className="text-sm text-[#A8B2C6] leading-relaxed">
                 Adjust the nozzle height <MathTex tex="h_0" /> and target apex{' '}
                 <MathTex tex="(t_{\text{peak}}, y_{\max})" />. While the pure mathematical parabola
                 extends infinitely, the physical water stream exists only over the non-negative
@@ -604,8 +712,8 @@ export function QuadraticLessonPage() {
               <div className="space-y-3">
                 <label className="block space-y-1 text-xs">
                   <div className="flex justify-between font-mono-data">
-                    <span className="text-[#9CA6B8]">Nozzle Height (h₀)</span>
-                    <span>{launchH0.toFixed(1)} m</span>
+                    <span className="text-[#A8B2C6]">Nozzle Height (h₀)</span>
+                    <span className="text-[#F5C25B]">{launchH0.toFixed(1)} m</span>
                   </div>
                   <input
                     type="range"
@@ -615,14 +723,14 @@ export function QuadraticLessonPage() {
                     value={launchH0}
                     onChange={(e) => setLaunchH0(parseFloat(e.target.value))}
                     className="meridian-slider"
-                    style={{ ['--slider-accent' as string]: '#E5A94C' }}
+                    style={{ ['--slider-accent' as string]: '#F5C25B' }}
                   />
                 </label>
 
                 <label className="block space-y-1 text-xs">
                   <div className="flex justify-between font-mono-data">
-                    <span className="text-[#38BDF8]">Time to Apex (t_peak)</span>
-                    <span>{peakTime.toFixed(1)} s</span>
+                    <span className="text-[#46D6E8]">Time to Apex (t_peak)</span>
+                    <span className="text-[#46D6E8]">{peakTime.toFixed(1)} s</span>
                   </div>
                   <input
                     type="range"
@@ -632,14 +740,14 @@ export function QuadraticLessonPage() {
                     value={peakTime}
                     onChange={(e) => setPeakTime(parseFloat(e.target.value))}
                     className="meridian-slider"
-                    style={{ ['--slider-accent' as string]: '#38BDF8' }}
+                    style={{ ['--slider-accent' as string]: '#46D6E8' }}
                   />
                 </label>
 
                 <label className="block space-y-1 text-xs">
                   <div className="flex justify-between font-mono-data">
-                    <span className="text-[#F9735B]">Apex Height (y_max)</span>
-                    <span>{peakHeight.toFixed(1)} m</span>
+                    <span className="text-[#FF8563]">Apex Height (y_max)</span>
+                    <span className="text-[#FF8563]">{peakHeight.toFixed(1)} m</span>
                   </div>
                   <input
                     type="range"
@@ -649,23 +757,23 @@ export function QuadraticLessonPage() {
                     value={peakHeight}
                     onChange={(e) => setPeakHeight(parseFloat(e.target.value))}
                     className="meridian-slider"
-                    style={{ ['--slider-accent' as string]: '#F9735B' }}
+                    style={{ ['--slider-accent' as string]: '#FF8563' }}
                   />
                 </label>
               </div>
 
-              <div className="p-3.5 rounded bg-[#0D121A] border border-[rgba(237,235,228,0.1)] space-y-1.5 text-xs font-mono-data">
+              <div className="instrument-panel p-4 space-y-1.5 text-xs font-mono-data">
                 <div className="flex justify-between">
-                  <span className="text-[#9CA6B8]">Gravity Curvature (a):</span>
-                  <span className="text-[#E5A94C]">{fountain.aJet.toFixed(2)} m/s²</span>
+                  <span className="text-[#A8B2C6]">Gravity Curvature (a):</span>
+                  <span className="text-[#F5C25B]">{fountain.aJet.toFixed(2)} m/s²</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#9CA6B8]">Basin Impact (t_land):</span>
-                  <span className="text-[#34D399]">{fountain.tLand.toFixed(2)} s</span>
+                  <span className="text-[#A8B2C6]">Basin Impact (t_land):</span>
+                  <span className="text-[#45E6A6]">{fountain.tLand.toFixed(2)} s</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#9CA6B8]">Valid Domain:</span>
-                  <span className="text-[#EDEBE4]">[0, {fountain.tLand.toFixed(2)}] s</span>
+                  <span className="text-[#A8B2C6]">Valid Domain:</span>
+                  <span className="text-[#F7F4EC]">[0, {fountain.tLand.toFixed(2)}] s</span>
                 </div>
               </div>
             </div>
@@ -686,51 +794,59 @@ export function QuadraticLessonPage() {
         <section className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <Layers className="w-4 h-4 text-[#E5A94C]" />
-              <h2 className="font-serif-editorial text-2xl text-[#EDEBE4]">
+              <Layers className="w-4 h-4 text-[#F5C25B]" />
+              <h2 className="font-serif-editorial text-2xl text-[#F7F4EC]">
                 Embedded Course Instrument
               </h2>
             </div>
             <Link
               to="/instruments"
-              className="inline-flex items-center gap-1.5 text-xs font-mono-data text-[#E5A94C] hover:underline"
+              className="inline-flex items-center gap-1.5 text-xs font-mono-data text-[#FFE29E] hover:underline"
             >
-              <Sparkles className="w-3.5 h-3.5" /> Open Full Instruments Lab
+              <Sparkles className="w-3.5 h-3.5 text-[#F5C25B]" /> Open Full 3D &amp; Interactive Labs
             </Link>
           </div>
           <QuadraticWorkbench />
         </section>
 
-        {/* LAYER 7: Verified Standards & Sources */}
-        <section className="space-y-4 border-t hairline-rule pt-8">
-          <div>
-            <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#9CA6B8]">
-              Layer 07 · Verified Standards &amp; Official Sources
-            </span>
-            <h2 className="font-serif-editorial text-2xl text-[#EDEBE4]">
-              Florida B.E.S.T. / CPALMS Alignment
-            </h2>
-            <p className="text-xs text-[#9CA6B8] mt-1">
-              Algebra 1 Course Code{' '}
-              <a
-                href={FLDOE_SOURCES.cpalmsAlg1.url}
-                target="_blank"
-                rel="noreferrer"
-                className="text-[#E5A94C] underline underline-offset-2"
-              >
-                1200310 (CPALMS)
-              </a>{' '}
-              · Official{' '}
-              <a
-                href={FLDOE_SOURCES.bestPdf.url}
-                target="_blank"
-                rel="noreferrer"
-                className="text-[#EDEBE4] underline underline-offset-2"
-              >
-                FLDOE B.E.S.T. Mathematics PDF
-              </a>{' '}
-              · Consulted November 22, 2026.
-            </p>
+        {/* LAYER 7: Verified Standards & Next Lesson */}
+        <section id="layer-7" className="instrument-frame p-5 sm:p-6 space-y-5 scroll-mt-24">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#F5C25B]">
+                Layer 07 · Verified Standards &amp; Official Sources
+              </span>
+              <h2 className="font-serif-editorial text-2xl text-[#F7F4EC]">
+                Florida B.E.S.T. / CPALMS Alignment
+              </h2>
+              <p className="text-xs text-[#A8B2C6] mt-1">
+                Algebra 1 Course Code{' '}
+                <a
+                  href={FLDOE_SOURCES.cpalmsAlg1.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[#FFE29E] underline underline-offset-2"
+                >
+                  1200310 (CPALMS)
+                </a>{' '}
+                · Official{' '}
+                <a
+                  href={FLDOE_SOURCES.bestPdf.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[#F7F4EC] underline underline-offset-2"
+                >
+                  FLDOE B.E.S.T. Mathematics PDF
+                </a>{' '}
+                · Consulted November 22, 2026.
+              </p>
+            </div>
+            <Link
+              to="/textbook"
+              className="inline-flex items-center gap-1.5 font-mono-data text-[11px] text-[#FFE29E] hover:underline"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-[#F4C46C]" /> View in FL Textbook Hub
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -738,26 +854,57 @@ export function QuadraticLessonPage() {
               const std = VERIFIED_STANDARDS[code];
               if (!std) return null;
               return (
-                <div key={code} className="instrument-frame p-4 space-y-1.5">
+                <div key={code} className="instrument-panel p-4 space-y-1.5">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono-data text-xs text-[#E5A94C]">{std.code}</span>
+                    <span className="font-mono-data text-xs text-[#F5C25B]">{std.code}</span>
                     <a
                       href={std.sourceUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1 font-mono-data text-[11px] text-[#9CA6B8] hover:text-[#EDEBE4]"
+                      className="inline-flex items-center gap-1 font-mono-data text-[11px] text-[#A8B2C6] hover:text-[#FFE29E]"
                     >
                       {std.sourceLabel} <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>
-                  <p className="text-xs text-[#EDEBE4] leading-relaxed">{std.description}</p>
+                  <p className="text-xs text-[#F7F4EC] leading-relaxed">{std.description}</p>
                   {std.clarification && (
-                    <p className="text-[11px] text-[#6C7689] leading-snug">{std.clarification}</p>
+                    <p className="text-[11px] text-[#727D94] leading-snug">{std.clarification}</p>
                   )}
                 </div>
               );
             })}
           </div>
+
+          {nextNode && (
+            <div className="pt-4 border-t hairline-rule flex flex-wrap items-center justify-between gap-3">
+              <div className="text-xs text-[#A8B2C6]">
+                <span className="font-mono-data text-[10px] uppercase text-[#727D94] block">
+                  Continue Algebra 1 Sequence
+                </span>
+                <strong className="text-[#F7F4EC] font-serif-editorial text-lg">
+                  {nextNode.code} · {nextNode.title}
+                </strong>
+              </div>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <Link
+                  to="/frontier"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-mono-data border border-[#F4C46C]/35 bg-[#0B0C12] text-[#FFE29E] hover:border-[#FFE29E]/65 transition-colors"
+                >
+                  <Orbit className="w-3.5 h-3.5 text-[#F4C46C]" />
+                  String 3D Bridge
+                </Link>
+                <Link
+                  to={nextNode.route}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold text-[#060609] hover:brightness-110 transition-all shadow-[0_0_22px_-6px_rgba(244,196,108,0.6)]"
+                  style={{ background: 'linear-gradient(135deg, #F5C25B, #FFE29E)' }}
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Next Visual Lesson
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+          )}
         </section>
       </div>
     </AtlasShell>

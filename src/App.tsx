@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { CoursePage } from './pages/CoursePage';
+import { FloridaTextbookPage } from './pages/FloridaTextbookPage';
 import { GradePlannerPage } from './pages/GradePlannerPage';
 import { HomePage } from './pages/HomePage';
 import { InstrumentsPage } from './pages/InstrumentsPage';
@@ -8,6 +9,7 @@ import { MapPage } from './pages/MapPage';
 import { NeuralMathPage } from './pages/NeuralMathPage';
 import { QuadraticLessonPage } from './pages/QuadraticLessonPage';
 import { SolidsLessonPage } from './pages/SolidsLessonPage';
+import { StringTheoryPage } from './pages/StringTheoryPage';
 import { TopicLessonPage } from './pages/TopicLessonPage';
 import { UnitCircleLessonPage } from './pages/UnitCircleLessonPage';
 import { ENABLE_STAGE_MODE } from './presentation/stageConfig';
@@ -32,6 +34,8 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/presentation" element={<HomePage />} />
         <Route path="/stage" element={<HomePage />} />
+        <Route path="/frontier" element={<StringTheoryPage />} />
+        <Route path="/textbook" element={<FloridaTextbookPage />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/neural" element={<NeuralMathPage />} />
         <Route path="/course/:courseId" element={<CoursePage />} />

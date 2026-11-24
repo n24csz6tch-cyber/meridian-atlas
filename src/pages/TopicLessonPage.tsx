@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   AlertTriangle,
   ArrowRight,
+  BookOpen,
   ChevronLeft,
   ChevronRight,
   ExternalLink,
+  Orbit,
   Pause,
   Play,
   Sparkles,
@@ -1460,6 +1462,7 @@ function isTopicVisualId(id: string | undefined): id is TopicVisualId {
 
 export function TopicLessonPage() {
   const { topicId } = useParams<{ topicId: string }>();
+  const reducedMotion = useReducedMotion();
   const [stepIdx, setStepIdx] = useState(0);
   const [autoPlaySteps, setAutoPlaySteps] = useState(false);
 
@@ -1493,6 +1496,7 @@ export function TopicLessonPage() {
   const courseNodes = CURRICULUM_NODES.filter((n) => n.courseId === spec.courseId);
   const currentIdx = courseNodes.findIndex((n) => n.id === topicId);
   const nextNode = courseNodes[(currentIdx + 1) % courseNodes.length];
+  const stepProgressPct = Math.round(((safeStep + 1) / Math.max(1, stepCount)) * 100);
 
   return (
     <AtlasShell activeCourse={spec.courseId}>
@@ -1503,28 +1507,46 @@ export function TopicLessonPage() {
           code={nodeMeta?.code ?? spec.code}
         />
 
-        <header className="space-y-3 max-w-4xl">
-          <div className="inline-flex items-center gap-2">
-            {nodeMeta && (
-              <span
-                className="px-3 py-1 rounded-xl font-mono-data text-sm font-semibold border"
-                style={{
-                  color: course.accent,
-                  borderColor: `${course.accent}55`,
-                  backgroundColor: `${course.accent}16`,
-                }}
-              >
-                {nodeMeta.symbol}
+        <header className="instrument-frame fiducial-frame p-6 sm:p-7 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="inline-flex items-center gap-2.5">
+              {nodeMeta && (
+                <span
+                  className="px-3 py-1 rounded-xl font-mono-data text-sm font-semibold border"
+                  style={{
+                    color: course.accent,
+                    borderColor: `${course.accent}55`,
+                    backgroundColor: `${course.accent}16`,
+                  }}
+                >
+                  {nodeMeta.symbol}
+                </span>
+              )}
+              <span className="font-mono-data text-xs text-[#A8B2C6]">
+                {mergedQuestions.length} Interactive Drills · Visual Proof on Every Equation
               </span>
-            )}
-            <span className="font-mono-data text-xs text-[#6F7F99]">
-              {mergedQuestions.length} Interactive Drills · Visual Proof on Every Equation
-            </span>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 font-mono-data text-[11px]">
+              <Link
+                to="/textbook"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#F4C46C]/25 bg-[#0B0C12] text-[#FFE29E] hover:border-[#F4C46C]/55 transition-colors"
+              >
+                <BookOpen className="w-3 h-3 text-[#F4C46C]" /> FL Textbook
+              </Link>
+              <Link
+                to="/frontier"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#F4C46C]/25 bg-[#0B0C12] text-[#F4C46C] hover:border-[#FFE29E]/55 transition-colors"
+              >
+                <Orbit className="w-3 h-3" /> String 3D
+              </Link>
+            </div>
           </div>
-          <h1 className="font-serif-editorial text-4xl sm:text-5xl text-[#F4F3EE] leading-tight">
+
+          <h1 className="font-serif-editorial text-4xl sm:text-5xl text-[#F7F4EC] leading-tight">
             {spec.title}
           </h1>
-          <p className="text-base text-[#A5B4CC] leading-relaxed">{spec.lead}</p>
+          <p className="text-sm sm:text-base text-[#A8B2C6] leading-relaxed max-w-4xl">{spec.lead}</p>
         </header>
 
         {/* LAYER 1: 60FPS VISUAL INTUITION */}
@@ -1537,7 +1559,7 @@ export function TopicLessonPage() {
               >
                 Layer 01 · 60fps Visual Intuition &amp; Live Manipulation
               </span>
-              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F4F3EE]">
+              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
                 Drag Parameters &amp; Watch the Geometry Respond
               </h2>
             </div>
@@ -1555,7 +1577,7 @@ export function TopicLessonPage() {
             >
               Layer 02 · Visualized Mathematical Equations &amp; Invariants
             </span>
-            <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F4F3EE]">
+            <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
               Every Formula Paired With Its Geometric Meaning
             </h2>
           </div>
@@ -1571,28 +1593,30 @@ export function TopicLessonPage() {
                     >
                       {ax.label}
                     </span>
-                    <span className="font-mono-data text-[9.5px] px-2 py-0.5 rounded-full bg-white/[0.04] text-[#6F7F99]">
+                    <span className="font-mono-data text-[9.5px] px-2 py-0.5 rounded-full border border-[#F4C46C]/20 bg-[#0B0C12] text-[#F4C46C]">
                       EQ 0{idx + 1}
                     </span>
                   </div>
 
-                  <EquationMiniVisual
-                    kind={visualConfig.axiomVisuals[idx] ?? visualConfig.axiomVisuals[0]}
-                    accent={course.accent}
-                  />
+                  <div aria-label={`${ax.label} visual diagram`}>
+                    <EquationMiniVisual
+                      kind={visualConfig.axiomVisuals[idx] ?? visualConfig.axiomVisuals[0]}
+                      accent={course.accent}
+                    />
+                  </div>
 
                   <div className="instrument-panel px-3 py-2.5 overflow-x-auto">
-                    <MathTex tex={ax.tex} displayMode className="text-[#F4F3EE]" />
+                    <MathTex tex={ax.tex} displayMode className="text-[#F7F4EC]" />
                   </div>
                 </div>
-                <p className="text-xs text-[#A5B4CC] leading-relaxed">{ax.note}</p>
+                <p className="text-xs text-[#A8B2C6] leading-relaxed">{ax.note}</p>
               </div>
             ))}
           </div>
         </section>
 
         {/* LAYER 3: SYNCHRONIZED GUIDED DERIVATION */}
-        <section id="layer-3" className="instrument-frame p-5 sm:p-7 space-y-5 scroll-mt-24">
+        <section id="layer-3" className="instrument-frame fiducial-frame p-5 sm:p-7 space-y-5 scroll-mt-24">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <span
@@ -1601,7 +1625,7 @@ export function TopicLessonPage() {
               >
                 Layer 03 · Synchronized Step-by-Step Visual Derivation
               </span>
-              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F4F3EE]">
+              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
                 Follow Each Algebraic Move Alongside Its Live Diagram
               </h2>
             </div>
@@ -1614,7 +1638,7 @@ export function TopicLessonPage() {
                   setStepIdx((prev) => (prev - 1 + stepCount) % stepCount);
                 }}
                 aria-label="Previous derivation step"
-                className="p-1.5 rounded-full border border-white/15 bg-white/[0.03] text-[#A5B4CC] hover:text-[#F4F3EE] transition-colors"
+                className="p-1.5 rounded-full border border-[#F4C46C]/25 bg-[#0B0C12] text-[#A8B2C6] hover:text-[#F7F4EC] hover:border-[#F4C46C]/50 transition-colors"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
@@ -1624,9 +1648,9 @@ export function TopicLessonPage() {
                 onClick={() => setAutoPlaySteps((p) => !p)}
                 className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono-data border transition-all"
                 style={{
-                  borderColor: autoPlaySteps ? course.accent : 'rgba(255,255,255,0.16)',
-                  backgroundColor: autoPlaySteps ? `${course.accent}22` : 'rgba(255,255,255,0.03)',
-                  color: autoPlaySteps ? course.accent : '#A5B4CC',
+                  borderColor: autoPlaySteps ? course.accent : 'rgba(244, 196, 108, 0.28)',
+                  backgroundColor: autoPlaySteps ? `${course.accent}22` : '#0B0C12',
+                  color: autoPlaySteps ? course.accent : '#F7F4EC',
                 }}
               >
                 {autoPlaySteps ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
@@ -1640,11 +1664,25 @@ export function TopicLessonPage() {
                   setStepIdx((prev) => (prev + 1) % stepCount);
                 }}
                 aria-label="Next derivation step"
-                className="p-1.5 rounded-full border border-white/15 bg-white/[0.03] text-[#A5B4CC] hover:text-[#F4F3EE] transition-colors"
+                className="p-1.5 rounded-full border border-[#F4C46C]/25 bg-[#0B0C12] text-[#A8B2C6] hover:text-[#F7F4EC] hover:border-[#F4C46C]/50 transition-colors"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
+          </div>
+
+          {/* Synchronized Layer 3 Progress Track */}
+          <div className="h-1 w-full rounded-full bg-[#060609] border border-[#F4C46C]/15 overflow-hidden">
+            <motion.div
+              className="h-full rounded-full"
+              style={{
+                background: `linear-gradient(90deg, #F4C46C, ${course.accent})`,
+                boxShadow: `0 0 10px ${course.accent}`,
+              }}
+              initial={false}
+              animate={{ width: `${stepProgressPct}%` }}
+              transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 260, damping: 28 }}
+            />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
@@ -1660,12 +1698,12 @@ export function TopicLessonPage() {
                     }}
                     className={`p-3 rounded-xl text-left border transition-all ${
                       safeStep === idx
-                        ? 'bg-white/[0.07] text-[#F4F3EE]'
-                        : 'bg-[#080D16] border-white/10 text-[#A5B4CC] hover:text-[#F4F3EE]'
+                        ? 'bg-[#F4C46C]/[0.1] text-[#F7F4EC]'
+                        : 'bg-[#0B0C12] border-[#F4C46C]/15 text-[#A8B2C6] hover:text-[#F7F4EC] hover:border-[#F4C46C]/35'
                     }`}
                     style={
                       safeStep === idx
-                        ? { borderColor: course.accent, boxShadow: `0 0 18px -6px ${course.accent}` }
+                        ? { borderColor: course.accent, boxShadow: `0 0 20px -8px ${course.accent}` }
                         : undefined
                     }
                   >
@@ -1685,9 +1723,9 @@ export function TopicLessonPage() {
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={safeStep}
-                  initial={{ opacity: 0, x: 10 }}
+                  initial={reducedMotion ? false : { opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
+                  exit={reducedMotion ? undefined : { opacity: 0, x: -10 }}
                   transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
                   className="instrument-panel p-5 space-y-2.5"
                 >
@@ -1695,9 +1733,9 @@ export function TopicLessonPage() {
                     {spec.steps[safeStep].title}
                   </p>
                   <div className="overflow-x-auto py-1">
-                    <MathTex tex={spec.steps[safeStep].tex} displayMode className="text-[#F4F3EE]" />
+                    <MathTex tex={spec.steps[safeStep].tex} displayMode className="text-[#F7F4EC]" />
                   </div>
-                  <p className="text-xs sm:text-sm text-[#A5B4CC] leading-relaxed">
+                  <p className="text-xs sm:text-sm text-[#A8B2C6] leading-relaxed">
                     {spec.steps[safeStep].note}
                   </p>
                 </motion.div>
@@ -1725,7 +1763,7 @@ export function TopicLessonPage() {
             >
               Layer 04 · Interactive Verification &amp; Worked Solutions
             </span>
-            <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F4F3EE]">
+            <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
               Test Your Intuition With Instant Step-by-Step Feedback
             </h2>
           </div>
@@ -1737,17 +1775,21 @@ export function TopicLessonPage() {
         </section>
 
         {/* LAYER 5: COMMON MISCONCEPTION VISUALLY PROVEN */}
-        <section
+        <motion.section
           id="layer-5"
-          className="instrument-frame p-5 sm:p-7 space-y-5 border-[#FF7A5C]/35 scroll-mt-24"
+          initial={reducedMotion ? false : { opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className="instrument-frame p-5 sm:p-7 space-y-5 border-[#FF8563]/40 scroll-mt-24"
         >
           <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-[#FF7A5C] shrink-0 mt-1" />
+            <AlertTriangle className="w-5 h-5 text-[#FF8563] shrink-0 mt-1" />
             <div>
-              <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#FF7A5C] block">
+              <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#FF8563] block">
                 Layer 05 · Typical Error Visually Proven
               </span>
-              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F4F3EE]">
+              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
                 {spec.misconception.title}
               </h2>
             </div>
@@ -1759,44 +1801,44 @@ export function TopicLessonPage() {
             </div>
 
             <div className="lg:col-span-6 space-y-3">
-              <div className="instrument-panel p-4 border-[#FF7A5C]/35">
-                <span className="font-mono-data text-[10px] text-[#FF7A5C] uppercase block mb-1">
+              <div className="instrument-panel p-4 border-[#FF8563]/40 bg-[#FF8563]/[0.05]">
+                <span className="font-mono-data text-[10px] text-[#FF8563] uppercase block mb-1">
                   Common Fallacy (Fails Geometrically)
                 </span>
                 <div className="overflow-x-auto">
-                  <MathTex tex={spec.misconception.falseTex} displayMode className="text-[#FF7A5C]" />
+                  <MathTex tex={spec.misconception.falseTex} displayMode className="text-[#FF8563]" />
                 </div>
               </div>
-              <div className="instrument-panel p-4 border-[#36EBA8]/35">
-                <span className="font-mono-data text-[10px] text-[#36EBA8] uppercase block mb-1">
+              <div className="instrument-panel p-4 border-[#45E6A6]/40 bg-[#45E6A6]/[0.05]">
+                <span className="font-mono-data text-[10px] text-[#45E6A6] uppercase block mb-1">
                   Verified Mathematical Law
                 </span>
                 <div className="overflow-x-auto">
-                  <MathTex tex={spec.misconception.trueTex} displayMode className="text-[#36EBA8]" />
+                  <MathTex tex={spec.misconception.trueTex} displayMode className="text-[#45E6A6]" />
                 </div>
               </div>
-              <p className="text-xs sm:text-sm text-[#A5B4CC] leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#A8B2C6] leading-relaxed">
                 {spec.misconception.explanation}
               </p>
             </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* LAYER 6: REAL-WORLD APPLICATION + SCHEMATIC */}
         <section id="layer-6" className="instrument-frame p-5 sm:p-7 space-y-5 scroll-mt-24">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
             <div className="lg:col-span-7 space-y-3">
-              <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#F5BC5E] block">
+              <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#F4C46C] block">
                 Layer 06 · Real-World Scientific &amp; Engineering Application
               </span>
-              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F4F3EE]">
+              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
                 {spec.application.title}
               </h2>
-              <p className="text-xs sm:text-sm text-[#A5B4CC] leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#A8B2C6] leading-relaxed">
                 {spec.application.context}
               </p>
               <div className="instrument-panel p-4 overflow-x-auto">
-                <MathTex tex={spec.application.formulaTex} displayMode className="text-[#F4F3EE]" />
+                <MathTex tex={spec.application.formulaTex} displayMode className="text-[#F7F4EC]" />
               </div>
             </div>
 
@@ -1811,13 +1853,22 @@ export function TopicLessonPage() {
         </section>
 
         {/* LAYER 7: VERIFIED FLORIDA B.E.S.T. STANDARDS + NEXT LESSON */}
-        <section id="layer-7" className="instrument-frame p-5 sm:p-6 space-y-4 scroll-mt-24">
-          <span
-            className="font-mono-data text-[10px] uppercase tracking-[0.18em] block"
-            style={{ color: course.accent }}
-          >
-            Layer 07 · Verified Florida B.E.S.T. Standards (Consulted {CONSULTED_DATE})
-          </span>
+        <section id="layer-7" className="instrument-frame p-5 sm:p-6 space-y-5 scroll-mt-24">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span
+              className="font-mono-data text-[10px] uppercase tracking-[0.18em] block"
+              style={{ color: course.accent }}
+            >
+              Layer 07 · Verified Florida B.E.S.T. Standards (Consulted {CONSULTED_DATE})
+            </span>
+            <Link
+              to="/textbook"
+              className="inline-flex items-center gap-1.5 font-mono-data text-[11px] text-[#FFE29E] hover:underline"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-[#F4C46C]" /> View in FL Textbook Hub
+            </Link>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {spec.standards.map((code) => {
               const s = VERIFIED_STANDARDS[code];
@@ -1832,12 +1883,12 @@ export function TopicLessonPage() {
                       href={s.sourceUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-[11px] font-mono-data text-[#A5B4CC] hover:text-[#F4F3EE]"
+                      className="inline-flex items-center gap-1 text-[11px] font-mono-data text-[#A8B2C6] hover:text-[#FFE29E]"
                     >
                       {s.sourceLabel} <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>
-                  <p className="text-xs text-[#F4F3EE] leading-relaxed">{s.description}</p>
+                  <p className="text-xs text-[#F7F4EC] leading-relaxed">{s.description}</p>
                 </div>
               );
             })}
@@ -1845,23 +1896,34 @@ export function TopicLessonPage() {
 
           {nextNode && (
             <div className="pt-4 border-t hairline-rule flex flex-wrap items-center justify-between gap-3">
-              <div className="text-xs text-[#A5B4CC]">
-                <span className="font-mono-data text-[10px] uppercase text-[#6F7F99] block">
+              <div className="text-xs text-[#A8B2C6]">
+                <span className="font-mono-data text-[10px] uppercase text-[#727D94] block">
                   Continue {course.title} Sequence
                 </span>
-                <strong className="text-[#F4F3EE] font-serif-editorial text-lg">
+                <strong className="text-[#F7F4EC] font-serif-editorial text-lg">
                   {nextNode.code} · {nextNode.title}
                 </strong>
               </div>
-              <Link
-                to={nextNode.route}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold text-[#03050A] hover:brightness-110 transition-all"
-                style={{ backgroundColor: course.accent }}
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                Next Visual Lesson
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <Link
+                  to="/frontier"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-mono-data border border-[#F4C46C]/35 bg-[#0B0C12] text-[#FFE29E] hover:border-[#FFE29E]/65 transition-colors"
+                >
+                  <Orbit className="w-3.5 h-3.5 text-[#F4C46C]" />
+                  String 3D Bridge
+                </Link>
+                <Link
+                  to={nextNode.route}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold text-[#060609] hover:brightness-110 transition-all shadow-[0_0_22px_-6px_rgba(244,196,108,0.6)]"
+                  style={{
+                    background: `linear-gradient(135deg, ${course.accent}, #FFE29E)`,
+                  }}
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Next Visual Lesson
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
             </div>
           )}
         </section>
