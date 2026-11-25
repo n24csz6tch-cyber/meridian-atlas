@@ -15,6 +15,8 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { AtlasShell } from '../components/AtlasShell';
+import { CourseJourneySidebar } from '../components/CourseJourneySidebar';
+import { LessonNextBridge, LessonWarmupBanner } from '../components/LessonBridgeCard';
 import { LessonNavHeader } from '../components/LessonNavHeader';
 import { MathTex } from '../components/MathTex';
 import { PracticeEngine, PracticeQuestion } from '../components/PracticeEngine';
@@ -206,10 +208,17 @@ export function SolidsLessonPage() {
 
   return (
     <AtlasShell activeCourse="geometry">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-12">
-        <LessonNavHeader courseId="geometry" activeNodeId="g-solids" code="G-09" />
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <aside className="lg:col-span-4 xl:col-span-3 min-w-0 lg:sticky lg:top-20">
+          <CourseJourneySidebar courseId="geometry" activeNodeId="g-solids" />
+        </aside>
 
-        {/* Header */}
+        <div className="lg:col-span-8 xl:col-span-9 min-w-0 space-y-10">
+          <LessonNavHeader courseId="geometry" activeNodeId="g-solids" code="G-09" />
+
+          <LessonWarmupBanner courseId="geometry" nodeId="g-solids" />
+
+          {/* Header */}
         <header className="instrument-frame fiducial-frame p-6 sm:p-7 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="font-mono-data text-[11px] uppercase tracking-[0.2em] text-[#46D6E8]">
@@ -843,6 +852,9 @@ export function SolidsLessonPage() {
             </div>
           )}
         </section>
+
+        <LessonNextBridge courseId="geometry" nodeId="g-solids" />
+        </div>
       </div>
     </AtlasShell>
   );

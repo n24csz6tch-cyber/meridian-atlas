@@ -15,6 +15,8 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { AtlasShell } from '../components/AtlasShell';
+import { CourseJourneySidebar } from '../components/CourseJourneySidebar';
+import { LessonNextBridge, LessonWarmupBanner } from '../components/LessonBridgeCard';
 import { LessonNavHeader } from '../components/LessonNavHeader';
 import { MathTex } from '../components/MathTex';
 import { PracticeEngine, PracticeQuestion } from '../components/PracticeEngine';
@@ -145,10 +147,17 @@ export function LogarithmsLessonPage() {
 
   return (
     <AtlasShell activeCourse="algebra-2">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-12">
-        <LessonNavHeader courseId="algebra-2" activeNodeId="a2-logarithms" code="A2-04" />
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <aside className="lg:col-span-4 xl:col-span-3 min-w-0 lg:sticky lg:top-20">
+          <CourseJourneySidebar courseId="algebra-2" activeNodeId="a2-logarithms" />
+        </aside>
 
-        <header className="instrument-frame fiducial-frame p-6 sm:p-7 space-y-3">
+        <div className="lg:col-span-8 xl:col-span-9 min-w-0 space-y-10">
+          <LessonNavHeader courseId="algebra-2" activeNodeId="a2-logarithms" code="A2-04" />
+
+          <LessonWarmupBanner courseId="algebra-2" nodeId="a2-logarithms" />
+
+          <header className="instrument-frame fiducial-frame p-6 sm:p-7 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="font-mono-data text-[11px] uppercase tracking-[0.2em] text-[#45E6A6]">
               Algebra 2 Flagship · Inverse Reflection &amp; Scaling Observatory
@@ -197,7 +206,7 @@ export function LogarithmsLessonPage() {
               Logarithm Laws Paired With Geometric Reflection
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
             <div className="instrument-frame p-4 space-y-2.5">
               <div className="flex items-center justify-between">
                 <span className="font-mono-data text-[10px] uppercase text-[#F4C46C]">
@@ -638,6 +647,9 @@ export function LogarithmsLessonPage() {
             </div>
           )}
         </section>
+
+        <LessonNextBridge courseId="algebra-2" nodeId="a2-logarithms" />
+        </div>
       </div>
     </AtlasShell>
   );

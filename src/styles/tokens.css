@@ -1,13 +1,13 @@
 :root {
-  --bg-void: #060609;
-  --bg-surface: #0b0c12;
-  --bg-panel: #11131c;
-  --bg-elevated: #171a26;
-  --bg-glass: rgba(11, 12, 18, 0.8);
+  --bg-void: #050508;
+  --bg-surface: #0b0b12;
+  --bg-panel: #12121d;
+  --bg-elevated: #181827;
+  --bg-glass: rgba(11, 11, 18, 0.84);
 
-  --border-hairline: rgba(244, 196, 108, 0.16);
-  --border-strong: rgba(244, 196, 108, 0.36);
-  --border-specular: rgba(255, 234, 186, 0.2);
+  --border-hairline: rgba(244, 196, 108, 0.18);
+  --border-strong: rgba(244, 196, 108, 0.42);
+  --border-specular: rgba(255, 229, 163, 0.24);
 
   --ink-primary: #f7f4ec;
   --ink-secondary: #a8b2c6;
@@ -15,7 +15,11 @@
 
   --gold-champagne: #f4c46c;
   --gold-starlight: #ffe29e;
+  --gold-champagne-light: #ffe5a3;
+  --gold-burnished: #d49a3a;
   --gold-brass: #b88938;
+  --gold-glow-soft: rgba(244, 196, 108, 0.16);
+  --gold-glow-warm: rgba(255, 229, 163, 0.3);
 
   --course-algebra-1: #f5c25b;
   --course-algebra-1-glow: rgba(245, 194, 91, 0.24);

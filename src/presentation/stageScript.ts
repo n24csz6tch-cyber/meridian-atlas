@@ -70,14 +70,85 @@ export const STAGE_ACTS: StageActMeta[] = [
     durationSec: 18,
   },
   {
-    id: 'finale',
+    id: 'algebraic-pipeline',
     number: 'ACT VIII',
+    title: 'Algebraic Dataflow & Oscilloscope Engine',
+    subtitle: 'Streaming numbers through linear scale ax + b, quadratic warp x², and live composite waves.',
+    accent: '#F4C46C',
+    durationSec: 18,
+  },
+  {
+    id: 'polar-harmonic',
+    number: 'ACT IX',
+    title: 'Polar Harmonic Ring & Lissajous Orbits',
+    subtitle: 'Scrub angle θ across concentric rings, golden chord arcs, and p:q resonance roses.',
+    accent: '#46D6E8',
+    durationSec: 18,
+  },
+  {
+    id: 'confidence-ribbon',
+    number: 'ACT X',
+    title: 'Confidence Ribbon & Residual Telemetry',
+    subtitle: 'Live 68–95–99.7% empirical uncertainty envelopes, Box-Muller residuals, and R² fit.',
+    accent: '#45E6A6',
+    durationSec: 18,
+  },
+  {
+    id: 'tensor-riemann',
+    number: 'ACT XI',
+    title: '3D Tensor & Riemann Volume Manifold',
+    subtitle: 'Interactive 3D prism stacks converging toward exact multivariable surface integrals.',
+    accent: '#FFE29E',
+    durationSec: 20,
+  },
+  {
+    id: 'finale',
+    number: 'ACT XII',
     title: 'Lorenz Chaos Finale & Closing Observatory',
     subtitle: 'Two trajectories separated by 0.002 diverging across twin golden attractor lobes.',
     accent: '#FF8563',
     durationSec: 14,
   },
 ];
+
+export type DriveStageActId =
+  | 'algebraic-pipeline'
+  | 'polar-harmonic'
+  | 'confidence-ribbon'
+  | 'tensor-riemann';
+
+export interface DriveStageNote {
+  courseBridge: string;
+  tex: string;
+  takeaway: string;
+}
+
+export const DRIVE_STAGE_NOTES: Record<DriveStageActId, DriveStageNote> = {
+  'algebraic-pipeline': {
+    courseBridge: 'Algebra 1 · Function Composition & Oscilloscope Signal Flow',
+    tex: 'x \\xrightarrow{ax+b} u \\xrightarrow{u^2} f(x) = (ax + b)^2',
+    takeaway:
+      'Every neural layer and composite algebraic rule works like an assembly line: scale first, bend second, and read the output wave live.',
+  },
+  'polar-harmonic': {
+    courseBridge: 'Precalculus · Polar Roses, Circular Harmonics & Golden Ratios',
+    tex: 'r(\\theta) = \\cos\\!\\left(\\tfrac{p}{q}\\theta\\right), \\quad (x, y) = (r\\cos\\theta, r\\sin\\theta)',
+    takeaway:
+      'Drag right on the ring to scrub angle θ, or switch between 3-Petal, 5-Petal, and irrational Golden Ratio φ:1 orbits.',
+  },
+  'confidence-ribbon': {
+    courseBridge: 'Algebra 1 & Algebra 2 · Regression Residuals & 68–95–99.7% Bands',
+    tex: 'y = \\hat{y}(x) \\pm k\\sigma, \\qquad R^2 = 1 - \\dfrac{\\sum e_i^2}{\\sum (y_i - \\bar{y})^2}',
+    takeaway:
+      'Real measurements cluster around a trend curve inside layered 1σ, 2σ, and 3σ ribbons—showing uncertainty visually at a glance.',
+  },
+  'tensor-riemann': {
+    courseBridge: 'Precalculus & Calculus Bridge · 3D Riemann Sums & Tensor Slices',
+    tex: 'V_N = \\sum_{i,j=1}^N f(x_i, y_j)\\,\\Delta x\\,\\Delta y \\xrightarrow{N\\to\\infty} \\iint_D f(x,y)\\,dA',
+    takeaway:
+      'Increase the grid from 2×2 to 10×10 and watch blocky 3D prisms hug the smooth exact surface as error shrinks toward zero.',
+  },
+};
 
 export const MAP_FLIGHT_KEYFRAMES: {
   atSec: number;

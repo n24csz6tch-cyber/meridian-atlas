@@ -13,6 +13,9 @@ import {
 } from 'lucide-react';
 import { MathTex } from '../components/MathTex';
 import { COURSES } from '../data/curriculumGraph';
+import { AlgebraicPipelineEngine } from '../visuals/drive/AlgebraicPipelineEngine';
+import { ConfidenceRibbonField } from '../visuals/drive/ConfidenceRibbonField';
+import { PolarHarmonicRingEngine } from '../visuals/drive/PolarHarmonicRingEngine';
 import { DerivationStepVisual } from '../visuals/equations/LessonLayerVisuals';
 import { CalabiYauManifold3D } from '../visuals/frontier/CalabiYauManifold3D';
 import { OrbitalSignalTorus3D } from '../visuals/frontier/OrbitalSignalTorus3D';
@@ -23,6 +26,8 @@ import { ParabolaCanvas } from '../visuals/parabola/ParabolaCanvas';
 import { UnitCircleWaveCanvas } from '../visuals/trig/UnitCircleWaveCanvas';
 import { MathVortexCanvas } from '../visuals/vortex/MathVortexCanvas';
 import {
+  DRIVE_STAGE_NOTES,
+  DriveStageActId,
   FRONTIER_KEYFRAMES,
   MAP_FLIGHT_KEYFRAMES,
   PARABOLA_KEYFRAMES,
@@ -32,6 +37,7 @@ import {
 } from './stageScript';
 
 const LazySolidNetScene = lazy(() => import('../visuals/solids/SolidNetScene'));
+const LazyTensorRiemann3D = lazy(() => import('../visuals/drive/TensorRiemann3D'));
 
 interface StageModeProps {
   onExit: () => void;
@@ -171,7 +177,7 @@ export function StageMode({ onExit }: StageModeProps) {
       } else if (e.key === 'f' || e.key === 'F') {
         e.preventDefault();
         toggleFullscreen();
-      } else if (e.key >= '1' && e.key <= '8') {
+      } else if (e.key >= '1' && e.key <= '9') {
         const idx = Number(e.key) - 1;
         if (idx >= 0 && idx < STAGE_ACTS.length) {
           e.preventDefault();
@@ -180,6 +186,12 @@ export function StageMode({ onExit }: StageModeProps) {
           setActIndex(idx);
           flashNotice(STAGE_ACTS[idx].number);
         }
+      } else if (e.key === '0' && STAGE_ACTS.length >= 10) {
+        e.preventDefault();
+        elapsedRef.current = 0;
+        setElapsedTick(0);
+        setActIndex(9);
+        flashNotice(STAGE_ACTS[9].number);
       }
     };
 
@@ -189,7 +201,7 @@ export function StageMode({ onExit }: StageModeProps) {
 
   const sweepIndex = Math.max(0, Math.min(3, Math.floor((elapsedTick / act.durationSec) * 4)));
 
-  const showConstellationPhase = actIndex === 1 && elapsedTick >= 10;
+  const showConstellationPhase = act.id === 'harmonic-spine' && elapsedTick >= 10;
   const mapFrame = useMemo(() => {
     const relSec = showConstellationPhase ? Math.max(0, elapsedTick - 10) : 0;
     let chosen = MAP_FLIGHT_KEYFRAMES[0];
@@ -235,8 +247,8 @@ export function StageMode({ onExit }: StageModeProps) {
     return chosen;
   }, [elapsedTick]);
 
-  const showNeuralPhase = actIndex === 4 && elapsedTick >= 10;
-  const showClosingAurea = actIndex === 7 && elapsedTick >= 10;
+  const showNeuralPhase = act.id === 'neural-wave' && elapsedTick >= 10;
+  const showClosingAurea = act.id === 'finale' && elapsedTick >= 10;
 
   return (
     <div
@@ -246,10 +258,10 @@ export function StageMode({ onExit }: StageModeProps) {
       className="fixed inset-0 z-50 bg-[#060609] text-[#F7F4EC] flex flex-col justify-between select-none overflow-hidden"
     >
       {/* Top AUREA Editorial Header */}
-      <div className="px-6 sm:px-8 pt-4 pb-3 flex items-center justify-between gap-4 border-b border-[rgba(244,196,108,0.16)] bg-[#0B0C12]/80">
-        <div className="flex items-center gap-3 min-w-0">
+      <div className="px-3 sm:px-8 pt-3 sm:pt-4 pb-2.5 sm:pb-3 flex items-center justify-between gap-3 border-b border-[rgba(244,196,108,0.16)] bg-[#0B0C12]/80">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
           <span
-            className="font-mono-data text-xs uppercase tracking-[0.22em] px-2.5 py-0.5 rounded border shrink-0"
+            className="font-mono-data text-[11px] sm:text-xs uppercase tracking-[0.2em] px-2 sm:px-2.5 py-0.5 rounded border shrink-0"
             style={{
               color: act.accent,
               borderColor: `${act.accent}66`,
@@ -258,13 +270,13 @@ export function StageMode({ onExit }: StageModeProps) {
           >
             {act.number}
           </span>
-          <h2 className="font-serif-editorial text-xl sm:text-2xl text-[#F7F4EC] truncate">
+          <h2 className="font-serif-editorial text-lg sm:text-2xl text-[#F7F4EC] truncate">
             {act.title}
           </h2>
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
-          <span className="hidden lg:inline font-mono-data text-[11px] text-[#A8B2C6]">
+          <span className="hidden lg:inline font-mono-data text-[11px] text-[#A8B2C6] max-w-md truncate">
             {act.subtitle}
           </span>
           <button
@@ -280,7 +292,7 @@ export function StageMode({ onExit }: StageModeProps) {
       </div>
 
       {/* Main Stage Viewport */}
-      <div className="flex-1 relative px-6 sm:px-10 py-4 flex items-center justify-center overflow-y-auto">
+      <div className="flex-1 relative px-3 sm:px-8 py-4 flex items-start lg:items-center justify-center overflow-y-auto overflow-x-hidden">
         <AnimatePresence mode="wait" initial={false}>
           {/* ACT I: OVERTURE WITH ORBITAL SIGNAL TORUS 3D */}
           {actIndex === 0 && (
@@ -696,15 +708,77 @@ export function StageMode({ onExit }: StageModeProps) {
             </motion.div>
           )}
 
-          {/* ACT VIII: LORENZ CHAOS FINALE & CLOSING AUREA */}
-          {actIndex === 7 && (
+          {/* ACT VIII–XI: DRIVE MATHEMATICAL ENGINES SHOWCASE */}
+          {(act.id === 'algebraic-pipeline' ||
+            act.id === 'polar-harmonic' ||
+            act.id === 'confidence-ribbon' ||
+            act.id === 'tensor-riemann') && (() => {
+            const driveId = act.id as DriveStageActId;
+            const note = DRIVE_STAGE_NOTES[driveId];
+            return (
+              <motion.div
+                key={`act-${driveId}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.28 }}
+                className="my-auto w-full max-w-6xl min-w-0 space-y-3"
+              >
+                <div
+                  className="aurea-glass-card px-4 py-3 flex flex-col lg:flex-row lg:items-center justify-between gap-3 min-w-0"
+                  style={{ borderLeft: `3px solid ${act.accent}` }}
+                >
+                  <div className="space-y-1 min-w-0">
+                    <span
+                      className="font-mono-data text-[10.5px] uppercase tracking-[0.18em] block"
+                      style={{ color: act.accent }}
+                    >
+                      {note.courseBridge}
+                    </span>
+                    <p className="text-xs sm:text-sm text-[#A8B2C6] leading-relaxed">
+                      {note.takeaway}
+                    </p>
+                  </div>
+                  <div className="rounded-xl bg-[#060609]/95 border border-[#F4C46C]/22 px-3 py-2 overflow-x-auto max-w-full shrink-0">
+                    <MathTex tex={note.tex} className="text-xs sm:text-sm text-[#FFE29E]" />
+                  </div>
+                </div>
+
+                <div className="min-w-0">
+                  {driveId === 'algebraic-pipeline' && (
+                    <AlgebraicPipelineEngine heightClass="h-[165px] sm:h-[195px]" />
+                  )}
+                  {driveId === 'polar-harmonic' && (
+                    <PolarHarmonicRingEngine heightClass="h-[270px] sm:h-[345px]" />
+                  )}
+                  {driveId === 'confidence-ribbon' && (
+                    <ConfidenceRibbonField heightClass="h-[265px] sm:h-[335px]" />
+                  )}
+                  {driveId === 'tensor-riemann' && (
+                    <Suspense
+                      fallback={
+                        <div className="instrument-frame h-[340px] flex items-center justify-center font-mono-data text-xs text-[#A8B2C6]">
+                          Initializing 3D Tensor &amp; Riemann Manifold…
+                        </div>
+                      }
+                    >
+                      <LazyTensorRiemann3D heightClass="h-[280px] sm:h-[355px]" />
+                    </Suspense>
+                  )}
+                </div>
+              </motion.div>
+            );
+          })()}
+
+          {/* ACT XII: LORENZ CHAOS FINALE & CLOSING AUREA */}
+          {act.id === 'finale' && (
             <motion.div
               key="act-finale"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.28 }}
-              className="w-full max-w-6xl"
+              className="my-auto w-full max-w-6xl min-w-0"
             >
               {!showClosingAurea ? (
                 <div className="space-y-3">
@@ -720,7 +794,7 @@ export function StageMode({ onExit }: StageModeProps) {
                     lockedMode="lorenz"
                     compact
                     interactive={false}
-                    heightClass="h-[420px]"
+                    heightClass="h-[340px] sm:h-[420px]"
                   />
                 </div>
               ) : (
@@ -758,7 +832,7 @@ export function StageMode({ onExit }: StageModeProps) {
       </div>
 
       {/* Crisp Always-Accessible Bottom Control Dock */}
-      <div className="px-4 sm:px-8 pb-3 pt-2 border-t border-[rgba(244,196,108,0.16)] bg-[#060609]/95 backdrop-blur-md flex flex-wrap items-center justify-between gap-3">
+      <div className="px-3 sm:px-8 pb-3 pt-2 border-t border-[rgba(244,196,108,0.16)] bg-[#060609]/95 backdrop-blur-md flex flex-wrap items-center justify-between gap-2 sm:gap-3">
         <div className="flex items-center gap-1.5">
           <button
             type="button"
@@ -788,13 +862,13 @@ export function StageMode({ onExit }: StageModeProps) {
           >
             <SkipForward className="w-3.5 h-3.5" />
           </button>
-          <span className="ml-2 font-mono-data text-[11px] text-[#727D94]">
+          <span className="ml-1 sm:ml-2 font-mono-data text-[11px] text-[#727D94]">
             {String(Math.floor(elapsedTick)).padStart(2, '0')}s / {act.durationSec}s
           </span>
         </div>
 
-        {/* Act Selector Pills (I - VIII) */}
-        <div className="flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Presentation acts">
+        {/* Act Selector Pills (I - XII) */}
+        <div className="flex flex-wrap items-center gap-1" role="tablist" aria-label="Presentation acts">
           {STAGE_ACTS.map((item, idx) => {
             const active = idx === actIndex;
             const numeral = item.number.replace('ACT ', '');
@@ -805,8 +879,8 @@ export function StageMode({ onExit }: StageModeProps) {
                 role="tab"
                 aria-selected={active}
                 onClick={() => jumpToAct(idx)}
-                title={`${item.number}: ${item.title} (Key ${idx + 1})`}
-                className="px-2.5 py-1 rounded-full font-mono-data text-[11px] border transition-all"
+                title={`${item.number}: ${item.title}${idx < 9 ? ` (Key ${idx + 1})` : ''}`}
+                className="px-2 py-1 rounded-full font-mono-data text-[10.5px] sm:text-[11px] border transition-all"
                 style={{
                   borderColor: active ? item.accent : 'rgba(244,196,108,0.18)',
                   backgroundColor: active ? `${item.accent}26` : '#0B0C12',
@@ -861,10 +935,10 @@ export function StageMode({ onExit }: StageModeProps) {
 
       {/* Toggleable Mini-Index Drawer */}
       {showIndex && (
-        <div className="fixed bottom-16 right-4 sm:right-8 z-50 w-80 p-3 rounded-xl bg-[#0B0C12]/95 backdrop-blur-md border border-[rgba(244,196,108,0.28)] space-y-2 shadow-2xl">
+        <div className="fixed bottom-20 right-4 sm:right-8 z-50 w-80 max-w-[calc(100vw-2rem)] max-h-[68vh] overflow-y-auto p-3 rounded-xl bg-[#0B0C12]/95 backdrop-blur-md border border-[rgba(244,196,108,0.28)] space-y-2 shadow-2xl">
           <div className="flex items-center justify-between pb-1.5 border-b border-[rgba(244,196,108,0.16)]">
             <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#F4C46C]">
-              Stage Index (1–8 · Space · ←/→ · F · Esc)
+              Stage Index (1–0 · Space · ←/→ · F · Esc)
             </span>
             <button
               type="button"

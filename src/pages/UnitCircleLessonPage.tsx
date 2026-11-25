@@ -14,6 +14,8 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { AtlasShell } from '../components/AtlasShell';
+import { CourseJourneySidebar } from '../components/CourseJourneySidebar';
+import { LessonNextBridge, LessonWarmupBanner } from '../components/LessonBridgeCard';
 import { LessonNavHeader } from '../components/LessonNavHeader';
 import { MathTex } from '../components/MathTex';
 import { PracticeEngine, PracticeQuestion } from '../components/PracticeEngine';
@@ -133,10 +135,17 @@ export function UnitCircleLessonPage() {
 
   return (
     <AtlasShell activeCourse="precalculus">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-12">
-        <LessonNavHeader courseId="precalculus" activeNodeId="pc-unit-circle" code="PC-01" />
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <aside className="lg:col-span-4 xl:col-span-3 min-w-0 lg:sticky lg:top-20">
+          <CourseJourneySidebar courseId="precalculus" activeNodeId="pc-unit-circle" />
+        </aside>
 
-        <header className="instrument-frame fiducial-frame p-6 sm:p-7 space-y-3">
+        <div className="lg:col-span-8 xl:col-span-9 min-w-0 space-y-10">
+          <LessonNavHeader courseId="precalculus" activeNodeId="pc-unit-circle" code="PC-01" />
+
+          <LessonWarmupBanner courseId="precalculus" nodeId="pc-unit-circle" />
+
+          <header className="instrument-frame fiducial-frame p-6 sm:p-7 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="font-mono-data text-[11px] uppercase tracking-[0.2em] text-[#FF8563]">
               Precalculus Flagship · Circular Harmonics &amp; Vector Observatory
@@ -592,6 +601,9 @@ export function UnitCircleLessonPage() {
             </div>
           )}
         </section>
+
+        <LessonNextBridge courseId="precalculus" nodeId="pc-unit-circle" />
+        </div>
       </div>
     </AtlasShell>
   );

@@ -1,20 +1,67 @@
+import { Suspense, lazy, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Compass, ExternalLink, Network, Orbit, Sparkles } from 'lucide-react';
+import { ArrowRight, Compass, ExternalLink, Layers, Network, Orbit, Sparkles } from 'lucide-react';
 import { AtlasShell } from '../components/AtlasShell';
 import { LessonNavHeader } from '../components/LessonNavHeader';
 import { MathTex } from '../components/MathTex';
 import { VERIFIED_STANDARDS } from '../data/standards';
+import { AlgebraicPipelineEngine } from '../visuals/drive/AlgebraicPipelineEngine';
+import { ConfidenceRibbonField } from '../visuals/drive/ConfidenceRibbonField';
 import { EquationMiniVisual } from '../visuals/equations/EquationMiniVisual';
 import { GoldenHarmonicSpine } from '../visuals/harmony/GoldenHarmonicSpine';
 import { NeuralMathEngine } from '../visuals/neural/NeuralMathEngine';
 import { MathVortexCanvas } from '../visuals/vortex/MathVortexCanvas';
 
+const LazyTensorRiemann3D = lazy(() => import('../visuals/drive/TensorRiemann3D'));
+
+type DriveLabTab = 'pipeline' | 'confidence' | 'tensor';
+
+const DRIVE_TABS: {
+  id: DriveLabTab;
+  label: string;
+  accent: string;
+  badge: string;
+  summary: string;
+  formulaTex: string;
+}[] = [
+  {
+    id: 'pipeline',
+    label: 'Algebraic Dataflow & Oscilloscope',
+    accent: '#F4C46C',
+    badge: 'Signal Flow · Linear Scale -> Nonlinear Warp',
+    summary:
+      'Watch input x flow through ax + b and quadratic curvature into live composite waveforms—the exact computational anatomy of a neural neuron.',
+    formulaTex: 'x \\xrightarrow{ax+b} u \\xrightarrow{u^2} f(x) = (ax+b)^2',
+  },
+  {
+    id: 'confidence',
+    label: 'Confidence Ribbon & Residuals',
+    accent: '#45E6A6',
+    badge: 'Statistical Uncertainty · 68-95-99.7% Envelopes',
+    summary:
+      'Explore Gaussian noise around nonlinear regression trends, inspect 1σ/2σ/3σ probability ribbons, and track live R² error convergence.',
+    formulaTex: 'y = \\hat{y}(x) \\pm k\\sigma, \\quad R^2 = 1 - \\tfrac{\\sum e_i^2}{\\sum (y_i-\\bar{y})^2}',
+  },
+  {
+    id: 'tensor',
+    label: '3D Tensor & Riemann Manifold',
+    accent: '#46D6E8',
+    badge: 'Three.js WebGL · Voxel Stacks & Integral Volume',
+    summary:
+      'Inspect stacked 3D Riemann prisms and tensor matrix planes approximating curved multivariable surfaces from 2×2 up to 10×10 resolution.',
+    formulaTex: 'V_N = \\sum_{i,j=1}^N f(x_i,y_j)\\,\\Delta x\\,\\Delta y \\longrightarrow \\iint_D f\\,dA',
+  },
+];
+
 const MATRIX_STANDARDS = ['MA.912.NSO.4.1', 'MA.912.NSO.4.2'];
 
 export function NeuralMathPage() {
+  const [driveTab, setDriveTab] = useState<DriveLabTab>('pipeline');
+  const activeDriveMeta = DRIVE_TABS.find((t) => t.id === driveTab) ?? DRIVE_TABS[0];
+
   return (
     <AtlasShell activeCourse="algebra-2">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-12 min-w-0">
         <LessonNavHeader courseId="algebra-2" activeNodeId="a2-matrices" code="A2-06" />
 
         {/* Flagship AUREA Golden Observatory Hero */}
@@ -249,9 +296,145 @@ export function NeuralMathPage() {
           </div>
         </section>
 
+        {/* SECTION 4: DRIVE RECONSTRUCTED ENGINES — PIPELINE, CONFIDENCE RIBBON & 3D TENSOR RIEMANN */}
+        <section className="space-y-5 min-w-0">
+          <div className="flex flex-wrap items-end justify-between gap-3 border-b border-[rgba(244,196,108,0.17)] pb-3">
+            <div className="min-w-0 space-y-1">
+              <span className="font-mono-data text-[10px] uppercase tracking-[0.2em] text-[#F4C46C] flex items-center gap-1.5">
+                <Layers className="w-3.5 h-3.5" />
+                Observatory Instrument 04 · Interactive Engine Trio
+              </span>
+              <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
+                Dataflow Pipelines, Uncertainty Ribbons &amp; 3D Tensor Manifolds
+              </h2>
+            </div>
+
+            <div
+              role="tablist"
+              aria-label="Drive interactive mathematical engines"
+              className="flex flex-wrap items-center gap-1.5"
+            >
+              {DRIVE_TABS.map((tab) => {
+                const active = driveTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => setDriveTab(tab.id)}
+                    className={`px-3 py-1.5 rounded-full text-[11px] font-mono-data border transition-all ${
+                      active
+                        ? 'text-[#060609] font-semibold'
+                        : 'bg-[#0B0C12] text-[#A8B2C6] border-[rgba(244,196,108,0.18)] hover:text-[#F7F4EC]'
+                    }`}
+                    style={
+                      active
+                        ? {
+                            backgroundColor: tab.accent,
+                            borderColor: tab.accent,
+                            boxShadow: `0 0 18px -4px ${tab.accent}`,
+                          }
+                        : undefined
+                    }
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div
+            className="aurea-glass-card p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 min-w-0"
+            style={{ borderLeft: `3px solid ${activeDriveMeta.accent}` }}
+          >
+            <div className="space-y-1 min-w-0">
+              <span
+                className="font-mono-data text-[10px] uppercase tracking-[0.18em] block"
+                style={{ color: activeDriveMeta.accent }}
+              >
+                {activeDriveMeta.badge}
+              </span>
+              <p className="text-xs sm:text-sm text-[#A8B2C6] leading-relaxed">
+                {activeDriveMeta.summary}
+              </p>
+            </div>
+            <div className="rounded-xl bg-[#060609]/90 border border-[#F4C46C]/20 px-3 py-2 overflow-x-auto max-w-full shrink-0">
+              <MathTex tex={activeDriveMeta.formulaTex} className="text-xs text-[#FFE29E]" />
+            </div>
+          </div>
+
+          <div className="min-w-0">
+            {driveTab === 'pipeline' && <AlgebraicPipelineEngine />}
+            {driveTab === 'confidence' && <ConfidenceRibbonField />}
+            {driveTab === 'tensor' && (
+              <Suspense
+                fallback={
+                  <div className="instrument-frame h-[430px] flex items-center justify-center font-mono-data text-xs text-[#A8B2C6]">
+                    Initializing 3D Tensor &amp; Riemann Manifold…
+                  </div>
+                }
+              >
+                <LazyTensorRiemann3D />
+              </Suspense>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-w-0">
+            <div className="aurea-glass-card p-4 space-y-2 min-w-0">
+              <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#F4C46C]">
+                01 · Layered Algebraic Neurons
+              </span>
+              <div className="overflow-x-auto max-w-full">
+                <MathTex
+                  tex="f(x) = (ax + b)^2 \;\Longleftrightarrow\; \text{Linear} \to \text{Nonlinear}"
+                  displayMode
+                  className="text-xs text-[#F7F4EC]"
+                />
+              </div>
+              <p className="text-xs text-[#A8B2C6] leading-relaxed">
+                Just like a single neuron, the pipeline scales input <code className="text-[#46D6E8]">ax + b</code> first and bends it with a nonlinear curve second.
+              </p>
+            </div>
+
+            <div className="aurea-glass-card p-4 space-y-2 min-w-0">
+              <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#45E6A6]">
+                02 · Empirical Confidence &amp; MSE Loss
+              </span>
+              <div className="overflow-x-auto max-w-full">
+                <MathTex
+                  tex="\text{MSE} = \frac{1}{N}\sum_{i=1}^{N}(y_i - \hat{y}_i)^2, \quad \pm 2\sigma \approx 95\%"
+                  displayMode
+                  className="text-xs text-[#F7F4EC]"
+                />
+              </div>
+              <p className="text-xs text-[#A8B2C6] leading-relaxed">
+                Training minimizes squared residuals while the <code className="text-[#45E6A6]">1σ / 2σ / 3σ</code> ribbons visualize natural prediction spread.
+              </p>
+            </div>
+
+            <div className="aurea-glass-card p-4 space-y-2 min-w-0">
+              <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#46D6E8]">
+                03 · Tensor Grids &amp; Volume Integrals
+              </span>
+              <div className="overflow-x-auto max-w-full">
+                <MathTex
+                  tex="V_N = \sum_{i,j=1}^N f(x_i,y_j)\,\Delta A \to \iint_D f\,dA"
+                  displayMode
+                  className="text-xs text-[#F7F4EC]"
+                />
+              </div>
+              <p className="text-xs text-[#A8B2C6] leading-relaxed">
+                Discrete 3D tensor prisms approximate continuous curved manifolds—bridging matrix grids directly to multivariable calculus.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Verified Standards Alignment & Next Observatory Destinations */}
         <section
-          className="rounded-2xl p-5 sm:p-6 space-y-4 bg-[#0B0C12]/90 border"
+          className="rounded-2xl p-5 sm:p-6 space-y-4 bg-[#0B0C12]/90 border min-w-0"
           style={{ borderColor: 'rgba(244, 196, 108, 0.17)' }}
         >
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -278,7 +461,7 @@ export function NeuralMathPage() {
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-mono-data bg-[#F4C46C] text-[#060609] font-semibold hover:brightness-110"
               >
                 <Sparkles className="w-3.5 h-3.5" />
-                Explore All 16 Labs
+                Explore All 26 Labs
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>

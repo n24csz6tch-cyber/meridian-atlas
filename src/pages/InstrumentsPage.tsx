@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { Suspense, lazy, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   Activity,
@@ -27,6 +27,9 @@ import { AtlasShell } from '../components/AtlasShell';
 import { CourseId } from '../data/standards';
 import { QuadraticWorkbench } from '../instruments/QuadraticWorkbench';
 import { SolidNetLab } from '../instruments/SolidNetLab';
+import { AlgebraicPipelineEngine } from '../visuals/drive/AlgebraicPipelineEngine';
+import { ConfidenceRibbonField } from '../visuals/drive/ConfidenceRibbonField';
+import { PolarHarmonicRingEngine } from '../visuals/drive/PolarHarmonicRingEngine';
 import { CalabiYauManifold3D } from '../visuals/frontier/CalabiYauManifold3D';
 import { OrbitalSignalTorus3D } from '../visuals/frontier/OrbitalSignalTorus3D';
 import { GoldenHarmonicSpine } from '../visuals/harmony/GoldenHarmonicSpine';
@@ -38,17 +41,21 @@ import { UnitCircleWaveCanvas } from '../visuals/trig/UnitCircleWaveCanvas';
 import { VectorParallelogramCanvas } from '../visuals/trig/VectorParallelogramCanvas';
 import { MathVortexCanvas } from '../visuals/vortex/MathVortexCanvas';
 
+const LazyTensorRiemann3D = lazy(() => import('../visuals/drive/TensorRiemann3D'));
+
 type LabCategory = 'all' | 'frontier' | CourseId;
 
 type LabId =
   | 'orbital-torus'
   | 'calabi-yau'
+  | 'tensor-riemann'
   | 'apollonius-cone'
   | 'harmonic-spine'
   | 'solids'
   | 'neural'
   | 'vortex'
   | 'quadratic'
+  | 'algebraic-pipeline'
   | 'linear-exp'
   | 'abs-radicals'
   | 'inequalities'
@@ -57,10 +64,12 @@ type LabId =
   | 'circles-coord'
   | 'pythagoras'
   | 'logs'
+  | 'confidence-ribbon'
   | 'nonlinear-inv'
   | 'pascal-prob'
   | 'polynomials-rat'
   | 'trig-vectors'
+  | 'polar-harmonic'
   | 'parametric-polar'
   | 'limits-series';
 
@@ -101,6 +110,18 @@ const LAB_ITEMS: LabMeta[] = [
     companionRoute: '/frontier',
     companionLabel: 'Solve 10D Physics Challenges',
     icon: Atom,
+  },
+  {
+    id: 'tensor-riemann',
+    label: '3D Tensor & Riemann Manifold',
+    category: 'frontier',
+    accent: '#FFE29E',
+    tag: 'THREE.JS · 3D RIEMANN PRISMS & TENSOR SLICES',
+    description:
+      'Stack 3D Riemann prisms beneath curved manifolds, toggle Midpoint vs. Corner sampling, and watch volume converge toward exact integrals.',
+    companionRoute: '/neural',
+    companionLabel: 'Open Neural & Tensor Studio',
+    icon: Box,
   },
   {
     id: 'apollonius-cone',
@@ -178,6 +199,19 @@ const LAB_ITEMS: LabMeta[] = [
     companionRoute: '/lesson/quadratics',
     companionLabel: 'Open Quadratics Lesson',
     icon: FunctionSquare,
+  },
+  {
+    id: 'algebraic-pipeline',
+    label: 'Algebraic Dataflow & Wave',
+    category: 'algebra-1',
+    course: 'algebra-1',
+    accent: '#F5C25B',
+    tag: 'ALGEBRA 1 · DATAFLOW CONDUITS & OSCILLOSCOPE',
+    description:
+      'Stream live numbers through linear scaling ax + b and quadratic warping into a real-time multi-wave oscilloscope.',
+    companionRoute: '/lesson/a1-quadratics',
+    companionLabel: 'Open Quadratics Lesson',
+    icon: Activity,
   },
   {
     id: 'linear-exp',
@@ -284,6 +318,19 @@ const LAB_ITEMS: LabMeta[] = [
     icon: TrendingUp,
   },
   {
+    id: 'confidence-ribbon',
+    label: 'Confidence Ribbon & Residuals',
+    category: 'algebra-2',
+    course: 'algebra-2',
+    accent: '#45E6A6',
+    tag: 'ALGEBRA 2 & ML · 68-95-99.7% PROBABILITY BANDS',
+    description:
+      'Inspect layered 1σ, 2σ, and 3σ uncertainty ribbons with Monte Carlo residuals, live R², and Empirical Rule coverage.',
+    companionRoute: '/lesson/a2-probability',
+    companionLabel: 'Open Normal Curve Lesson',
+    icon: TrendingUp,
+  },
+  {
     id: 'nonlinear-inv',
     label: 'Nonlinear Systems & Radicals',
     category: 'algebra-2',
@@ -349,6 +396,19 @@ const LAB_ITEMS: LabMeta[] = [
     icon: Radar,
   },
   {
+    id: 'polar-harmonic',
+    label: 'Polar Harmonic Chord Ring',
+    category: 'precalculus',
+    course: 'precalculus',
+    accent: '#FF8563',
+    tag: 'PRECALCULUS · POLAR ROSES & GOLDEN CHORDS',
+    description:
+      'Scrub angle θ on orbital rings, trace sin/cos harmonic chords, and morph between circles, roses, and golden-ratio rosettes.',
+    companionRoute: '/lesson/pc-polar',
+    companionLabel: 'Open Polar Curves Lesson',
+    icon: Radar,
+  },
+  {
     id: 'limits-series',
     label: 'Limits & Infinite Series',
     category: 'precalculus',
@@ -364,12 +424,12 @@ const LAB_ITEMS: LabMeta[] = [
 ];
 
 const CATEGORY_FILTERS: { id: LabCategory; label: string; accent: string }[] = [
-  { id: 'all', label: 'All 22 Labs', accent: '#F4C46C' },
-  { id: 'frontier', label: '3D & String Frontier', accent: '#FFE29E' },
-  { id: 'algebra-1', label: 'Algebra 1', accent: '#F5C25B' },
-  { id: 'geometry', label: 'Geometry', accent: '#46D6E8' },
-  { id: 'algebra-2', label: 'Algebra 2', accent: '#45E6A6' },
-  { id: 'precalculus', label: 'Precalculus', accent: '#FF8563' },
+  { id: 'all', label: 'All 26 Labs', accent: '#F4C46C' },
+  { id: 'frontier', label: '3D & String Frontier (4)', accent: '#FFE29E' },
+  { id: 'algebra-1', label: 'Algebra 1 (6)', accent: '#F5C25B' },
+  { id: 'geometry', label: 'Geometry (4)', accent: '#46D6E8' },
+  { id: 'algebra-2', label: 'Algebra 2 (6)', accent: '#45E6A6' },
+  { id: 'precalculus', label: 'Precalculus (6)', accent: '#FF8563' },
 ];
 
 function isLabId(val: string | null): val is LabId {
@@ -402,12 +462,12 @@ export function InstrumentsPage() {
 
   return (
     <AtlasShell activeCourse={activeMeta.course}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6 min-w-0">
         <header className="space-y-5 border-b border-[rgba(244,196,108,0.16)] pb-6">
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 min-w-0">
               <span className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-[#F4C46C]">
-                AUREA Precision Observatory · 22 Standalone Lab Suites (3D + 31 Topic Engines)
+                AUREA Precision Observatory · 26 Standalone Lab Suites (3D + 35 Topic Engines)
               </span>
               <h1 className="font-serif-editorial text-3xl sm:text-5xl text-[#F7F4EC]">
                 3D &amp; Mathematical Instruments Workbench
@@ -525,100 +585,116 @@ export function InstrumentsPage() {
         </div>
 
         {/* Active Laboratory Stage (Only active lab mounts, keeping WebGL contexts lean & safe) */}
-        {activeLab === 'orbital-torus' && <OrbitalSignalTorus3D />}
-        {activeLab === 'calabi-yau' && <CalabiYauManifold3D />}
-        {activeLab === 'apollonius-cone' && <ApolloniusCone3D />}
-        {activeLab === 'harmonic-spine' && <GoldenHarmonicSpine />}
-        {activeLab === 'solids' && <SolidNetLab />}
-        {activeLab === 'neural' && <NeuralMathEngine />}
-        {activeLab === 'vortex' && <MathVortexCanvas />}
-        {activeLab === 'quadratic' && <QuadraticWorkbench />}
+        <div className="min-w-0">
+          {activeLab === 'orbital-torus' && <OrbitalSignalTorus3D />}
+          {activeLab === 'calabi-yau' && <CalabiYauManifold3D />}
+          {activeLab === 'tensor-riemann' && (
+            <Suspense
+              fallback={
+                <div className="instrument-frame h-[430px] flex items-center justify-center font-mono-data text-xs text-[#A8B2C6]">
+                  Initializing 3D Tensor &amp; Riemann Manifold…
+                </div>
+              }
+            >
+              <LazyTensorRiemann3D />
+            </Suspense>
+          )}
+          {activeLab === 'apollonius-cone' && <ApolloniusCone3D />}
+          {activeLab === 'harmonic-spine' && <GoldenHarmonicSpine />}
+          {activeLab === 'solids' && <SolidNetLab />}
+          {activeLab === 'neural' && <NeuralMathEngine />}
+          {activeLab === 'vortex' && <MathVortexCanvas />}
+          {activeLab === 'quadratic' && <QuadraticWorkbench />}
+          {activeLab === 'algebraic-pipeline' && <AlgebraicPipelineEngine />}
+          {activeLab === 'confidence-ribbon' && <ConfidenceRibbonField />}
+          {activeLab === 'polar-harmonic' && <PolarHarmonicRingEngine />}
 
-        {activeLab === 'linear-exp' && (
-          <div className="space-y-5">
-            <TopicVisualCanvas topicId="a1-expressions" />
-            <TopicVisualCanvas topicId="a1-linear" />
-            <TopicVisualCanvas topicId="a1-exponential" />
-          </div>
-        )}
-        {activeLab === 'abs-radicals' && (
-          <div className="space-y-5">
-            <TopicVisualCanvas topicId="a1-abs-piecewise" />
-            <TopicVisualCanvas topicId="a1-radicals-exp" />
-          </div>
-        )}
-        {activeLab === 'inequalities' && (
-          <div className="space-y-5">
-            <TopicVisualCanvas topicId="a1-inequalities" />
-            <TopicVisualCanvas topicId="a1-systems" />
-          </div>
-        )}
-        {activeLab === 'regression' && <TopicVisualCanvas topicId="a1-statistics" />}
+          {activeLab === 'linear-exp' && (
+            <div className="space-y-5">
+              <TopicVisualCanvas topicId="a1-expressions" />
+              <TopicVisualCanvas topicId="a1-linear" />
+              <TopicVisualCanvas topicId="a1-exponential" />
+            </div>
+          )}
+          {activeLab === 'abs-radicals' && (
+            <div className="space-y-5">
+              <TopicVisualCanvas topicId="a1-abs-piecewise" />
+              <TopicVisualCanvas topicId="a1-radicals-exp" />
+            </div>
+          )}
+          {activeLab === 'inequalities' && (
+            <div className="space-y-5">
+              <TopicVisualCanvas topicId="a1-inequalities" />
+              <TopicVisualCanvas topicId="a1-systems" />
+            </div>
+          )}
+          {activeLab === 'regression' && <TopicVisualCanvas topicId="a1-statistics" />}
 
-        {activeLab === 'angles-triangles' && (
-          <div className="space-y-5">
-            <TopicVisualCanvas topicId="g-parallel-angles" />
-            <TopicVisualCanvas topicId="g-triangles" />
-            <TopicVisualCanvas topicId="g-similarity" />
-            <TopicVisualCanvas topicId="g-quadrilaterals" />
-          </div>
-        )}
-        {activeLab === 'pythagoras' && (
-          <div className="space-y-5">
-            <TopicVisualCanvas topicId="g-right-trig" />
-            <TopicVisualCanvas topicId="g-transformations" />
-          </div>
-        )}
-        {activeLab === 'circles-coord' && (
-          <div className="space-y-5">
-            <TopicVisualCanvas topicId="g-circles" />
-            <TopicVisualCanvas topicId="g-coordinate" />
-          </div>
-        )}
+          {activeLab === 'angles-triangles' && (
+            <div className="space-y-5">
+              <TopicVisualCanvas topicId="g-parallel-angles" />
+              <TopicVisualCanvas topicId="g-triangles" />
+              <TopicVisualCanvas topicId="g-similarity" />
+              <TopicVisualCanvas topicId="g-quadrilaterals" />
+            </div>
+          )}
+          {activeLab === 'pythagoras' && (
+            <div className="space-y-5">
+              <TopicVisualCanvas topicId="g-right-trig" />
+              <TopicVisualCanvas topicId="g-transformations" />
+            </div>
+          )}
+          {activeLab === 'circles-coord' && (
+            <div className="space-y-5">
+              <TopicVisualCanvas topicId="g-circles" />
+              <TopicVisualCanvas topicId="g-coordinate" />
+            </div>
+          )}
 
-        {activeLab === 'logs' && <LogarithmLab />}
-        {activeLab === 'nonlinear-inv' && (
-          <div className="space-y-5">
-            <TopicVisualCanvas topicId="a2-quad-systems" />
-            <TopicVisualCanvas topicId="a2-radicals" />
-          </div>
-        )}
-        {activeLab === 'pascal-prob' && (
-          <div className="space-y-5">
-            <TopicVisualCanvas topicId="a2-combinatorics" />
-            <TopicVisualCanvas topicId="a2-probability" />
-          </div>
-        )}
-        {activeLab === 'polynomials-rat' && (
-          <div className="space-y-5">
-            <TopicVisualCanvas topicId="a2-polynomials" />
-            <TopicVisualCanvas topicId="a2-complex" />
-            <TopicVisualCanvas topicId="a2-rational" />
-          </div>
-        )}
+          {activeLab === 'logs' && <LogarithmLab />}
+          {activeLab === 'nonlinear-inv' && (
+            <div className="space-y-5">
+              <TopicVisualCanvas topicId="a2-quad-systems" />
+              <TopicVisualCanvas topicId="a2-radicals" />
+            </div>
+          )}
+          {activeLab === 'pascal-prob' && (
+            <div className="space-y-5">
+              <TopicVisualCanvas topicId="a2-combinatorics" />
+              <TopicVisualCanvas topicId="a2-probability" />
+            </div>
+          )}
+          {activeLab === 'polynomials-rat' && (
+            <div className="space-y-5">
+              <TopicVisualCanvas topicId="a2-polynomials" />
+              <TopicVisualCanvas topicId="a2-complex" />
+              <TopicVisualCanvas topicId="a2-rational" />
+            </div>
+          )}
 
-        {activeLab === 'trig-vectors' && (
-          <div className="space-y-5">
-            <UnitCircleWaveCanvas />
-            <TopicVisualCanvas topicId="pc-trig-identities" />
-            <TopicVisualCanvas topicId="pc-law-sines" />
-            <VectorParallelogramCanvas />
-            <TopicVisualCanvas topicId="pc-vectors" />
-          </div>
-        )}
-        {activeLab === 'parametric-polar' && (
-          <div className="space-y-5">
-            <TopicVisualCanvas topicId="pc-parametric" />
-            <TopicVisualCanvas topicId="pc-polar" />
-            <TopicVisualCanvas topicId="pc-conics" />
-          </div>
-        )}
-        {activeLab === 'limits-series' && (
-          <div className="space-y-5">
-            <TopicVisualCanvas topicId="pc-limits" />
-            <TopicVisualCanvas topicId="pc-series" />
-          </div>
-        )}
+          {activeLab === 'trig-vectors' && (
+            <div className="space-y-5">
+              <UnitCircleWaveCanvas />
+              <TopicVisualCanvas topicId="pc-trig-identities" />
+              <TopicVisualCanvas topicId="pc-law-sines" />
+              <VectorParallelogramCanvas />
+              <TopicVisualCanvas topicId="pc-vectors" />
+            </div>
+          )}
+          {activeLab === 'parametric-polar' && (
+            <div className="space-y-5">
+              <TopicVisualCanvas topicId="pc-parametric" />
+              <TopicVisualCanvas topicId="pc-polar" />
+              <TopicVisualCanvas topicId="pc-conics" />
+            </div>
+          )}
+          {activeLab === 'limits-series' && (
+            <div className="space-y-5">
+              <TopicVisualCanvas topicId="pc-limits" />
+              <TopicVisualCanvas topicId="pc-series" />
+            </div>
+          )}
+        </div>
       </div>
     </AtlasShell>
   );

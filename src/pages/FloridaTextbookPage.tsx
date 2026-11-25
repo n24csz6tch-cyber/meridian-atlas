@@ -21,7 +21,7 @@ import {
 import { AtlasShell } from '../components/AtlasShell';
 import { MathTex } from '../components/MathTex';
 import { PracticeEngine } from '../components/PracticeEngine';
-import { COURSES } from '../data/curriculumGraph';
+import { COURSES, CURRICULUM_NODES, CurriculumNode } from '../data/curriculumGraph';
 import {
   FLORIDA_COURSE_TEXTBOOK_META,
   FLORIDA_MTR_HABITS,
@@ -33,6 +33,29 @@ import { EquationMiniVisual } from '../visuals/equations/EquationMiniVisual';
 import { TopicVisualCanvas } from '../visuals/topics/TopicVisualCanvas';
 
 const COURSE_ORDER: CourseId[] = ['algebra-1', 'geometry', 'algebra-2', 'precalculus'];
+
+const STAGE_LABELS: Record<1 | 2 | 3, string> = {
+  1: 'Stage 1 · Foundations',
+  2: 'Stage 2 · Core Mechanics',
+  3: 'Stage 3 · Mastery & Connections',
+};
+
+function getChapterStageInfo(ch: FloridaTextbookChapter): {
+  stageNumber: 1 | 2 | 3;
+  stageLabel: string;
+  node: CurriculumNode | undefined;
+} {
+  const courseNodes = CURRICULUM_NODES.filter((n) => n.courseId === ch.courseId);
+  const idx = courseNodes.findIndex((n) => n.route === ch.linkedLessonRoute);
+  const safeIdx =
+    idx >= 0 ? idx : Math.min(courseNodes.length - 1, Math.max(0, ch.chapterNumber - 1));
+  const stageNumber: 1 | 2 | 3 = safeIdx < 3 ? 1 : safeIdx < 6 ? 2 : 3;
+  return {
+    stageNumber,
+    stageLabel: STAGE_LABELS[stageNumber],
+    node: idx >= 0 ? courseNodes[idx] : undefined,
+  };
+}
 
 function isValidCourseId(val: string | null): val is CourseId {
   return val === 'algebra-1' || val === 'geometry' || val === 'algebra-2' || val === 'precalculus';
@@ -152,6 +175,7 @@ export function FloridaTextbookPage() {
 
   const safeStepIdx = Math.min(exampleStepIdx, Math.max(0, totalExampleSteps - 1));
   const currentWorkedStep = activeChapter.workedExample.steps[safeStepIdx];
+  const activeChapterStage = getChapterStageInfo(activeChapter);
   const activeMtrHabit =
     FLORIDA_MTR_HABITS.find((m) => m.number === selectedMtrNumber) ?? FLORIDA_MTR_HABITS[0];
 
@@ -159,7 +183,14 @@ export function FloridaTextbookPage() {
     <AtlasShell activeCourse={selectedCourse}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-10">
         {/* HERO COMMAND HEADER */}
-        <header className="instrument-frame p-5 sm:p-8 space-y-6 border-[rgba(244,196,108,0.24)] relative overflow-hidden">
+        <header className="instrument-frame fiducial-frame obsidian-glass p-5 sm:p-8 space-y-6 border-[#F4C46C]/30 relative overflow-hidden">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute top-0 left-0 right-0 h-[1.5px]"
+            style={{
+              background: `linear-gradient(90deg, transparent, #F4C46C 35%, ${course.accent} 65%, transparent)`,
+            }}
+          />
           <div
             aria-hidden="true"
             className="pointer-events-none absolute -top-24 right-0 w-96 h-96 rounded-full opacity-20 blur-3xl"
@@ -167,7 +198,7 @@ export function FloridaTextbookPage() {
           />
 
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-3">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-[#F4C46C]/40 bg-[#F4C46C]/10 font-mono-data text-[11px] text-[#FFE29E]">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-[#F4C46C]/45 bg-[#F4C46C]/12 font-mono-data text-[11px] text-[#FFE29E]">
               <BookOpen className="w-3.5 h-3.5 text-[#F4C46C]" />
               <span>Florida B.E.S.T. Interactive Textbook · 28 Chapters · B1G-M Aligned</span>
             </div>
@@ -222,7 +253,7 @@ export function FloridaTextbookPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search chapter, formula, or code (e.g. MA.912.GR.7)..."
-                  className="w-full pl-10 pr-9 py-2.5 rounded-full bg-[#060609] border border-[rgba(244,196,108,0.26)] text-xs sm:text-sm text-[#F7F4EC] placeholder:text-[#727D94] focus:border-[#F4C46C]"
+                  className="w-full pl-10 pr-9 py-2.5 rounded-full bg-[#060609] border border-[#F4C46C]/30 text-xs sm:text-sm text-[#F7F4EC] placeholder:text-[#727D94] focus:border-[#FFE29E]"
                 />
                 {searchQuery && (
                   <button
@@ -249,7 +280,7 @@ export function FloridaTextbookPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={reducedMotion ? undefined : { opacity: 0, y: -6 }}
                 transition={{ duration: 0.2 }}
-                className="relative z-10 p-4 rounded-xl bg-[#0B0C12] border border-[rgba(244,196,108,0.28)] space-y-3"
+                className="relative z-10 p-4 rounded-xl bg-[#0B0C12] border border-[#F4C46C]/35 space-y-3"
               >
                 <div className="flex items-center justify-between">
                   <span className="font-mono-data text-[11px] uppercase tracking-wider text-[#F4C46C]">
@@ -276,32 +307,49 @@ export function FloridaTextbookPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-64 overflow-y-auto pr-1">
                     {searchResults.map((res) => {
                       const rc = COURSES[res.courseId];
+                      const resStage = getChapterStageInfo(res);
                       return (
-                        <button
+                        <div
                           key={res.id}
-                          type="button"
-                          onClick={() => {
-                            handleSelectChapter(res);
-                            setSearchQuery('');
-                          }}
-                          className="text-left p-3 rounded-xl bg-[#11131C] border border-white/10 hover:border-[#F4C46C]/50 transition-all space-y-1"
+                          className="p-3 rounded-xl bg-[#0B0C12] border border-[#F4C46C]/22 hover:border-[#F4C46C]/55 transition-all flex flex-col justify-between gap-2"
                         >
-                          <div className="flex items-center justify-between gap-2">
-                            <span
-                              className="font-mono-data text-[10px] uppercase"
-                              style={{ color: rc.accent }}
-                            >
-                              {rc.shortTitle} · Ch {res.chapterNumber}
-                            </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              handleSelectChapter(res);
+                              setSearchQuery('');
+                            }}
+                            className="text-left space-y-1 w-full"
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <span
+                                className="font-mono-data text-[10px] uppercase"
+                                style={{ color: rc.accent }}
+                              >
+                                {rc.shortTitle} · Ch {res.chapterNumber}
+                              </span>
+                              <span className="font-mono-data text-[9.5px] px-2 py-0.5 rounded-full border border-[#F4C46C]/25 bg-[#F4C46C]/10 text-[#FFE29E]">
+                                Stage {resStage.stageNumber}
+                              </span>
+                            </div>
+                            <p className="text-xs font-semibold text-[#F7F4EC] line-clamp-1">
+                              {res.title}
+                            </p>
+                            <p className="text-[11px] text-[#A8B2C6] line-clamp-1">{res.subtitle}</p>
+                          </button>
+
+                          <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-[#F4C46C]/15">
                             <span className="font-mono-data text-[10px] text-[#727D94]">
                               {res.benchmarks[0]}
                             </span>
+                            <Link
+                              to={res.linkedLessonRoute}
+                              className="inline-flex items-center gap-1 font-mono-data text-[10px] text-[#FFE29E] hover:underline"
+                            >
+                              Open Lesson <ArrowRight className="w-3 h-3" />
+                            </Link>
                           </div>
-                          <p className="text-xs font-semibold text-[#F7F4EC] line-clamp-1">
-                            {res.title}
-                          </p>
-                          <p className="text-[11px] text-[#A8B2C6] line-clamp-1">{res.subtitle}</p>
-                        </button>
+                        </div>
                       );
                     })}
                   </div>
@@ -323,14 +371,14 @@ export function FloridaTextbookPage() {
                   onClick={() => handleSelectCourse(cid)}
                   className={`text-left p-3.5 rounded-xl border transition-all flex flex-col justify-between gap-2 ${
                     isSelected
-                      ? 'bg-[#11131C]'
-                      : 'bg-[#08090F] border-white/10 hover:border-[rgba(244,196,108,0.28)]'
+                      ? 'bg-[#121420]'
+                      : 'bg-[#08090F]/95 border-[#F4C46C]/18 hover:border-[#F4C46C]/45'
                   }`}
                   style={
                     isSelected
                       ? {
                           borderColor: c.accent,
-                          boxShadow: `0 0 24px -10px ${c.accent}`,
+                          boxShadow: `inset 0 1px 0 rgba(255, 234, 186, 0.2), 0 0 24px -10px ${c.accent}`,
                         }
                       : undefined
                   }
@@ -345,7 +393,7 @@ export function FloridaTextbookPage() {
                     <span
                       className="w-2.5 h-2.5 rounded-full"
                       style={{
-                        backgroundColor: isSelected ? c.accent : 'rgba(255,255,255,0.14)',
+                        backgroundColor: isSelected ? c.accent : 'rgba(244,196,108,0.18)',
                         boxShadow: isSelected ? `0 0 10px ${c.accent}` : undefined,
                       }}
                     />
@@ -361,6 +409,52 @@ export function FloridaTextbookPage() {
             })}
           </div>
         </header>
+
+        {/* ALGEBRA 1 GUIDED HUB QUICK SPOTLIGHT CARD */}
+        <section
+          aria-label="Algebra 1 Guided Hub quick spotlight"
+          className="obsidian-glass rounded-2xl p-5 sm:p-6 border border-[#F4C46C]/40 relative overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-5"
+          style={{
+            background:
+              'linear-gradient(135deg, rgba(244, 196, 108, 0.13) 0%, rgba(11, 12, 18, 0.96) 55%, rgba(6, 6, 9, 0.98) 100%)',
+            boxShadow: 'inset 0 1px 0 rgba(255, 234, 186, 0.22), 0 12px 36px -18px rgba(244, 196, 108, 0.45)',
+          }}
+        >
+          <div className="space-y-1.5 max-w-3xl">
+            <div className="inline-flex items-center gap-2 font-mono-data text-[10.5px] uppercase tracking-[0.2em] text-[#FFE29E]">
+              <Sparkles className="w-3.5 h-3.5 text-[#F4C46C]" />
+              <span>Unified Guided Path · Algebra 1 &amp; Full 4-Year Sequence</span>
+            </div>
+            <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
+              Keep Every Algebra 1 Unit, Survival Formula &amp; Symbol Guide Together
+            </h2>
+            <p className="text-xs sm:text-sm text-[#A8B2C6] leading-relaxed">
+              Every textbook chapter below powers a specific stage in the guided 9-unit path. Open
+              the docked side hub anytime to track mastery, preview prerequisites, and translate math
+              symbols into plain English.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            <Link
+              to="/course/algebra-1"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold text-[#060609] hover:brightness-110 transition-all shadow-[0_0_24px_-6px_rgba(244,196,108,0.7)]"
+              style={{ background: 'linear-gradient(135deg, #F5C25B, #FFE29E)' }}
+            >
+              <span>Algebra 1 Guided Hub</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+            {selectedCourse !== 'algebra-1' && (
+              <Link
+                to={`/course/${selectedCourse}`}
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-mono-data border border-[#F4C46C]/35 bg-[#0B0C12] text-[#FFE29E] hover:border-[#FFE29E]/65 transition-colors"
+              >
+                <span>{course.title} Guided Hub</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            )}
+          </div>
+        </section>
 
         {/* CHAPTER RAIL (7 CHAPTERS FOR ACTIVE COURSE) */}
         <section aria-label={`${course.title} chapter selector`} className="space-y-3">
@@ -381,33 +475,59 @@ export function FloridaTextbookPage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2.5">
             {courseChapters.map((ch) => {
               const active = ch.id === activeChapter.id;
+              const chStage = getChapterStageInfo(ch);
               return (
-                <button
+                <div
                   key={ch.id}
-                  type="button"
-                  onClick={() => handleSelectChapter(ch)}
-                  className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between gap-1.5 ${
+                  className={`rounded-xl border p-3 transition-all flex flex-col justify-between gap-2.5 min-w-0 ${
                     active
-                      ? 'bg-[#171A26] text-[#F7F4EC]'
-                      : 'bg-[#0B0C12] border-white/10 text-[#A8B2C6] hover:text-[#F7F4EC] hover:border-[rgba(244,196,108,0.28)]'
+                      ? 'bg-[#141724] text-[#F7F4EC]'
+                      : 'bg-[#0B0C12]/95 border-[#F4C46C]/20 text-[#A8B2C6] hover:text-[#F7F4EC] hover:border-[#F4C46C]/45'
                   }`}
                   style={
                     active
-                      ? { borderColor: course.accent, boxShadow: `0 0 18px -8px ${course.accent}` }
+                      ? {
+                          borderColor: course.accent,
+                          boxShadow: `inset 0 1px 0 rgba(255, 234, 186, 0.2), 0 0 18px -8px ${course.accent}`,
+                        }
                       : undefined
                   }
                 >
-                  <span
-                    className="font-mono-data text-[10px] uppercase tracking-wider"
-                    style={{ color: active ? course.accent : '#727D94' }}
+                  <button
+                    type="button"
+                    onClick={() => handleSelectChapter(ch)}
+                    className="text-left space-y-1.5 w-full"
                   >
-                    Chapter 0{ch.chapterNumber}
-                  </span>
-                  <span className="text-xs font-medium leading-snug line-clamp-2">{ch.title}</span>
-                </button>
+                    <div className="flex items-center justify-between gap-1">
+                      <span
+                        className="font-mono-data text-[10px] uppercase tracking-wider"
+                        style={{ color: active ? course.accent : '#F4C46C' }}
+                      >
+                        Ch 0{ch.chapterNumber}
+                      </span>
+                      <span className="font-mono-data text-[9px] px-1.5 py-0.5 rounded-full border border-[#F4C46C]/30 bg-[#F4C46C]/10 text-[#FFE29E]">
+                        Stage {chStage.stageNumber}
+                      </span>
+                    </div>
+                    <span className="text-xs font-medium leading-snug line-clamp-2 block text-[#F7F4EC]">
+                      {ch.title}
+                    </span>
+                  </button>
+
+                  <Link
+                    to={ch.linkedLessonRoute}
+                    className="pt-2 border-t border-[#F4C46C]/15 flex items-center justify-between gap-1 font-mono-data text-[10px] hover:underline"
+                    style={{ color: course.accent }}
+                  >
+                    <span className="truncate">
+                      {chStage.node?.code ?? 'Lesson'} · Interactive
+                    </span>
+                    <ArrowRight className="w-3 h-3 shrink-0" />
+                  </Link>
+                </div>
               );
             })}
           </div>
@@ -424,7 +544,7 @@ export function FloridaTextbookPage() {
             className="space-y-8"
           >
             {/* 1. CHAPTER OVERVIEW, BIG IDEA & STANDARDS */}
-            <section className="instrument-frame p-5 sm:p-7 space-y-6">
+            <section className="instrument-frame fiducial-frame p-5 sm:p-7 space-y-6 border-[#F4C46C]/28">
               <div className="flex flex-wrap items-start justify-between gap-4 border-b hairline-rule pb-5">
                 <div className="space-y-2 max-w-3xl">
                   <div className="flex flex-wrap items-center gap-2">
@@ -438,7 +558,11 @@ export function FloridaTextbookPage() {
                     >
                       {course.shortTitle} · CHAPTER 0{activeChapter.chapterNumber}
                     </span>
-                    <span className="px-3 py-1 rounded-full font-mono-data text-[11px] border border-[#F4C46C]/35 bg-[#F4C46C]/10 text-[#FFE29E]">
+                    <span className="px-3 py-1 rounded-full font-mono-data text-[11px] border border-[#F4C46C]/40 bg-[#F4C46C]/14 text-[#FFE29E]">
+                      Powers {activeChapterStage.stageLabel}
+                      {activeChapterStage.node ? ` · ${activeChapterStage.node.code}` : ''}
+                    </span>
+                    <span className="px-3 py-1 rounded-full font-mono-data text-[11px] border border-[#F4C46C]/25 bg-[#0B0C12] text-[#A8B2C6]">
                       {activeChapter.mtrFocus}
                     </span>
                   </div>
@@ -453,7 +577,7 @@ export function FloridaTextbookPage() {
                     to={activeChapter.linkedLessonRoute}
                     className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold text-[#060609] hover:brightness-110 transition-all"
                     style={{
-                      backgroundColor: course.accent,
+                      background: `linear-gradient(135deg, ${course.accent}, #FFE29E)`,
                       boxShadow: `0 0 22px -6px ${course.accent}`,
                     }}
                   >
@@ -462,8 +586,15 @@ export function FloridaTextbookPage() {
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                   <Link
+                    to={`/course/${activeChapter.courseId}`}
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-mono-data border border-[#F4C46C]/35 bg-[#0B0C12] text-[#FFE29E] hover:border-[#FFE29E]/65 transition-colors"
+                  >
+                    <Layers className="w-3.5 h-3.5 text-[#F4C46C]" />
+                    {course.shortTitle} Guided Hub
+                  </Link>
+                  <Link
                     to="/frontier"
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-mono-data border border-[#F4C46C]/40 bg-[#F4C46C]/10 text-[#FFE29E] hover:bg-[#F4C46C]/20 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-mono-data border border-[#F4C46C]/30 bg-[#F4C46C]/10 text-[#FFE29E] hover:bg-[#F4C46C]/20 transition-colors"
                   >
                     <Atom className="w-3.5 h-3.5 text-[#F4C46C]" />
                     String Theory 3D
@@ -472,7 +603,7 @@ export function FloridaTextbookPage() {
               </div>
 
               {/* Big Idea Card */}
-              <div className="p-4 sm:p-5 rounded-xl bg-[#0B0C12] border border-[rgba(244,196,108,0.22)] space-y-1.5">
+              <div className="instrument-panel p-4 sm:p-5 rounded-xl border-[#F4C46C]/28 space-y-1.5">
                 <span className="font-mono-data text-[10.5px] uppercase tracking-widest text-[#F4C46C] block">
                   Core Chapter Intuition · Why It All Fits Together
                 </span>
@@ -483,7 +614,7 @@ export function FloridaTextbookPage() {
 
               {/* EOC Trap + Frontier Physics Bridge */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl bg-[#11131C] border border-[#FF8563]/35 space-y-1.5">
+                <div className="p-4 rounded-xl bg-[#0B0C12]/95 border border-[#FF8563]/35 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4 text-[#FF8563]" />
                     <span className="font-mono-data text-[10.5px] uppercase tracking-wider text-[#FF8563]">
@@ -495,7 +626,7 @@ export function FloridaTextbookPage() {
                   </p>
                 </div>
 
-                <div className="p-4 rounded-xl bg-[#11131C] border border-[#F4C46C]/35 space-y-1.5">
+                <div className="p-4 rounded-xl bg-[#0B0C12]/95 border border-[#F4C46C]/35 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <Compass className="w-4 h-4 text-[#F4C46C]" />
                     <span className="font-mono-data text-[10.5px] uppercase tracking-wider text-[#FFE29E]">
@@ -520,7 +651,7 @@ export function FloridaTextbookPage() {
                     return (
                       <div
                         key={code}
-                        className="p-3.5 rounded-xl bg-[#0B0C12] border border-white/10 space-y-1"
+                        className="p-3.5 rounded-xl bg-[#0B0C12]/95 border border-[#F4C46C]/20 space-y-1"
                       >
                         <div className="flex items-center justify-between gap-2">
                           <span
@@ -623,7 +754,7 @@ export function FloridaTextbookPage() {
                       );
                     }}
                     aria-label="Previous worked example step"
-                    className="p-2 rounded-full border border-white/15 bg-[#0B0C12] text-[#A8B2C6] hover:text-[#F7F4EC] transition-colors"
+                    className="p-2 rounded-full border border-[#F4C46C]/25 bg-[#0B0C12] text-[#A8B2C6] hover:text-[#FFE29E] hover:border-[#F4C46C]/55 transition-colors"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
@@ -653,14 +784,14 @@ export function FloridaTextbookPage() {
                       setExampleStepIdx((prev) => (prev + 1) % totalExampleSteps);
                     }}
                     aria-label="Next worked example step"
-                    className="p-2 rounded-full border border-white/15 bg-[#0B0C12] text-[#A8B2C6] hover:text-[#F7F4EC] transition-colors"
+                    className="p-2 rounded-full border border-[#F4C46C]/25 bg-[#0B0C12] text-[#A8B2C6] hover:text-[#FFE29E] hover:border-[#F4C46C]/55 transition-colors"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
 
-              <div className="p-4 sm:p-5 rounded-xl bg-[#0B0C12] border border-white/10 space-y-2">
+              <div className="p-4 sm:p-5 rounded-xl bg-[#0B0C12] border border-[#F4C46C]/20 space-y-2">
                 <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#727D94]">
                   Problem Statement
                 </span>
@@ -690,8 +821,8 @@ export function FloridaTextbookPage() {
                       }}
                       className={`p-3 rounded-xl border text-left transition-all ${
                         isCurrent
-                          ? 'bg-[#171A26] text-[#F7F4EC]'
-                          : 'bg-[#0B0C12] border-white/10 text-[#A8B2C6] hover:text-[#F7F4EC]'
+                          ? 'bg-[#141724] text-[#F7F4EC]'
+                          : 'bg-[#0B0C12] border-[#F4C46C]/18 text-[#A8B2C6] hover:text-[#F7F4EC] hover:border-[#F4C46C]/40'
                       }`}
                       style={
                         isCurrent
@@ -772,7 +903,7 @@ export function FloridaTextbookPage() {
                 <button
                   type="button"
                   onClick={() => handleSelectChapter(prevChapter)}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-white/15 bg-[#0B0C12] text-xs font-mono-data text-[#A8B2C6] hover:text-[#F7F4EC] hover:border-[#F4C46C]/45 transition-all"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-[#F4C46C]/25 bg-[#0B0C12] text-xs font-mono-data text-[#A8B2C6] hover:text-[#FFE29E] hover:border-[#F4C46C]/55 transition-all"
                 >
                   <ChevronLeft className="w-4 h-4" />
                   Ch 0{prevChapter.chapterNumber}: {prevChapter.title}
@@ -785,8 +916,8 @@ export function FloridaTextbookPage() {
                 <button
                   type="button"
                   onClick={() => handleSelectChapter(nextChapter)}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold text-[#060609] hover:brightness-110 transition-all"
-                  style={{ backgroundColor: course.accent }}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold text-[#060609] hover:brightness-110 transition-all shadow-[0_0_22px_-6px_rgba(244,196,108,0.5)]"
+                  style={{ background: `linear-gradient(135deg, ${course.accent}, #FFE29E)` }}
                 >
                   Next: Ch 0{nextChapter.chapterNumber} · {nextChapter.title}
                   <ChevronRight className="w-4 h-4" />
@@ -797,7 +928,7 @@ export function FloridaTextbookPage() {
         </AnimatePresence>
 
         {/* 5. THE 7 FLORIDA MTR THINKING HABITS */}
-        <section className="instrument-frame p-5 sm:p-7 space-y-5 border-[rgba(244,196,108,0.22)]">
+        <section className="instrument-frame fiducial-frame p-5 sm:p-7 space-y-5 border-[#F4C46C]/28">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <span className="font-mono-data text-[11px] uppercase tracking-widest text-[#F4C46C] block">
@@ -828,8 +959,8 @@ export function FloridaTextbookPage() {
                   onClick={() => setSelectedMtrNumber(mtr.number)}
                   className={`p-3 rounded-xl border text-left transition-all space-y-1 ${
                     active
-                      ? 'bg-[#171A26] border-[#F4C46C] text-[#F7F4EC]'
-                      : 'bg-[#0B0C12] border-white/10 text-[#A8B2C6] hover:text-[#F7F4EC]'
+                      ? 'bg-[#141724] border-[#F4C46C] text-[#F7F4EC] shadow-[0_0_18px_-8px_rgba(244,196,108,0.65)]'
+                      : 'bg-[#0B0C12] border-[#F4C46C]/18 text-[#A8B2C6] hover:text-[#F7F4EC] hover:border-[#F4C46C]/45'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-1">

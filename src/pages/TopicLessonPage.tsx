@@ -14,6 +14,8 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { AtlasShell } from '../components/AtlasShell';
+import { CourseJourneySidebar } from '../components/CourseJourneySidebar';
+import { LessonNextBridge, LessonWarmupBanner } from '../components/LessonBridgeCard';
 import { LessonNavHeader } from '../components/LessonNavHeader';
 import { MathTex } from '../components/MathTex';
 import { PracticeEngine, PracticeQuestion } from '../components/PracticeEngine';
@@ -1500,14 +1502,21 @@ export function TopicLessonPage() {
 
   return (
     <AtlasShell activeCourse={spec.courseId}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-12">
-        <LessonNavHeader
-          courseId={spec.courseId}
-          activeNodeId={topicId}
-          code={nodeMeta?.code ?? spec.code}
-        />
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <aside className="lg:col-span-4 xl:col-span-3 min-w-0 lg:sticky lg:top-20">
+          <CourseJourneySidebar courseId={spec.courseId} activeNodeId={topicId} />
+        </aside>
 
-        <header className="instrument-frame fiducial-frame p-6 sm:p-7 space-y-3">
+        <div className="lg:col-span-8 xl:col-span-9 min-w-0 space-y-10">
+          <LessonNavHeader
+            courseId={spec.courseId}
+            activeNodeId={topicId}
+            code={nodeMeta?.code ?? spec.code}
+          />
+
+          <LessonWarmupBanner courseId={spec.courseId} nodeId={topicId} />
+
+          <header className="instrument-frame fiducial-frame p-6 sm:p-7 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="inline-flex items-center gap-2.5">
               {nodeMeta && (
@@ -1927,6 +1936,9 @@ export function TopicLessonPage() {
             </div>
           )}
         </section>
+
+        <LessonNextBridge courseId={spec.courseId} nodeId={topicId} />
+        </div>
       </div>
     </AtlasShell>
   );

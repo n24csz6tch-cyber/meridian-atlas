@@ -1,21 +1,28 @@
-import { useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
+  Activity,
   ArrowRight,
   Atom,
   BookOpen,
+  Box,
   Calculator,
+  CheckCircle2,
   Compass,
   Cpu,
   ExternalLink,
   Layers,
   Network,
   Orbit,
+  PlayCircle,
   Presentation,
+  Radar,
   Sparkles,
+  TrendingUp,
 } from 'lucide-react';
 import { AtlasShell } from '../components/AtlasShell';
+import { CourseJourneySidebar } from '../components/CourseJourneySidebar';
 import { MathTex } from '../components/MathTex';
 import { COURSES, CURRICULUM_NODES } from '../data/curriculumGraph';
 import {
@@ -23,6 +30,10 @@ import {
   FLORIDA_TEXTBOOK_CHAPTERS,
 } from '../data/floridaTextbookGuide';
 import { CourseId, FLDOE_SOURCES } from '../data/standards';
+import { getCompletedNodes, PROGRESS_CHANGE_EVENT } from '../data/studentGuidance';
+import { AlgebraicPipelineEngine } from '../visuals/drive/AlgebraicPipelineEngine';
+import { ConfidenceRibbonField } from '../visuals/drive/ConfidenceRibbonField';
+import { PolarHarmonicRingEngine } from '../visuals/drive/PolarHarmonicRingEngine';
 import { CalabiYauManifold3D } from '../visuals/frontier/CalabiYauManifold3D';
 import { OrbitalSignalTorus3D } from '../visuals/frontier/OrbitalSignalTorus3D';
 import { GoldenHarmonicSpine } from '../visuals/harmony/GoldenHarmonicSpine';
@@ -30,9 +41,102 @@ import { NeuralAtlasMap } from '../visuals/map/NeuralAtlasMap';
 import { ApolloniusCone3D } from '../visuals/solids/ApolloniusCone3D';
 import { MathVortexCanvas } from '../visuals/vortex/MathVortexCanvas';
 
+const LazyTensorRiemann3D = lazy(() => import('../visuals/drive/TensorRiemann3D'));
+
 const COURSE_ORDER: CourseId[] = ['algebra-1', 'geometry', 'algebra-2', 'precalculus'];
 
 type HeroStageMode = 'orbital' | 'calabi' | 'vortex';
+type CinemaEngineId = 'pipeline' | 'polar' | 'confidence' | 'tensor';
+
+const ALGEBRA1_QUICK_STAGES = [
+  {
+    stage: 1,
+    title: 'Stage 1 · Foundations',
+    range: 'Units 01–03',
+    caption: 'Translate words into algebraic blocks, measure steady slope, and tame roots & powers.',
+    nodeIds: ['a1-expressions', 'a1-linear', 'a1-radicals-exp'],
+  },
+  {
+    stage: 2,
+    title: 'Stage 2 · Core Mechanics',
+    range: 'Units 04–06',
+    caption: 'Cross two lines to solve systems, shade safe budgets, and bend V-shaped corner graphs.',
+    nodeIds: ['a1-systems', 'a1-inequalities', 'a1-abs-piecewise'],
+  },
+  {
+    stage: 3,
+    title: 'Stage 3 · Quadratics & Data',
+    range: 'Units 07–09',
+    caption: 'Launch exponential growth, curve parabolas with Δ = b² − 4ac, and fit trend lines to data.',
+    nodeIds: ['a1-exponential', 'a1-quadratics', 'a1-statistics'],
+  },
+] as const;
+
+const CINEMA_ENGINES: {
+  id: CinemaEngineId;
+  label: string;
+  courseTag: string;
+  accent: string;
+  labId: string;
+  headline: string;
+  plainEnglish: string;
+  tryHint: string;
+  formulaTex: string;
+  icon: typeof Activity;
+}[] = [
+  {
+    id: 'pipeline',
+    label: 'Algebraic Dataflow',
+    courseTag: 'Algebra 1 & 2 · Signal Composition',
+    accent: '#F4C46C',
+    labId: 'algebraic-pipeline',
+    headline: 'Watch a Number Flow Through a Live Equation Machine',
+    plainEnglish:
+      'Think of f(x) = (ax + b)² like a two-station assembly line: Station 1 stretches and shifts x into ax + b, and Station 2 bends it into a parabola while the oscilloscope draws both waves side by side.',
+    tryHint: 'Drag slider a or b—or toggle Manual x—to watch golden packets pulse along the conduits.',
+    formulaTex: 'x \\xrightarrow{ax+b} u \\xrightarrow{u^2} (ax+b)^2',
+    icon: Activity,
+  },
+  {
+    id: 'polar',
+    label: 'Polar Harmonic Ring',
+    courseTag: 'Precalculus · Radar & Rose Geometry',
+    accent: '#46D6E8',
+    labId: 'polar-harmonic',
+    headline: 'Steer by Angle & Radius Instead of Left-Right Grid Steps',
+    plainEnglish:
+      'Polar coordinates work like radar: aim at angle θ and walk out distance r. Locking frequency ratios like 3:1 or 5:1 blooms crisp flower petals, while Golden Ratio φ weaves patterns that never repeat.',
+    tryHint: 'Drag anywhere on the ring to scrub θ or tap 3-Petal, 5-Petal, and Golden Ratio.',
+    formulaTex: 'r(\\theta) = \\cos\\!\\left(\\tfrac{p}{q}\\theta\\right), \\quad (x,y)=(r\\cos\\theta,r\\sin\\theta)',
+    icon: Radar,
+  },
+  {
+    id: 'confidence',
+    label: 'Confidence Ribbon Field',
+    courseTag: 'Algebra 1 & 2 · Data & Uncertainty',
+    accent: '#45E6A6',
+    labId: 'confidence-ribbon',
+    headline: 'See Why Real Data Floats Inside 68%–95%–99.7% Prediction Ribbons',
+    plainEnglish:
+      'Real-world measurements rarely sit right on a textbook line. These glowing ribbons show where 68% (±1σ), 95% (±2σ), and 99.7% (±3σ) of noisy points land around a curved trend.',
+    tryHint: 'Hover across the field to probe uncertainty, or raise Noise σ and watch R² react live.',
+    formulaTex: 'y = \\hat{y}(x) \\pm k\\sigma, \\quad R^2 = 1 - \\tfrac{\\sum e_i^2}{\\sum (y_i-\\bar{y})^2}',
+    icon: TrendingUp,
+  },
+  {
+    id: 'tensor',
+    label: '3D Tensor & Riemann',
+    courseTag: 'Precalculus & Calculus · 3D Volume',
+    accent: '#FFE29E',
+    labId: 'tensor-riemann',
+    headline: 'Stack 3D Prisms to Measure Curved Surfaces Like Digital LEGOs',
+    plainEnglish:
+      'How do engineers find the exact volume under a curved hill? Slice the floor into tiny squares and stack flat columns up to the curve—the finer your grid (2×2 → 10×10), the closer your prism sum hugs the true integral.',
+    tryHint: 'Drag to orbit the 3D prisms, raise Grid N, and compare Riemann Sum V against Exact Integral.',
+    formulaTex: 'V_N = \\sum_{i,j=1}^N f(x_i,y_j)\\,\\Delta x\\,\\Delta y \\longrightarrow \\iint_D f\\,dA',
+    icon: Box,
+  },
+];
 
 const HERO_TABS: {
   id: HeroStageMode;
@@ -66,22 +170,57 @@ const HERO_TABS: {
 
 export function HomePage() {
   const [heroMode, setHeroMode] = useState<HeroStageMode>('orbital');
+  const [cinemaEngine, setCinemaEngine] = useState<CinemaEngineId>('pipeline');
   const [dirFilter, setDirFilter] = useState<'all' | CourseId>('all');
   const [dirView, setDirView] = useState<'both' | 'textbook' | 'lessons'>('both');
+  const [completedIds, setCompletedIds] = useState<string[]>(() => getCompletedNodes());
+
+  useEffect(() => {
+    const syncProgress = () => setCompletedIds(getCompletedNodes());
+    syncProgress();
+    window.addEventListener(PROGRESS_CHANGE_EVENT, syncProgress);
+    window.addEventListener('storage', syncProgress);
+    return () => {
+      window.removeEventListener(PROGRESS_CHANGE_EVENT, syncProgress);
+      window.removeEventListener('storage', syncProgress);
+    };
+  }, []);
+
+  const algebra1Nodes = useMemo(
+    () => CURRICULUM_NODES.filter((n) => n.courseId === 'algebra-1'),
+    []
+  );
+  const algebra1NodeMap = useMemo(
+    () => new Map(algebra1Nodes.map((n) => [n.id, n])),
+    [algebra1Nodes]
+  );
+  const completedSet = useMemo(() => new Set(completedIds), [completedIds]);
+  const algebra1MasteredCount = useMemo(
+    () => algebra1Nodes.filter((n) => completedSet.has(n.id)).length,
+    [algebra1Nodes, completedSet]
+  );
+  const algebra1MasteredPct = Math.round(
+    (algebra1MasteredCount / Math.max(1, algebra1Nodes.length)) * 100
+  );
+  const nextAlgebra1Node = useMemo(
+    () => algebra1Nodes.find((n) => !completedSet.has(n.id)) ?? algebra1Nodes[0],
+    [algebra1Nodes, completedSet]
+  );
 
   const activeHeroTab = HERO_TABS.find((t) => t.id === heroMode) ?? HERO_TABS[0];
+  const activeCinemaMeta = CINEMA_ENGINES.find((c) => c.id === cinemaEngine) ?? CINEMA_ENGINES[0];
   const visibleDirectoryCourses = dirFilter === 'all' ? COURSE_ORDER : [dirFilter];
 
   return (
     <AtlasShell>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-20 min-w-0">
         {/* SECTION A: AUREA GOLDEN CYBER-OBSERVATORY HERO */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center pt-1">
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center pt-1 min-w-0">
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-5 space-y-6"
+            className="lg:col-span-5 space-y-6 min-w-0"
           >
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#F4C46C]/35 bg-[#F4C46C]/10 text-[11px] font-mono-data uppercase tracking-[0.16em] text-[#FFE29E]">
               <Sparkles className="w-3.5 h-3.5 text-[#F4C46C]" />
@@ -161,7 +300,7 @@ export function HomePage() {
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-7 space-y-3"
+            className="lg:col-span-7 space-y-3 min-w-0"
           >
             <div className="flex flex-wrap items-center justify-between gap-2 px-1">
               <div
@@ -230,7 +369,323 @@ export function HomePage() {
           </motion.div>
         </section>
 
-        {/* SECTION B: FULL-BLEED GOLDEN HARMONIC SPINE */}
+        {/* SECTION B: ALGEBRA 1 GUIDED SANCTUARY — DOCKED SIDE-HUB + 3-STAGE QUICK-START */}
+        <section
+          id="algebra-1-sanctuary"
+          aria-label="Algebra 1 Guided Sanctuary"
+          className="space-y-6 scroll-mt-24 min-w-0"
+        >
+          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[rgba(244,196,108,0.18)] pb-4">
+            <div className="space-y-1 min-w-0">
+              <span className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-[#F5C25B] inline-flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-[#F4C46C]" />
+                Algebra 1 Guided Sanctuary · 100% Unified in One Docked Hub
+              </span>
+              <h2 className="font-serif-editorial text-3xl sm:text-4xl text-[#F7F4EC]">
+                Start Algebra 1 From Scratch — With Zero Confusion
+              </h2>
+            </div>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <Link
+                to="/course/algebra-1"
+                className="luminous-pill-btn inline-flex items-center gap-2 px-4 py-2 text-xs"
+              >
+                <Compass className="w-3.5 h-3.5" />
+                Open Algebra 1 Hub
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+              <Link
+                to="/lesson/a1-quadratics"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-mono-data border border-[#F4C46C]/40 bg-[#11131C] text-[#FFE29E] hover:border-[#FFE29E] transition-colors"
+              >
+                Quadratics Lab
+                <ArrowRight className="w-3.5 h-3.5 text-[#F4C46C]" />
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start min-w-0">
+            {/* Left Docked Side-Hub: Complete 9-Unit Path, Survival Sheet & Symbol Decoder */}
+            <div className="lg:col-span-5 xl:col-span-4 min-w-0">
+              <CourseJourneySidebar courseId="algebra-1" />
+            </div>
+
+            {/* Right Sanctuary Panel: Live Mastery Tracker + 3-Stage Quick-Start Roadmap */}
+            <div className="lg:col-span-7 xl:col-span-8 min-w-0 space-y-5">
+              <div className="aurea-gold-frame p-5 sm:p-6 space-y-5 min-w-0">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="space-y-1.5 min-w-0">
+                    <span className="font-mono-data text-[10.5px] uppercase tracking-[0.2em] text-[#F5C25B] block">
+                      Live Algebra 1 Mastery Telemetry
+                    </span>
+                    <h3 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
+                      Your Guided 3-Stage Quick-Start Path
+                    </h3>
+                    <p className="text-xs sm:text-sm text-[#A8B2C6] leading-relaxed max-w-2xl">
+                      Follow all 9 Algebra 1 units in order, check off mastered lessons in the docked
+                      hub, and switch tabs anytime for fast formula survival rules and plain-English
+                      symbol translations.
+                    </p>
+                  </div>
+
+                  <div className="instrument-panel px-4 py-2.5 border-[#F4C46C]/30 shrink-0 text-right">
+                    <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#A8B2C6] block">
+                      Algebra 1 Progress
+                    </span>
+                    <span className="font-mono-data text-lg font-semibold text-[#FFE29E]">
+                      {algebra1MasteredCount} / {algebra1Nodes.length} Mastered ({algebra1MasteredPct}%)
+                    </span>
+                  </div>
+                </div>
+
+                {/* Live Mastery Progress Bar */}
+                <div className="space-y-2">
+                  <div
+                    role="progressbar"
+                    aria-valuenow={algebra1MasteredPct}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`Algebra 1 mastery progress: ${algebra1MasteredCount} of ${algebra1Nodes.length} units`}
+                    className="h-2.5 w-full rounded-full bg-[#050508] border border-[#F4C46C]/25 overflow-hidden"
+                  >
+                    <div
+                      className="h-full rounded-full transition-all duration-300"
+                      style={{
+                        width: `${algebra1MasteredPct}%`,
+                        background: 'linear-gradient(90deg, #F5C25B, #FFE5A3, #45E6A6)',
+                        boxShadow: '0 0 16px rgba(244, 196, 108, 0.7)',
+                      }}
+                    />
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono-data">
+                    <span className="text-[#A8B2C6]">
+                      {algebra1MasteredCount === algebra1Nodes.length
+                        ? 'All 9 Algebra 1 units mastered! Ready for Geometry Step 1.'
+                        : `Recommended Next: ${nextAlgebra1Node.code} · ${nextAlgebra1Node.title}`}
+                    </span>
+                    <Link
+                      to={nextAlgebra1Node.route}
+                      className="text-[#45E6A6] hover:underline inline-flex items-center gap-1"
+                    >
+                      Continue {nextAlgebra1Node.code} <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Beginner-Friendly 3-Stage Algebra 1 Quick-Start Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 min-w-0">
+                  {ALGEBRA1_QUICK_STAGES.map((stage) => (
+                    <div
+                      key={stage.stage}
+                      className="aurea-glass-card p-4 space-y-3 flex flex-col justify-between min-w-0"
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#F5C25B]">
+                            {stage.range}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-full text-[9.5px] font-mono-data bg-[#F4C46C]/15 border border-[#F4C46C]/30 text-[#FFE29E]">
+                            Stage {stage.stage}
+                          </span>
+                        </div>
+                        <h4 className="font-serif-editorial text-xl text-[#F7F4EC]">
+                          {stage.title}
+                        </h4>
+                        <p className="text-xs text-[#A8B2C6] leading-relaxed">{stage.caption}</p>
+                      </div>
+
+                      <div className="space-y-1.5 pt-2 border-t border-[#F4C46C]/15">
+                        {stage.nodeIds.map((nid) => {
+                          const node = algebra1NodeMap.get(nid);
+                          if (!node) return null;
+                          const done = completedSet.has(nid);
+                          return (
+                            <Link
+                              key={nid}
+                              to={node.route}
+                              className={`flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg border text-[11px] transition-all min-w-0 ${
+                                done
+                                  ? 'bg-[#45E6A6]/[0.08] border-[#45E6A6]/35 text-[#45E6A6]'
+                                  : 'bg-[#050508]/80 border-[#F4C46C]/15 text-[#F7F4EC] hover:border-[#F4C46C]/50 hover:text-[#FFE29E]'
+                              }`}
+                            >
+                              <span className="truncate font-medium">
+                                <span className="font-mono-data text-[10px] text-[#F4C46C] mr-1.5">
+                                  {node.code}
+                                </span>
+                                {node.title}
+                              </span>
+                              {done ? (
+                                <CheckCircle2 className="w-3.5 h-3.5 text-[#45E6A6] shrink-0" />
+                              ) : (
+                                <ArrowRight className="w-3 h-3 text-[#727D94] shrink-0" />
+                              )}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Direct Algebra 1 Action CTAs */}
+                <div className="pt-2 flex flex-wrap items-center gap-2.5">
+                  <Link
+                    to="/lesson/a1-expressions"
+                    className="luminous-pill-btn inline-flex items-center gap-2 px-5 py-2.5 text-xs"
+                  >
+                    <PlayCircle className="w-4 h-4" />
+                    Start Algebra 1 · Step 1
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                  <Link
+                    to="/lesson/a1-quadratics"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-mono-data bg-[#12121D] border border-[#F4C46C]/40 text-[#FFE29E] hover:border-[#FFE5A3] transition-colors"
+                  >
+                    Explore Quadratics (/lesson/a1-quadratics)
+                  </Link>
+                  <Link
+                    to="/course/algebra-1"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-mono-data bg-[#0B0B12] border border-[#46D6E8]/35 text-[#46D6E8] hover:border-[#46D6E8]/70 transition-colors"
+                  >
+                    Full /course/algebra-1 Roadmap
+                  </Link>
+                  <Link
+                    to="/textbook?course=algebra-1"
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-mono-data bg-[#0B0B12] border border-[#F4C46C]/25 text-[#A8B2C6] hover:text-[#FFE29E] transition-colors"
+                  >
+                    <BookOpen className="w-3.5 h-3.5 text-[#F4C46C]" />
+                    7 Algebra 1 Book Chapters
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION C: LIVING MATHEMATICAL CINEMA — RECONSTRUCTED VISUAL ENGINES */}
+        <section
+          id="living-cinema"
+          aria-label="Living Mathematical Cinema"
+          className="space-y-6 scroll-mt-24 min-w-0"
+        >
+          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[rgba(244,196,108,0.18)] pb-4">
+            <div className="space-y-1 min-w-0">
+              <span className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-[#F4C46C]">
+                Living Mathematical Cinema · 4 Reconstructed 60fps Engines
+              </span>
+              <h2 className="font-serif-editorial text-3xl sm:text-4xl text-[#F7F4EC]">
+                Touch Every Formula in Real-Time Motion
+              </h2>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                to={`/instruments?lab=${activeCinemaMeta.labId}`}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono-data bg-[#12121D] border border-[#F4C46C]/40 text-[#FFE29E] hover:border-[#FFE5A3] transition-colors"
+              >
+                <Cpu className="w-3.5 h-3.5 text-[#F4C46C]" />
+                Open in /instruments
+              </Link>
+              <Link
+                to="/presentation"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono-data bg-[#FF8563]/14 border border-[#FF8563]/45 text-[#FF8563] hover:bg-[#FF8563]/22 transition-colors"
+              >
+                <Presentation className="w-3.5 h-3.5" />
+                Present in /presentation
+              </Link>
+            </div>
+          </div>
+
+          {/* 4 Interactive Cinema Selector Tabs */}
+          <div
+            role="tablist"
+            aria-label="Living Mathematical Cinema Engine Selector"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 min-w-0"
+          >
+            {CINEMA_ENGINES.map((item) => {
+              const Icon = item.icon;
+              const active = cinemaEngine === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setCinemaEngine(item.id)}
+                  className={`text-left p-3.5 rounded-2xl border transition-all min-w-0 ${
+                    active
+                      ? 'aurea-pill-active'
+                      : 'aurea-glass-card text-[#A8B2C6] hover:text-[#F7F4EC]'
+                  }`}
+                  style={
+                    active
+                      ? {
+                          borderColor: item.accent,
+                          boxShadow: `0 0 24px -8px ${item.accent}`,
+                        }
+                      : undefined
+                  }
+                >
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span
+                      className="font-mono-data text-[10px] uppercase tracking-wider truncate"
+                      style={{ color: item.accent }}
+                    >
+                      {item.courseTag}
+                    </span>
+                    <Icon className="w-4 h-4 shrink-0" style={{ color: item.accent }} />
+                  </div>
+                  <div className="font-serif-editorial text-xl text-[#F7F4EC] truncate">
+                    {item.label}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Plain-English Guide Banner for Ages 11-18 */}
+          <div
+            className="aurea-glass-card p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 min-w-0"
+            style={{ borderLeft: `3px solid ${activeCinemaMeta.accent}` }}
+          >
+            <div className="space-y-1.5 min-w-0">
+              <h3 className="font-serif-editorial text-xl sm:text-2xl text-[#F7F4EC]">
+                {activeCinemaMeta.headline}
+              </h3>
+              <p className="text-xs sm:text-sm text-[#A8B2C6] leading-relaxed max-w-3xl">
+                {activeCinemaMeta.plainEnglish}
+              </p>
+              <p className="text-[11px] font-mono-data text-[#45E6A6]">
+                Try this: {activeCinemaMeta.tryHint}
+              </p>
+            </div>
+            <div className="rounded-xl bg-[#050508]/95 border border-[#F4C46C]/22 px-3.5 py-2.5 overflow-x-auto max-w-full shrink-0">
+              <MathTex tex={activeCinemaMeta.formulaTex} className="text-xs sm:text-sm text-[#FFE29E]" />
+            </div>
+          </div>
+
+          {/* Single Active Cinema Engine Mounted at Any Time (Snappy WebGL & Canvas Budget) */}
+          <div className="min-w-0">
+            {cinemaEngine === 'pipeline' && <AlgebraicPipelineEngine />}
+            {cinemaEngine === 'polar' && <PolarHarmonicRingEngine />}
+            {cinemaEngine === 'confidence' && <ConfidenceRibbonField />}
+            {cinemaEngine === 'tensor' && (
+              <Suspense
+                fallback={
+                  <div className="instrument-frame h-[430px] flex items-center justify-center font-mono-data text-xs text-[#A8B2C6]">
+                    Initializing 3D Tensor &amp; Riemann Manifold…
+                  </div>
+                }
+              >
+                <LazyTensorRiemann3D />
+              </Suspense>
+            )}
+          </div>
+        </section>
+
+        {/* SECTION D: FULL-BLEED GOLDEN HARMONIC SPINE */}
         <section className="space-y-5">
           <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[rgba(244,196,108,0.16)] pb-4">
             <div className="space-y-1">
@@ -436,7 +891,7 @@ export function HomePage() {
           <div
             className={`grid grid-cols-1 ${
               dirFilter === 'all' ? 'lg:grid-cols-2' : 'max-w-5xl'
-            } gap-6`}
+            } gap-6 min-w-0`}
           >
             {visibleDirectoryCourses.map((cid) => {
               const c = COURSES[cid];
@@ -449,7 +904,7 @@ export function HomePage() {
               return (
                 <article
                   key={cid}
-                  className="instrument-frame p-5 sm:p-6 flex flex-col justify-between gap-5"
+                  className="aurea-glass-card p-5 sm:p-6 flex flex-col justify-between gap-5 min-w-0"
                   style={{ borderTop: `2px solid ${c.accent}` }}
                 >
                   <div className="space-y-4">
@@ -583,11 +1038,11 @@ export function HomePage() {
           </div>
         </section>
 
-        {/* SECTION F: OBSERVATORY SUITE PORTALS */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* SECTION H: OBSERVATORY SUITE PORTALS */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 min-w-0">
           <Link
             to="/frontier"
-            className="instrument-frame p-5 space-y-2.5 hover:border-[#F4C46C]/60 transition-all"
+            className="aurea-glass-card p-5 space-y-2.5 hover:border-[#F4C46C]/60 transition-all min-w-0"
           >
             <div className="flex items-center justify-between text-[#FFE29E]">
               <span className="font-mono-data text-[10px] uppercase tracking-wider">10D Frontier</span>
@@ -601,7 +1056,7 @@ export function HomePage() {
 
           <Link
             to="/textbook"
-            className="instrument-frame p-5 space-y-2.5 hover:border-[#46D6E8]/60 transition-all"
+            className="aurea-glass-card p-5 space-y-2.5 hover:border-[#46D6E8]/60 transition-all min-w-0"
           >
             <div className="flex items-center justify-between text-[#46D6E8]">
               <span className="font-mono-data text-[10px] uppercase tracking-wider">28 Chapters</span>
@@ -615,21 +1070,21 @@ export function HomePage() {
 
           <Link
             to="/instruments"
-            className="instrument-frame p-5 space-y-2.5 hover:border-[#45E6A6]/60 transition-all"
+            className="aurea-glass-card p-5 space-y-2.5 hover:border-[#45E6A6]/60 transition-all min-w-0"
           >
             <div className="flex items-center justify-between text-[#45E6A6]">
-              <span className="font-mono-data text-[10px] uppercase tracking-wider">Lab Workbench</span>
+              <span className="font-mono-data text-[10px] uppercase tracking-wider">26 Interactive Labs</span>
               <Cpu className="w-4 h-4" />
             </div>
             <h3 className="font-serif-editorial text-xl text-[#F7F4EC]">All 3D &amp; Math Labs</h3>
             <p className="text-xs text-[#A8B2C6] leading-relaxed">
-              Every standalone 3D manifold, conic slicer, solid net, neural engine, and topic lab.
+              Every standalone 3D manifold, tensor Riemann stack, dataflow oscilloscope, and topic lab.
             </p>
           </Link>
 
           <Link
             to="/planner"
-            className="instrument-frame p-5 space-y-2.5 hover:border-[#FF8563]/60 transition-all"
+            className="aurea-glass-card p-5 space-y-2.5 hover:border-[#FF8563]/60 transition-all min-w-0"
           >
             <div className="flex items-center justify-between text-[#FF8563]">
               <span className="font-mono-data text-[10px] uppercase tracking-wider">Target Gauge</span>

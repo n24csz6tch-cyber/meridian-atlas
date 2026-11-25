@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Compass } from 'lucide-react';
+import { BookOpen, ChevronLeft, ChevronRight, Compass, Home } from 'lucide-react';
 import { COURSES, CURRICULUM_NODES } from '../data/curriculumGraph';
 import { CourseId } from '../data/standards';
 
-interface LessonNavHeaderProps {
+export interface LessonNavHeaderProps {
   courseId: CourseId;
   activeNodeId: string;
   code: string;
@@ -22,81 +22,130 @@ const LAYER_LINKS = [
 export function LessonNavHeader({ courseId, activeNodeId, code }: LessonNavHeaderProps) {
   const course = COURSES[courseId];
   const siblings = CURRICULUM_NODES.filter((n) => n.courseId === courseId);
+  const courseIdx = siblings.findIndex((n) => n.id === activeNodeId);
+  const stepNumber = courseIdx >= 0 ? courseIdx + 1 : 1;
+  const totalSteps = siblings.length || 9;
+
+  const globalIdx = CURRICULUM_NODES.findIndex((n) => n.id === activeNodeId);
+  const prevNode = globalIdx > 0 ? CURRICULUM_NODES[globalIdx - 1] : null;
+  const nextNode =
+    globalIdx >= 0 && globalIdx < CURRICULUM_NODES.length - 1
+      ? CURRICULUM_NODES[globalIdx + 1]
+      : null;
 
   return (
-    <div className="space-y-4">
-      {/* Top Telemetry Strip */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b hairline-rule pb-4">
-        <div className="flex flex-wrap items-center gap-4">
+    <div className="aurea-glass-card p-3.5 sm:p-4 space-y-3">
+      {/* Top Row: Clean Breadcrumbs + Step K of 9 + Prev/Next Controls */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b hairline-rule pb-3">
+        <nav
+          aria-label="Lesson breadcrumbs"
+          className="flex flex-wrap items-center gap-1.5 text-xs font-mono-data min-w-0"
+        >
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1 text-[#A8B2C6] hover:text-[#FFE5A3] transition-colors"
+          >
+            <Home className="w-3.5 h-3.5 text-[#F4C46C]" />
+            <span>Course Hub</span>
+          </Link>
+          <ChevronRight className="w-3.5 h-3.5 text-[#727D94] shrink-0" />
           <Link
             to={`/course/${courseId}`}
-            className="inline-flex items-center gap-1.5 text-xs font-mono-data text-[#A8B2C6] hover:text-[#FFE29E] transition-colors"
+            className="font-semibold hover:underline underline-offset-2 transition-colors"
+            style={{ color: course.accent }}
           >
-            <ArrowLeft className="w-3.5 h-3.5 text-[#F4C46C]" /> {course.title} Hub
+            {course.title}
           </Link>
+          <ChevronRight className="w-3.5 h-3.5 text-[#727D94] shrink-0 hidden sm:inline" />
           <Link
             to="/textbook"
-            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-mono-data text-[#727D94] hover:text-[#FFE29E] transition-colors"
+            className="hidden sm:inline-flex items-center gap-1 text-[#A8B2C6] hover:text-[#FFE5A3] transition-colors"
           >
-            <BookOpen className="w-3.5 h-3.5 text-[#F4C46C]" /> FL Textbook
+            <BookOpen className="w-3.5 h-3.5 text-[#F4C46C]" />
+            <span>FL Textbook</span>
           </Link>
+          <ChevronRight className="w-3.5 h-3.5 text-[#727D94] shrink-0 hidden md:inline" />
           <Link
             to="/map"
-            className="hidden md:inline-flex items-center gap-1.5 text-xs font-mono-data text-[#727D94] hover:text-[#46D6E8] transition-colors"
+            className="hidden md:inline-flex items-center gap-1 text-[#A8B2C6] hover:text-[#46D6E8] transition-colors"
           >
-            <Compass className="w-3.5 h-3.5" /> 36-Node Constellation
+            <Compass className="w-3.5 h-3.5 text-[#46D6E8]" />
+            <span>Constellation</span>
           </Link>
+        </nav>
+
+        {/* Step K of 9 Badge + Prev / Next Arrow Buttons */}
+        <div className="flex items-center gap-2 shrink-0">
+          <span
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-mono-data text-[10.5px] uppercase tracking-[0.14em] border"
+            style={{
+              color: '#FFE5A3',
+              borderColor: 'rgba(244, 196, 108, 0.42)',
+              background: 'linear-gradient(135deg, rgba(244, 196, 108, 0.16), rgba(18, 18, 29, 0.9))',
+              boxShadow: 'inset 0 1px 0 rgba(255, 229, 163, 0.18), 0 0 16px -8px rgba(244, 196, 108, 0.5)',
+            }}
+          >
+            <span style={{ color: course.accent }}>{code}</span>
+            <span className="text-[#727D94]">·</span>
+            <span>
+              Step {stepNumber} of {totalSteps}
+            </span>
+          </span>
+
+          <div className="inline-flex items-center gap-1">
+            {prevNode ? (
+              <Link
+                to={prevNode.route}
+                aria-label={`Previous lesson: ${prevNode.title}`}
+                title={`Previous: ${prevNode.code} · ${prevNode.title}`}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-mono-data border border-[#F4C46C]/22 bg-[#0B0B12]/90 text-[#A8B2C6] hover:text-[#FFE5A3] hover:border-[#F4C46C]/50 transition-colors"
+              >
+                <ChevronLeft className="w-3.5 h-3.5 text-[#F4C46C]" />
+                <span className="hidden sm:inline">Prev</span>
+              </Link>
+            ) : (
+              <span
+                aria-disabled="true"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-mono-data border border-[#F4C46C]/10 bg-[#050508]/60 text-[#727D94]/45 cursor-not-allowed"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Prev</span>
+              </span>
+            )}
+
+            {nextNode ? (
+              <Link
+                to={nextNode.route}
+                aria-label={`Next lesson: ${nextNode.title}`}
+                title={`Next: ${nextNode.code} · ${nextNode.title}`}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-mono-data border border-[#F4C46C]/32 bg-[#12121D]/90 text-[#FFE5A3] hover:border-[#FFE5A3]/65 hover:bg-[#F4C46C]/15 transition-colors"
+              >
+                <span className="hidden sm:inline">Next</span>
+                <ChevronRight className="w-3.5 h-3.5 text-[#F4C46C]" />
+              </Link>
+            ) : (
+              <span
+                aria-disabled="true"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-mono-data border border-[#F4C46C]/10 bg-[#050508]/60 text-[#727D94]/45 cursor-not-allowed"
+              >
+                <span className="hidden sm:inline">Next</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </span>
+            )}
+          </div>
         </div>
-        <span
-          className="px-3.5 py-1 rounded-full font-mono-data text-[10.5px] uppercase tracking-[0.18em] border"
-          style={{
-            color: course.accent,
-            borderColor: `${course.accent}55`,
-            backgroundColor: `${course.accent}14`,
-            boxShadow: `inset 0 1px 0 rgba(255, 234, 186, 0.14), 0 0 18px -8px ${course.accent}`,
-          }}
-        >
-          {code} · 7-LAYER MODULE · {course.shortTitle}
-        </span>
       </div>
 
-      {/* All 9 Sibling Units in Course */}
-      <div className="flex flex-wrap items-center gap-1.5">
-        {siblings.map((node) => {
-          const active = node.id === activeNodeId;
-          return (
-            <Link
-              key={node.id}
-              to={node.route}
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono-data border transition-all ${
-                active
-                  ? 'text-[#060609] font-semibold'
-                  : 'bg-[#0B0C12]/90 text-[#A8B2C6] border-[#F4C46C]/15 hover:text-[#F7F4EC] hover:border-[#F4C46C]/40'
-              }`}
-              style={
-                active
-                  ? {
-                      backgroundColor: course.accent,
-                      borderColor: course.accent,
-                      boxShadow: `0 0 18px -4px ${course.accent}`,
-                    }
-                  : undefined
-              }
-            >
-              <span className={active ? 'opacity-80' : 'text-[#F4C46C]/70'}>{node.code}</span>
-              <span>{node.title}</span>
-            </Link>
-          );
-        })}
-      </div>
-
-      {/* 7-Layer Quick Jump Bar */}
-      <nav aria-label="Lesson layers" className="flex flex-wrap items-center gap-1.5 pt-1">
+      {/* Concise 7-Layer Quick-Jump Pill Bar */}
+      <nav
+        aria-label="Lesson layers"
+        className="flex items-center gap-1.5 overflow-x-auto no-scrollbar max-w-full"
+      >
         {LAYER_LINKS.map((l) => (
           <a
             key={l.href}
             href={l.href}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono-data bg-[#11131C]/80 border border-[#F4C46C]/15 text-[#727D94] hover:text-[#F7F4EC] hover:border-[#F4C46C]/45 transition-colors"
+            className="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10.5px] font-mono-data bg-[#0B0B12]/90 border border-[#F4C46C]/16 text-[#A8B2C6] hover:text-[#FFE5A3] hover:border-[#F4C46C]/48 hover:bg-[#F4C46C]/[0.08] transition-all"
           >
             <span style={{ color: course.accent }}>{l.num}</span>
             <span>{l.label}</span>
