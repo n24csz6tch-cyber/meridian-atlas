@@ -34,7 +34,7 @@ const ROUTE_TITLES: [RegExp, string][] = [
   [/^\/course\/geometry/, 'AUREA — Geometry Guided Hub & 3D Proofs'],
   [/^\/course\/algebra-2/, 'AUREA — Algebra 2 Guided Hub & Neural Matrices'],
   [/^\/course\/precalculus/, 'AUREA — Precalculus Honors & Harmonic Calculus'],
-  [/^\/instruments/, 'AUREA — 26 Interactive 3D & Math Instruments'],
+  [/^\/instruments/, 'AUREA — 33 Interactive 3D & Kinetic Math Instruments'],
   [/^\/neural/, 'AUREA — Neural Matrices, Dataflow & Harmonic Studio'],
   [/^\/frontier/, 'AUREA — String Theory 3D & Calabi-Yau Frontier'],
   [/^\/textbook/, 'AUREA — Florida B.E.S.T. 28-Chapter Interactive Book'],

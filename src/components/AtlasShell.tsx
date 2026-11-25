@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
 import { BookOpen, Menu, Orbit, Presentation, Sparkles, Trophy, X } from 'lucide-react';
 import { COURSES, CURRICULUM_NODES } from '../data/curriculumGraph';
 import { CourseId, FLDOE_SOURCES } from '../data/standards';
@@ -12,6 +13,39 @@ interface AtlasShellProps {
 
 const MASTERED_STORAGE_KEY = 'aurea_mastered_nodes_v1';
 const TOTAL_NODES = CURRICULUM_NODES.length;
+
+function inferCourseFromPath(pathname: string): CourseId | undefined {
+  const path = pathname.toLowerCase();
+  if (
+    path.startsWith('/course/algebra-1') ||
+    path.startsWith('/lesson/a1-') ||
+    path.startsWith('/lesson/quadratics')
+  ) {
+    return 'algebra-1';
+  }
+  if (
+    path.startsWith('/course/geometry') ||
+    path.startsWith('/lesson/g-') ||
+    path.startsWith('/lesson/solids-3d')
+  ) {
+    return 'geometry';
+  }
+  if (
+    path.startsWith('/course/algebra-2') ||
+    path.startsWith('/lesson/a2-') ||
+    path.startsWith('/lesson/logarithms')
+  ) {
+    return 'algebra-2';
+  }
+  if (
+    path.startsWith('/course/precalculus') ||
+    path.startsWith('/lesson/pc-') ||
+    path.startsWith('/lesson/unit-circle')
+  ) {
+    return 'precalculus';
+  }
+  return undefined;
+}
 
 function readMasteredCount(): number {
   if (typeof window === 'undefined') return 0;
@@ -50,8 +84,9 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Planner', to: '/planner' },
 ];
 
-export function AtlasShell({ children, activeCourse }: AtlasShellProps) {
+export function AtlasShell({ children, activeCourse }: AtlasShellProps): JSX.Element {
   const location = useLocation();
+  const reducedMotion = useReducedMotion();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [masteredCount, setMasteredCount] = useState<number>(() => readMasteredCount());
 
@@ -72,17 +107,21 @@ export function AtlasShell({ children, activeCourse }: AtlasShellProps) {
     setMobileOpen(false);
   }, [location.pathname]);
 
-  const accent = activeCourse ? COURSES[activeCourse].accent : '#F4C46C';
-  const glow = activeCourse ? `${COURSES[activeCourse].accent}36` : 'rgba(244, 196, 108, 0.22)';
+  const resolvedCourseId: CourseId | undefined =
+    activeCourse ?? inferCourseFromPath(location.pathname);
+  const resolvedAccent = resolvedCourseId ? COURSES[resolvedCourseId].accent : '#F4C46C';
+  const resolvedGlow = resolvedCourseId
+    ? COURSES[resolvedCourseId].glow
+    : 'rgba(244, 196, 108, 0.22)';
   const masteredPct = Math.round((masteredCount / Math.max(1, TOTAL_NODES)) * 100);
 
   return (
     <div
-      data-course={activeCourse ?? 'algebra-1'}
+      data-course={resolvedCourseId ?? 'algebra-1'}
       className="relative min-h-screen flex flex-col bg-[#050508] text-[#F7F4EC] cartographic-grid overflow-x-clip"
       style={{
-        ['--active-accent' as string]: accent,
-        ['--active-glow' as string]: glow,
+        ['--active-accent' as string]: resolvedAccent,
+        ['--active-glow' as string]: resolvedGlow,
       }}
     >
       {/* Living global atmospheric aura + ambient golden neural filaments */}
@@ -90,7 +129,7 @@ export function AtlasShell({ children, activeCourse }: AtlasShellProps) {
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-0 observatory-aura"
       />
-      <AmbientNeuralBackdrop accent={accent} />
+      <AmbientNeuralBackdrop accent={resolvedAccent} courseId={resolvedCourseId} />
 
       {/* AUREA Golden Command Bar */}
       <header className="sticky top-0 z-30 px-2.5 sm:px-5 pt-2.5 pb-2 pointer-events-none">
@@ -98,7 +137,7 @@ export function AtlasShell({ children, activeCourse }: AtlasShellProps) {
           <div
             className="absolute top-0 left-0 right-0 h-[1.5px] opacity-90 pointer-events-none"
             style={{
-              background: `linear-gradient(90deg, transparent 4%, #F4C46C 30%, ${accent} 52%, #FFE5A3 74%, transparent 96%)`,
+              background: `linear-gradient(90deg, transparent 4%, #F4C46C 30%, ${resolvedAccent} 52%, #FFE5A3 74%, transparent 96%)`,
             }}
           />
 
@@ -109,7 +148,7 @@ export function AtlasShell({ children, activeCourse }: AtlasShellProps) {
               style={{
                 borderColor: 'rgba(244, 196, 108, 0.48)',
                 background: 'radial-gradient(circle at 30% 30%, rgba(255, 229, 163, 0.25), rgba(244, 196, 108, 0.08))',
-                boxShadow: `0 0 20px -5px ${accent}99`,
+                boxShadow: `0 0 20px -5px ${resolvedAccent}99`,
               }}
             >
               <Orbit className="w-4 h-4 text-[#FFE5A3]" />
@@ -151,7 +190,10 @@ export function AtlasShell({ children, activeCourse }: AtlasShellProps) {
                   {isActive ? (
                     <span
                       className="inline-block w-1.5 h-1.5 rounded-full mr-1.5 align-middle"
-                      style={{ backgroundColor: accent, boxShadow: `0 0 8px ${accent}` }}
+                      style={{
+                        backgroundColor: resolvedAccent,
+                        boxShadow: `0 0 8px ${resolvedAccent}`,
+                      }}
                     />
                   ) : item.coreGold ? (
                     <Sparkles className="inline-block w-2.5 h-2.5 mr-1 -mt-0.5 text-[#F4C46C]" />
@@ -257,7 +299,7 @@ export function AtlasShell({ children, activeCourse }: AtlasShellProps) {
                     {isActive ? (
                       <span
                         className="w-1.5 h-1.5 rounded-full shrink-0"
-                        style={{ backgroundColor: accent }}
+                        style={{ backgroundColor: resolvedAccent }}
                       />
                     ) : item.coreGold ? (
                       <Sparkles className="w-3 h-3 text-[#F4C46C] shrink-0" />
@@ -280,7 +322,21 @@ export function AtlasShell({ children, activeCourse }: AtlasShellProps) {
         )}
       </header>
 
-      <main className="relative z-10 flex-1 min-w-0 overflow-x-clip">{children}</main>
+      <main className="relative z-10 flex-1 min-w-0 overflow-x-clip">
+        <motion.div
+          key={location.pathname}
+          className="min-w-0 w-full"
+          initial={reducedMotion ? false : { opacity: 0, y: 10, scale: 0.994 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={
+            reducedMotion
+              ? { duration: 0 }
+              : { duration: 0.26, ease: [0.22, 1, 0.36, 1] }
+          }
+        >
+          {children}
+        </motion.div>
+      </main>
 
       {/* Clean AUREA Observatory Footer (Zero Watermarks) */}
       <footer className="relative z-10 border-t border-[#F4C46C]/16 bg-[#050508]/94 backdrop-blur-md py-10 mt-20">

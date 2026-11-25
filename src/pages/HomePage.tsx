@@ -11,7 +11,9 @@ import {
   CheckCircle2,
   Compass,
   Cpu,
+  Droplets,
   ExternalLink,
+  GitBranch,
   Layers,
   Network,
   Orbit,
@@ -20,6 +22,7 @@ import {
   Radar,
   Sparkles,
   TrendingUp,
+  Waypoints,
 } from 'lucide-react';
 import { AtlasShell } from '../components/AtlasShell';
 import { CourseJourneySidebar } from '../components/CourseJourneySidebar';
@@ -37,16 +40,42 @@ import { PolarHarmonicRingEngine } from '../visuals/drive/PolarHarmonicRingEngin
 import { CalabiYauManifold3D } from '../visuals/frontier/CalabiYauManifold3D';
 import { OrbitalSignalTorus3D } from '../visuals/frontier/OrbitalSignalTorus3D';
 import { GoldenHarmonicSpine } from '../visuals/harmony/GoldenHarmonicSpine';
+import { FourierEpicyclesEngine } from '../visuals/kinetic/FourierEpicyclesEngine';
+import { FormulaMorphEngine } from '../visuals/kinetic/FormulaMorphEngine';
+import { PythagorasFluidProof } from '../visuals/kinetic/PythagorasFluidProof';
 import { NeuralAtlasMap } from '../visuals/map/NeuralAtlasMap';
 import { ApolloniusCone3D } from '../visuals/solids/ApolloniusCone3D';
 import { MathVortexCanvas } from '../visuals/vortex/MathVortexCanvas';
 
 const LazyTensorRiemann3D = lazy(() => import('../visuals/drive/TensorRiemann3D'));
+const LazyVectorFlowField3D = lazy(() => import('../visuals/cinema3d/VectorFlowField3D'));
+const LazyLorenzAttractor3D = lazy(() => import('../visuals/cinema3d/LorenzAttractor3D'));
+const LazyMatrixTransform3D = lazy(() => import('../visuals/cinema3d/MatrixTransform3D'));
+const LazySurfaceRevolution3D = lazy(() => import('../visuals/cinema3d/SurfaceRevolution3D'));
 
 const COURSE_ORDER: CourseId[] = ['algebra-1', 'geometry', 'algebra-2', 'precalculus'];
 
 type HeroStageMode = 'orbital' | 'calabi' | 'vortex';
-type CinemaEngineId = 'pipeline' | 'polar' | 'confidence' | 'tensor';
+type CinemaCategory = 'all' | 'shaders-3d' | 'kinetic' | 'drive';
+type CinemaEngineId =
+  | 'pipeline'
+  | 'polar'
+  | 'confidence'
+  | 'tensor'
+  | 'vector-flow'
+  | 'lorenz-chaos'
+  | 'matrix-warp'
+  | 'surface-rev'
+  | 'fourier-epi'
+  | 'formula-morph'
+  | 'pythagoras-fluid';
+
+const CINEMA_CATEGORIES: { id: CinemaCategory; label: string; accent: string }[] = [
+  { id: 'all', label: 'All (11)', accent: '#F4C46C' },
+  { id: 'shaders-3d', label: '3D Shaders (5)', accent: '#46D6E8' },
+  { id: 'kinetic', label: 'Kinetic 3B1B (3)', accent: '#45E6A6' },
+  { id: 'drive', label: 'Drive Signal (3)', accent: '#FFE29E' },
+];
 
 const ALGEBRA1_QUICK_STAGES = [
   {
@@ -74,6 +103,7 @@ const ALGEBRA1_QUICK_STAGES = [
 
 const CINEMA_ENGINES: {
   id: CinemaEngineId;
+  category: Exclude<CinemaCategory, 'all'>;
   label: string;
   courseTag: string;
   accent: string;
@@ -86,8 +116,9 @@ const CINEMA_ENGINES: {
 }[] = [
   {
     id: 'pipeline',
+    category: 'drive',
     label: 'Algebraic Dataflow',
-    courseTag: 'Algebra 1 & 2 · Signal Composition',
+    courseTag: 'Algebra 1 & 2 · Drive Signal',
     accent: '#F4C46C',
     labId: 'algebraic-pipeline',
     headline: 'Watch a Number Flow Through a Live Equation Machine',
@@ -98,9 +129,108 @@ const CINEMA_ENGINES: {
     icon: Activity,
   },
   {
+    id: 'vector-flow',
+    category: 'shaders-3d',
+    label: '3D Vector Flow Field',
+    courseTag: '3D Shader · Curl & Streamlines',
+    accent: '#46D6E8',
+    labId: 'vector-flow-3d',
+    headline: 'Follow 1,800 Glowing Particles Through Invisible 3D Force Arrows',
+    plainEnglish:
+      'Every point in 3D space holds a velocity arrow telling particles where to turn next. Switch between a swirling vortex, magnetic dipole loops, saddle curl, and a spiral gravity sink.',
+    tryHint: 'Raise Curl / Twist (k) or toggle Velocity Arrows to see how local spin curves particle trails.',
+    formulaTex: '\\mathbf{F}(x,y,z) = \\langle F_x, F_y, F_z \\rangle,\\; \\nabla \\times \\mathbf{F}',
+    icon: Compass,
+  },
+  {
+    id: 'lorenz-chaos',
+    category: 'shaders-3d',
+    label: '3D Lorenz Chaos Butterfly',
+    courseTag: '3D Shader · Strange Attractor',
+    accent: '#FF8563',
+    labId: 'lorenz-chaos-3d',
+    headline: 'Watch Two Nearly Identical Paths Split Across a 3D Chaos Butterfly',
+    plainEnglish:
+      'Golden and cyan trajectories start just 0.01 units apart—smaller than a butterfly wingbeat—yet deterministic weather equations fling them onto opposite lobes while staying inside one sculpted attractor.',
+    tryHint: 'Compare Classic Butterfly (ρ = 28) against Calm Orbit (ρ = 16) or click Reset Δ₀ = 0.01.',
+    formulaTex: '\\dot{x}=\\sigma(y-x),\\; \\dot{y}=x(\\rho-z)-y,\\; \\dot{z}=xy-\\beta z',
+    icon: Orbit,
+  },
+  {
+    id: 'matrix-warp',
+    category: 'shaders-3d',
+    label: '3D Matrix Space Warp',
+    courseTag: '3D Shader · Linear Algebra',
+    accent: '#FFE29E',
+    labId: 'matrix-transform-3d',
+    headline: 'See a 3×3 Matrix Stretch, Shear, and Flip Every Grid Line in 3D',
+    plainEnglish:
+      'A matrix does not just store numbers—it moves all of space at once. Track the three basis arrows (î, ĵ, k̂) and watch the determinant det(A) measure how much the unit cube’s volume scales or mirrors.',
+    tryHint: 'Try Mirror Flip (det = -1) and scrub Morph t through 0.50 to see space flatten to zero volume.',
+    formulaTex: 'T(\\mathbf{v}) = A\\mathbf{v},\\quad \\det(A) = \\text{Signed Volume Scale}',
+    icon: Layers,
+  },
+  {
+    id: 'surface-rev',
+    category: 'shaders-3d',
+    label: '360° Solid of Revolution',
+    courseTag: '3D Shader · Disk Method',
+    accent: '#46D6E8',
+    labId: 'surface-revolution-3d',
+    headline: 'Spin a Flat 2D Curve 360° Into a Translucent 3D Volume',
+    plainEnglish:
+      'Rotate y = √x or y = 0.5x around the horizontal axis like a cosmic potter’s wheel. Every thin vertical slice sweeps out a glowing circular disk whose area πr² stacks into exact 3D volume.',
+    tryHint: 'Scrub Sweep Angle from 15° to 360° and slide the green Disk Cross-Section along the axis.',
+    formulaTex: 'V = \\pi \\int_a^b [f(x)]^2\\,dx',
+    icon: Box,
+  },
+  {
+    id: 'fourier-epi',
+    category: 'kinetic',
+    label: 'Fourier Epicycles',
+    courseTag: 'Kinetic 3B1B · Phasor Harmonics',
+    accent: '#F4C46C',
+    labId: 'fourier-epicycles',
+    headline: 'Draw Square Waves, Hearts, and Stars Using Spinning Circles Alone',
+    plainEnglish:
+      'Link circles tip-to-tail, each spinning at an integer frequency multiple. With 1 circle you get an ellipse; stack 5 to 15 harmonic circles and sharp corners snap into focus like magic.',
+    tryHint: 'Switch to 5-Point Star or Heart Curve, then drag Harmonics N from 1 up to 15.',
+    formulaTex: 'z(t) = \\sum_{k} c_k\\,e^{i\\omega_k t}',
+    icon: Waypoints,
+  },
+  {
+    id: 'formula-morph',
+    category: 'kinetic',
+    label: 'Kinetic Formula Morph',
+    courseTag: 'Kinetic 3B1B · Algebra Proof',
+    accent: '#45E6A6',
+    labId: 'formula-morph',
+    headline: 'Watch Equations Physically Glide & Rearrange Into Their Solved Form',
+    plainEnglish:
+      'Instead of memorizing formulas, watch each color-coded symbol slide to its new home step by step—completing the square on ax² + bx + c = 0, isolating slope-intercept form, or flipping logs into inverses.',
+    tryHint: 'Click Prev/Next or toggle Auto-Morph while reading “What Just Moved & Why” below each step.',
+    formulaTex: 'ax^2 + bx + c = 0 \\;\\Longrightarrow\\; x = \\dfrac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}',
+    icon: GitBranch,
+  },
+  {
+    id: 'pythagoras-fluid',
+    category: 'kinetic',
+    label: 'Pythagoras Fluid Proof',
+    courseTag: 'Kinetic 3B1B · Hydraulic Area',
+    accent: '#45E6A6',
+    labId: 'pythagoras-fluid',
+    headline: 'Pour Luminous Liquid From a² and b² Directly Into c²',
+    plainEnglish:
+      'See why the Pythagorean theorem works without a single memorized line: the glowing liquid filling the two leg squares drains through conduits and fills the tilted hypotenuse square to the exact brim.',
+    tryHint: 'Adjust legs a and b or scrub Pour Progress manually to inspect exact area conservation.',
+    formulaTex: 'a^2 + b^2 = c^2',
+    icon: Droplets,
+  },
+  {
     id: 'polar',
+    category: 'drive',
     label: 'Polar Harmonic Ring',
-    courseTag: 'Precalculus · Radar & Rose Geometry',
+    courseTag: 'Precalculus · Drive Signal',
     accent: '#46D6E8',
     labId: 'polar-harmonic',
     headline: 'Steer by Angle & Radius Instead of Left-Right Grid Steps',
@@ -112,8 +242,9 @@ const CINEMA_ENGINES: {
   },
   {
     id: 'confidence',
+    category: 'drive',
     label: 'Confidence Ribbon Field',
-    courseTag: 'Algebra 1 & 2 · Data & Uncertainty',
+    courseTag: 'Algebra 1 & 2 · Drive Signal',
     accent: '#45E6A6',
     labId: 'confidence-ribbon',
     headline: 'See Why Real Data Floats Inside 68%–95%–99.7% Prediction Ribbons',
@@ -125,8 +256,9 @@ const CINEMA_ENGINES: {
   },
   {
     id: 'tensor',
+    category: 'shaders-3d',
     label: '3D Tensor & Riemann',
-    courseTag: 'Precalculus & Calculus · 3D Volume',
+    courseTag: '3D Shader · Multivariable Volume',
     accent: '#FFE29E',
     labId: 'tensor-riemann',
     headline: 'Stack 3D Prisms to Measure Curved Surfaces Like Digital LEGOs',
@@ -170,6 +302,7 @@ const HERO_TABS: {
 
 export function HomePage() {
   const [heroMode, setHeroMode] = useState<HeroStageMode>('orbital');
+  const [cinemaCategory, setCinemaCategory] = useState<CinemaCategory>('all');
   const [cinemaEngine, setCinemaEngine] = useState<CinemaEngineId>('pipeline');
   const [dirFilter, setDirFilter] = useState<'all' | CourseId>('all');
   const [dirView, setDirView] = useState<'both' | 'textbook' | 'lessons'>('both');
@@ -208,6 +341,13 @@ export function HomePage() {
   );
 
   const activeHeroTab = HERO_TABS.find((t) => t.id === heroMode) ?? HERO_TABS[0];
+  const visibleCinemaEngines = useMemo(
+    () =>
+      cinemaCategory === 'all'
+        ? CINEMA_ENGINES
+        : CINEMA_ENGINES.filter((item) => item.category === cinemaCategory),
+    [cinemaCategory]
+  );
   const activeCinemaMeta = CINEMA_ENGINES.find((c) => c.id === cinemaEngine) ?? CINEMA_ENGINES[0];
   const visibleDirectoryCourses = dirFilter === 'all' ? COURSE_ORDER : [dirFilter];
 
@@ -478,7 +618,7 @@ export function HomePage() {
                   {ALGEBRA1_QUICK_STAGES.map((stage) => (
                     <div
                       key={stage.stage}
-                      className="aurea-glass-card p-4 space-y-3 flex flex-col justify-between min-w-0"
+                      className="aurea-glass-card aurea-sheen-card p-4 space-y-3 flex flex-col justify-between min-w-0"
                     >
                       <div className="space-y-2">
                         <div className="flex items-center justify-between gap-2">
@@ -564,7 +704,7 @@ export function HomePage() {
           </div>
         </section>
 
-        {/* SECTION C: LIVING MATHEMATICAL CINEMA — RECONSTRUCTED VISUAL ENGINES */}
+        {/* SECTION C: LIVING MATHEMATICAL CINEMA — 11 INTERACTIVE VISUAL ENGINES */}
         <section
           id="living-cinema"
           aria-label="Living Mathematical Cinema"
@@ -573,7 +713,7 @@ export function HomePage() {
           <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[rgba(244,196,108,0.18)] pb-4">
             <div className="space-y-1 min-w-0">
               <span className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-[#F4C46C]">
-                Living Mathematical Cinema · 4 Reconstructed 60fps Engines
+                Living Mathematical Cinema · 11 Interactive 3D &amp; Kinetic Engines
               </span>
               <h2 className="font-serif-editorial text-3xl sm:text-4xl text-[#F7F4EC]">
                 Touch Every Formula in Real-Time Motion
@@ -598,13 +738,48 @@ export function HomePage() {
             </div>
           </div>
 
-          {/* 4 Interactive Cinema Selector Tabs */}
+          {/* Category Filter Pills */}
+          <div
+            className="flex flex-wrap items-center gap-2 min-w-0"
+            role="group"
+            aria-label="Filter cinema engines by category"
+          >
+            {CINEMA_CATEGORIES.map((cat) => {
+              const active = cinemaCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => {
+                    setCinemaCategory(cat.id);
+                    if (cat.id !== 'all' && activeCinemaMeta.category !== cat.id) {
+                      const firstInCategory = CINEMA_ENGINES.find((item) => item.category === cat.id);
+                      if (firstInCategory) setCinemaEngine(firstInCategory.id);
+                    }
+                  }}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-mono-data border transition-all ${
+                    active ? 'font-semibold' : 'bg-[#0B0C12] text-[#A8B2C6] hover:text-[#F7F4EC]'
+                  }`}
+                  style={{
+                    borderColor: active ? cat.accent : 'rgba(244,196,108,0.18)',
+                    backgroundColor: active ? `${cat.accent}22` : '#0B0C12',
+                    color: active ? cat.accent : undefined,
+                    boxShadow: active ? `0 0 18px -6px ${cat.accent}` : undefined,
+                  }}
+                >
+                  {cat.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Interactive Cinema Selector Tabs */}
           <div
             role="tablist"
             aria-label="Living Mathematical Cinema Engine Selector"
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 min-w-0"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 min-w-0"
           >
-            {CINEMA_ENGINES.map((item) => {
+            {visibleCinemaEngines.map((item) => {
               const Icon = item.icon;
               const active = cinemaEngine === item.id;
               return (
@@ -614,7 +789,7 @@ export function HomePage() {
                   role="tab"
                   aria-selected={active}
                   onClick={() => setCinemaEngine(item.id)}
-                  className={`text-left p-3.5 rounded-2xl border transition-all min-w-0 ${
+                  className={`text-left p-3.5 rounded-2xl border transition-all min-w-0 aurea-sheen-card ${
                     active
                       ? 'aurea-pill-active'
                       : 'aurea-glass-card text-[#A8B2C6] hover:text-[#F7F4EC]'
@@ -637,7 +812,7 @@ export function HomePage() {
                     </span>
                     <Icon className="w-4 h-4 shrink-0" style={{ color: item.accent }} />
                   </div>
-                  <div className="font-serif-editorial text-xl text-[#F7F4EC] truncate">
+                  <div className="font-serif-editorial text-lg sm:text-xl text-[#F7F4EC] truncate">
                     {item.label}
                   </div>
                 </button>
@@ -671,6 +846,9 @@ export function HomePage() {
             {cinemaEngine === 'pipeline' && <AlgebraicPipelineEngine />}
             {cinemaEngine === 'polar' && <PolarHarmonicRingEngine />}
             {cinemaEngine === 'confidence' && <ConfidenceRibbonField />}
+            {cinemaEngine === 'fourier-epi' && <FourierEpicyclesEngine />}
+            {cinemaEngine === 'formula-morph' && <FormulaMorphEngine />}
+            {cinemaEngine === 'pythagoras-fluid' && <PythagorasFluidProof />}
             {cinemaEngine === 'tensor' && (
               <Suspense
                 fallback={
@@ -680,6 +858,50 @@ export function HomePage() {
                 }
               >
                 <LazyTensorRiemann3D />
+              </Suspense>
+            )}
+            {cinemaEngine === 'vector-flow' && (
+              <Suspense
+                fallback={
+                  <div className="instrument-frame h-[430px] flex items-center justify-center font-mono-data text-xs text-[#A8B2C6]">
+                    Initializing 3D Vector Flow Field…
+                  </div>
+                }
+              >
+                <LazyVectorFlowField3D />
+              </Suspense>
+            )}
+            {cinemaEngine === 'lorenz-chaos' && (
+              <Suspense
+                fallback={
+                  <div className="instrument-frame h-[430px] flex items-center justify-center font-mono-data text-xs text-[#A8B2C6]">
+                    Initializing 3D Lorenz Chaos Butterfly…
+                  </div>
+                }
+              >
+                <LazyLorenzAttractor3D />
+              </Suspense>
+            )}
+            {cinemaEngine === 'matrix-warp' && (
+              <Suspense
+                fallback={
+                  <div className="instrument-frame h-[430px] flex items-center justify-center font-mono-data text-xs text-[#A8B2C6]">
+                    Initializing 3D Matrix Space Warp…
+                  </div>
+                }
+              >
+                <LazyMatrixTransform3D />
+              </Suspense>
+            )}
+            {cinemaEngine === 'surface-rev' && (
+              <Suspense
+                fallback={
+                  <div className="instrument-frame h-[430px] flex items-center justify-center font-mono-data text-xs text-[#A8B2C6]">
+                    Initializing 360° Surface of Revolution…
+                  </div>
+                }
+              >
+                <LazySurfaceRevolution3D />
               </Suspense>
             )}
           </div>
@@ -1042,7 +1264,7 @@ export function HomePage() {
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 min-w-0">
           <Link
             to="/frontier"
-            className="aurea-glass-card p-5 space-y-2.5 hover:border-[#F4C46C]/60 transition-all min-w-0"
+            className="aurea-glass-card aurea-sheen-card p-5 space-y-2.5 hover:border-[#F4C46C]/60 transition-all min-w-0"
           >
             <div className="flex items-center justify-between text-[#FFE29E]">
               <span className="font-mono-data text-[10px] uppercase tracking-wider">10D Frontier</span>
@@ -1056,7 +1278,7 @@ export function HomePage() {
 
           <Link
             to="/textbook"
-            className="aurea-glass-card p-5 space-y-2.5 hover:border-[#46D6E8]/60 transition-all min-w-0"
+            className="aurea-glass-card aurea-sheen-card p-5 space-y-2.5 hover:border-[#46D6E8]/60 transition-all min-w-0"
           >
             <div className="flex items-center justify-between text-[#46D6E8]">
               <span className="font-mono-data text-[10px] uppercase tracking-wider">28 Chapters</span>
@@ -1070,21 +1292,21 @@ export function HomePage() {
 
           <Link
             to="/instruments"
-            className="aurea-glass-card p-5 space-y-2.5 hover:border-[#45E6A6]/60 transition-all min-w-0"
+            className="aurea-glass-card aurea-sheen-card p-5 space-y-2.5 hover:border-[#45E6A6]/60 transition-all min-w-0"
           >
             <div className="flex items-center justify-between text-[#45E6A6]">
-              <span className="font-mono-data text-[10px] uppercase tracking-wider">26 Interactive Labs</span>
+              <span className="font-mono-data text-[10px] uppercase tracking-wider">33 Interactive Labs</span>
               <Cpu className="w-4 h-4" />
             </div>
-            <h3 className="font-serif-editorial text-xl text-[#F7F4EC]">All 3D &amp; Math Labs</h3>
+            <h3 className="font-serif-editorial text-xl text-[#F7F4EC]">All 3D &amp; Kinetic Labs</h3>
             <p className="text-xs text-[#A8B2C6] leading-relaxed">
-              Every standalone 3D manifold, tensor Riemann stack, dataflow oscilloscope, and topic lab.
+              Every 3D shader, kinetic 3Blue1Brown proof, dataflow oscilloscope, and topic workbench.
             </p>
           </Link>
 
           <Link
             to="/planner"
-            className="aurea-glass-card p-5 space-y-2.5 hover:border-[#FF8563]/60 transition-all min-w-0"
+            className="aurea-glass-card aurea-sheen-card p-5 space-y-2.5 hover:border-[#FF8563]/60 transition-all min-w-0"
           >
             <div className="flex items-center justify-between text-[#FF8563]">
               <span className="font-mono-data text-[10px] uppercase tracking-wider">Target Gauge</span>

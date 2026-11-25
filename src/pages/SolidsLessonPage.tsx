@@ -27,6 +27,7 @@ import { EquationMiniVisual } from '../visuals/equations/EquationMiniVisual';
 import type { SolidHighlightPart } from '../visuals/solids/SolidNetScene';
 
 const LazySolidNetScene = lazy(() => import('../visuals/solids/SolidNetScene'));
+const LazySurfaceRevolution3D = lazy(() => import('../visuals/cinema3d/SurfaceRevolution3D'));
 
 const WORKED_3D_STEPS: {
   title: string;
@@ -354,6 +355,41 @@ export function SolidsLessonPage() {
                 <MathTex tex="k^2" /> and 3D volume by <MathTex tex="k^3" />.
               </p>
             </div>
+          </div>
+
+          {/* 360° Revolving Solid Explorer */}
+          <div className="instrument-frame p-5 sm:p-6 space-y-4 min-w-0">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="space-y-1 min-w-0">
+                <span className="font-mono-data text-[10.5px] uppercase tracking-[0.18em] text-[#46D6E8] block">
+                  360° Revolving Solid Explorer · Geometry to Disk-Method Calculus
+                </span>
+                <h3 className="font-serif-editorial text-xl sm:text-2xl text-[#F7F4EC]">
+                  Spin Any Flat 2D Curve 360° Into a 3D Volume
+                </h3>
+                <p className="text-xs sm:text-sm text-[#A8B2C6] leading-relaxed max-w-3xl">
+                  Just like unrolling a cylinder turns a curved wall into a rectangle, spinning a
+                  2D profile <MathTex tex="y = f(x)" /> around the horizontal axis sweeps out
+                  glowing circular cross-section disks of area <MathTex tex="\pi r^2" />.
+                </p>
+              </div>
+              <Link
+                to="/instruments?lab=surface-revolution-3d"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono-data border border-[#46D6E8]/40 bg-[#0B0C12] text-[#46D6E8] hover:border-[#46D6E8]/75 transition-colors shrink-0"
+              >
+                Full Revolution Lab <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <Suspense
+              fallback={
+                <div className="instrument-frame h-[340px] flex items-center justify-center font-mono-data text-xs text-[#A8B2C6]">
+                  Initializing 360° Revolving Solid Explorer…
+                </div>
+              }
+            >
+              <LazySurfaceRevolution3D compact />
+            </Suspense>
           </div>
         </section>
 

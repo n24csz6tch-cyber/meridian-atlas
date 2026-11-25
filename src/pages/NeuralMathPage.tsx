@@ -13,8 +13,10 @@ import { NeuralMathEngine } from '../visuals/neural/NeuralMathEngine';
 import { MathVortexCanvas } from '../visuals/vortex/MathVortexCanvas';
 
 const LazyTensorRiemann3D = lazy(() => import('../visuals/drive/TensorRiemann3D'));
+const LazyMatrixTransform3D = lazy(() => import('../visuals/cinema3d/MatrixTransform3D'));
+const LazyVectorFlowField3D = lazy(() => import('../visuals/cinema3d/VectorFlowField3D'));
 
-type DriveLabTab = 'pipeline' | 'confidence' | 'tensor';
+type DriveLabTab = 'matrix-3d' | 'vector-flow' | 'pipeline' | 'confidence' | 'tensor';
 
 const DRIVE_TABS: {
   id: DriveLabTab;
@@ -24,6 +26,24 @@ const DRIVE_TABS: {
   summary: string;
   formulaTex: string;
 }[] = [
+  {
+    id: 'matrix-3d',
+    label: '3D Matrix Space Warp',
+    accent: '#FFE29E',
+    badge: 'Three.js WebGL · Linear Basis Vectors & det(A) Volume',
+    summary:
+      'Watch a 3×3 matrix bend all of 3D space at once: track where unit basis vectors (î, ĵ, k̂) land and see how det(A) measures signed 3D volume scaling.',
+    formulaTex: 'T(\\mathbf{v}) = A\\mathbf{v},\\quad \\det(A) = \\text{Signed Volume Scale}',
+  },
+  {
+    id: 'vector-flow',
+    label: '3D Vector Flow Field',
+    accent: '#46D6E8',
+    badge: 'Three.js WebGL · Curl Vortex, Magnetic Dipole & Gravity Sink',
+    summary:
+      'Follow 1,800 glowing streamlines across continuous 3D vector fields—linking matrix Jacobians and curl directly to physical flow dynamics.',
+    formulaTex: '\\mathbf{F}(x,y,z) = \\langle F_x, F_y, F_z \\rangle,\\quad \\mathbf{r}_{n+1} = \\mathbf{r}_n + \\mathbf{F}(\\mathbf{r}_n)\\,\\Delta t',
+  },
   {
     id: 'pipeline',
     label: 'Algebraic Dataflow & Oscilloscope',
@@ -45,7 +65,7 @@ const DRIVE_TABS: {
   {
     id: 'tensor',
     label: '3D Tensor & Riemann Manifold',
-    accent: '#46D6E8',
+    accent: '#FF8563',
     badge: 'Three.js WebGL · Voxel Stacks & Integral Volume',
     summary:
       'Inspect stacked 3D Riemann prisms and tensor matrix planes approximating curved multivariable surfaces from 2×2 up to 10×10 resolution.',
@@ -56,7 +76,7 @@ const DRIVE_TABS: {
 const MATRIX_STANDARDS = ['MA.912.NSO.4.1', 'MA.912.NSO.4.2'];
 
 export function NeuralMathPage() {
-  const [driveTab, setDriveTab] = useState<DriveLabTab>('pipeline');
+  const [driveTab, setDriveTab] = useState<DriveLabTab>('matrix-3d');
   const activeDriveMeta = DRIVE_TABS.find((t) => t.id === driveTab) ?? DRIVE_TABS[0];
 
   return (
@@ -296,22 +316,22 @@ export function NeuralMathPage() {
           </div>
         </section>
 
-        {/* SECTION 4: DRIVE RECONSTRUCTED ENGINES — PIPELINE, CONFIDENCE RIBBON & 3D TENSOR RIEMANN */}
+        {/* SECTION 4: LINEAR SPACE WARPS, 3D VECTOR FIELDS & DRIVE ENGINES */}
         <section className="space-y-5 min-w-0">
           <div className="flex flex-wrap items-end justify-between gap-3 border-b border-[rgba(244,196,108,0.17)] pb-3">
             <div className="min-w-0 space-y-1">
               <span className="font-mono-data text-[10px] uppercase tracking-[0.2em] text-[#F4C46C] flex items-center gap-1.5">
                 <Layers className="w-3.5 h-3.5" />
-                Observatory Instrument 04 · Interactive Engine Trio
+                Observatory Instrument 04 · 5-Tab Linear Algebra, Flow &amp; Dataflow Studio
               </span>
               <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[#F7F4EC]">
-                Dataflow Pipelines, Uncertainty Ribbons &amp; 3D Tensor Manifolds
+                3D Matrix Space Warps, Vector Flow Fields &amp; Tensor Manifolds
               </h2>
             </div>
 
             <div
               role="tablist"
-              aria-label="Drive interactive mathematical engines"
+              aria-label="Observatory interactive mathematical engines"
               className="flex flex-wrap items-center gap-1.5"
             >
               {DRIVE_TABS.map((tab) => {
@@ -366,6 +386,28 @@ export function NeuralMathPage() {
           </div>
 
           <div className="min-w-0">
+            {driveTab === 'matrix-3d' && (
+              <Suspense
+                fallback={
+                  <div className="instrument-frame h-[430px] flex items-center justify-center font-mono-data text-xs text-[#A8B2C6]">
+                    Initializing 3D Matrix Space Warp…
+                  </div>
+                }
+              >
+                <LazyMatrixTransform3D />
+              </Suspense>
+            )}
+            {driveTab === 'vector-flow' && (
+              <Suspense
+                fallback={
+                  <div className="instrument-frame h-[430px] flex items-center justify-center font-mono-data text-xs text-[#A8B2C6]">
+                    Initializing 3D Vector Flow Field…
+                  </div>
+                }
+              >
+                <LazyVectorFlowField3D />
+              </Suspense>
+            )}
             {driveTab === 'pipeline' && <AlgebraicPipelineEngine />}
             {driveTab === 'confidence' && <ConfidenceRibbonField />}
             {driveTab === 'tensor' && (
@@ -381,8 +423,45 @@ export function NeuralMathPage() {
             )}
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-w-0">
+            <div className="aurea-glass-card aurea-sheen-card p-4 space-y-2 min-w-0">
+              <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#FFE29E]">
+                A · Matrix Basis Columns &amp; Determinant Volume
+              </span>
+              <div className="overflow-x-auto max-w-full">
+                <MathTex
+                  tex="A = \begin{bmatrix} | & | & | \\ T(\hat{\mathbf{i}}) & T(\hat{\mathbf{j}}) & T(\hat{\mathbf{k}}) \\ | & | & | \end{bmatrix}, \quad V' = |\det(A)| \cdot V"
+                  displayMode
+                  className="text-xs text-[#F7F4EC]"
+                />
+              </div>
+              <p className="text-xs text-[#A8B2C6] leading-relaxed">
+                Every column of <code className="text-[#FFE29E]">A</code> tells you where one unit
+                axis arrow lands in 3D space. When <code className="text-[#FF8563]">det(A) &lt; 0</code>,
+                space flips inside-out like a mirror.
+              </p>
+            </div>
+
+            <div className="aurea-glass-card aurea-sheen-card p-4 space-y-2 min-w-0">
+              <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#46D6E8]">
+                B · 3D Vector Fields, Curl &amp; Streamline Integration
+              </span>
+              <div className="overflow-x-auto max-w-full">
+                <MathTex
+                  tex="\mathbf{v}(\mathbf{r}) = \mathbf{F}(x,y,z), \quad \mathbf{r}_{n+1} = \mathbf{r}_n + \mathbf{F}\!\left(\mathbf{r}_n + \tfrac{\Delta t}{2}\mathbf{F}(\mathbf{r}_n)\right)\Delta t"
+                  displayMode
+                  className="text-xs text-[#F7F4EC]"
+                />
+              </div>
+              <p className="text-xs text-[#A8B2C6] leading-relaxed">
+                Neural gradient flows and fluid vortices obey the same 3D vector calculus: follow
+                local velocity arrows step by step via Runge–Kutta streamlines to trace whole orbits.
+              </p>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-w-0">
-            <div className="aurea-glass-card p-4 space-y-2 min-w-0">
+            <div className="aurea-glass-card aurea-sheen-card p-4 space-y-2 min-w-0">
               <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#F4C46C]">
                 01 · Layered Algebraic Neurons
               </span>
@@ -398,7 +477,7 @@ export function NeuralMathPage() {
               </p>
             </div>
 
-            <div className="aurea-glass-card p-4 space-y-2 min-w-0">
+            <div className="aurea-glass-card aurea-sheen-card p-4 space-y-2 min-w-0">
               <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#45E6A6]">
                 02 · Empirical Confidence &amp; MSE Loss
               </span>
@@ -414,7 +493,7 @@ export function NeuralMathPage() {
               </p>
             </div>
 
-            <div className="aurea-glass-card p-4 space-y-2 min-w-0">
+            <div className="aurea-glass-card aurea-sheen-card p-4 space-y-2 min-w-0">
               <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#46D6E8]">
                 03 · Tensor Grids &amp; Volume Integrals
               </span>
@@ -461,7 +540,7 @@ export function NeuralMathPage() {
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-mono-data bg-[#F4C46C] text-[#060609] font-semibold hover:brightness-110"
               >
                 <Sparkles className="w-3.5 h-3.5" />
-                Explore All 26 Labs
+                Explore All 33 Labs
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>

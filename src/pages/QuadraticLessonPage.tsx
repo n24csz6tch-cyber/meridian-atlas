@@ -24,6 +24,7 @@ import { CURRICULUM_NODES } from '../data/curriculumGraph';
 import { FLDOE_SOURCES, VERIFIED_STANDARDS } from '../data/standards';
 import { QuadraticWorkbench } from '../instruments/QuadraticWorkbench';
 import { EquationMiniVisual } from '../visuals/equations/EquationMiniVisual';
+import { FormulaMorphEngine } from '../visuals/kinetic/FormulaMorphEngine';
 import {
   ParabolaCanvas,
   ParabolaHighlightFeature,
@@ -571,6 +572,23 @@ export function QuadraticLessonPage() {
                 heightClass="h-[400px]"
               />
             </div>
+          </div>
+
+          <div className="pt-5 border-t hairline-rule space-y-3 min-w-0">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="space-y-0.5 min-w-0">
+                <span className="font-mono-data text-[10.5px] uppercase tracking-[0.18em] text-[#F4C46C] block">
+                  Kinetic Step-by-Step Proof · Completing the Square
+                </span>
+                <h3 className="font-serif-editorial text-xl sm:text-2xl text-[#F7F4EC]">
+                  Watch <MathTex tex="ax^2 + bx + c = 0" /> Morph Into the Quadratic Formula
+                </h3>
+              </div>
+              <span className="font-mono-data text-[10.5px] text-[#45E6A6]">
+                Follow every color-coded symbol as it moves
+              </span>
+            </div>
+            <FormulaMorphEngine compact initialPreset="quadratic" />
           </div>
         </section>
 

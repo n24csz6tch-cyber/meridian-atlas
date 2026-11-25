@@ -102,14 +102,87 @@ export const STAGE_ACTS: StageActMeta[] = [
     durationSec: 20,
   },
   {
-    id: 'finale',
+    id: 'fourier-epicycles',
     number: 'ACT XII',
+    title: 'Fourier Epicycles · Drawing Curves With Circles',
+    subtitle: 'Linking rotating phasor circles tip-to-tail to synthesize waves, stars, and closed contours.',
+    accent: '#F4C46C',
+    durationSec: 20,
+  },
+  {
+    id: 'lorenz-chaos-3d',
+    number: 'ACT XIII',
+    title: '3D Lorenz Chaos Butterfly & Divergence Telemetry',
+    subtitle: 'Two trajectories offset by Δ₀ = 0.01 separating across twin glowing 3D attractor wings.',
+    accent: '#FF8563',
+    durationSec: 20,
+  },
+  {
+    id: 'matrix-transform-3d',
+    number: 'ACT XIV',
+    title: '3D Matrix Space Warp & Determinant Volume',
+    subtitle: 'Watching 3×3 matrices rotate, shear, and mirror-flip all of 3D space around basis vectors.',
+    accent: '#FFE29E',
+    durationSec: 20,
+  },
+  {
+    id: 'surface-revolution-3d',
+    number: 'ACT XV',
+    title: '360° Solid of Revolution & Disk Integrals',
+    subtitle: 'Sweeping flat 2D curves 360° around an axis into crystal 3D bowls, vases, and cones.',
+    accent: '#46D6E8',
+    durationSec: 20,
+  },
+  {
+    id: 'kinetic-proofs',
+    number: 'ACT XVI',
+    title: 'Kinetic Formula Morph & Liquid Pythagoras',
+    subtitle: 'Watch ax² + bx + c = 0 glide into the Quadratic Formula, then pour a² + b² liquid into c².',
+    accent: '#45E6A6',
+    durationSec: 22,
+  },
+  {
+    id: 'finale',
+    number: 'ACT XVII',
     title: 'Lorenz Chaos Finale & Closing Observatory',
     subtitle: 'Two trajectories separated by 0.002 diverging across twin golden attractor lobes.',
     accent: '#FF8563',
     durationSec: 14,
   },
 ];
+
+export type V3StageActId =
+  | 'fourier-epicycles'
+  | 'lorenz-chaos-3d'
+  | 'matrix-transform-3d'
+  | 'surface-revolution-3d';
+
+export const V3_STAGE_NOTES: Record<V3StageActId, DriveStageNote> = {
+  'fourier-epicycles': {
+    courseBridge: 'Precalculus & Signal Synthesis · Complex Fourier Series & Epicycles',
+    tex: 'z(t) = \\sum_{k=-N}^{N} c_k\\,e^{i\\omega_k t}',
+    takeaway:
+      'Every harmonic circle spins at an integer speed multiple—stack more circles to sharpen corners on square waves, hearts, and 5-point stars.',
+  },
+  'lorenz-chaos-3d': {
+    courseBridge: 'Differential Equations & Chaos · Sensitive Dependence (Δ₀ = 0.01)',
+    tex: '\\dot{x} = \\sigma(y-x),\\; \\dot{y} = x(\\rho-z)-y,\\; \\dot{z} = xy - \\beta z',
+    takeaway:
+      'Golden and cyan paths start 0.01 apart—smaller than a butterfly wingbeat—yet deterministic weather equations fling them onto opposite wings.',
+  },
+  'matrix-transform-3d': {
+    courseBridge: 'Algebra 2 & Linear Algebra · 3D Basis Vectors & Signed Determinant',
+    tex: 'T(\\mathbf{v}) = A\\mathbf{v},\\qquad V_{\\text{cube}}\' = |\\det(A)|',
+    takeaway:
+      'Columns of A tell you exactly where î, ĵ, and k̂ land; scrub Morph t through 0.50 on Mirror Flip to see volume collapse through zero.',
+  },
+  'surface-revolution-3d': {
+    courseBridge: 'Geometry to Calculus · 360° Lathe Solids & Disk Cross-Sections',
+    tex: 'V = \\pi \\int_a^b [f(x)]^2\\,dx',
+    takeaway:
+      'Sweep the 2D curve from 15° to 360° and watch circular cross-section disks accumulate exact three-dimensional volume.',
+  },
+};
 
 export type DriveStageActId =
   | 'algebraic-pipeline'

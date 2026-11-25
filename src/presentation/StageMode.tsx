@@ -20,6 +20,9 @@ import { DerivationStepVisual } from '../visuals/equations/LessonLayerVisuals';
 import { CalabiYauManifold3D } from '../visuals/frontier/CalabiYauManifold3D';
 import { OrbitalSignalTorus3D } from '../visuals/frontier/OrbitalSignalTorus3D';
 import { GoldenHarmonicSpine } from '../visuals/harmony/GoldenHarmonicSpine';
+import { FourierEpicyclesEngine } from '../visuals/kinetic/FourierEpicyclesEngine';
+import { FormulaMorphEngine } from '../visuals/kinetic/FormulaMorphEngine';
+import { PythagorasFluidProof } from '../visuals/kinetic/PythagorasFluidProof';
 import { NeuralAtlasMap } from '../visuals/map/NeuralAtlasMap';
 import { NeuralMathEngine } from '../visuals/neural/NeuralMathEngine';
 import { ParabolaCanvas } from '../visuals/parabola/ParabolaCanvas';
@@ -34,10 +37,15 @@ import {
   PROOF_KEYFRAMES,
   SOLIDS_KEYFRAMES,
   STAGE_ACTS,
+  V3_STAGE_NOTES,
+  V3StageActId,
 } from './stageScript';
 
 const LazySolidNetScene = lazy(() => import('../visuals/solids/SolidNetScene'));
 const LazyTensorRiemann3D = lazy(() => import('../visuals/drive/TensorRiemann3D'));
+const LazyLorenzAttractor3D = lazy(() => import('../visuals/cinema3d/LorenzAttractor3D'));
+const LazyMatrixTransform3D = lazy(() => import('../visuals/cinema3d/MatrixTransform3D'));
+const LazySurfaceRevolution3D = lazy(() => import('../visuals/cinema3d/SurfaceRevolution3D'));
 
 interface StageModeProps {
   onExit: () => void;
@@ -61,6 +69,7 @@ export function StageMode({ onExit }: StageModeProps) {
 
   const elapsedRef = useRef(0);
   const progressBarRef = useRef<HTMLDivElement>(null);
+  const activePillRef = useRef<HTMLButtonElement | null>(null);
 
   const act = STAGE_ACTS[actIndex];
 
@@ -91,6 +100,7 @@ export function StageMode({ onExit }: StageModeProps) {
     if (progressBarRef.current) {
       progressBarRef.current.style.width = '0%';
     }
+    activePillRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
   }, [actIndex]);
 
   useEffect(() => {
@@ -177,7 +187,31 @@ export function StageMode({ onExit }: StageModeProps) {
       } else if (e.key === 'f' || e.key === 'F') {
         e.preventDefault();
         toggleFullscreen();
-      } else if (e.key >= '1' && e.key <= '9') {
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        elapsedRef.current = 0;
+        setElapsedTick(0);
+        setActIndex(0);
+        flashNotice(STAGE_ACTS[0].number);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        const lastIdx = STAGE_ACTS.length - 1;
+        elapsedRef.current = 0;
+        setElapsedTick(0);
+        setActIndex(lastIdx);
+        flashNotice(STAGE_ACTS[lastIdx].number);
+      } else if (e.shiftKey && /^Digit[0-9]$/.test(e.code)) {
+        const digit = Number(e.code.replace('Digit', ''));
+        const offset = digit === 0 ? 9 : digit - 1;
+        const idx = 10 + offset;
+        if (idx >= 0 && idx < STAGE_ACTS.length) {
+          e.preventDefault();
+          elapsedRef.current = 0;
+          setElapsedTick(0);
+          setActIndex(idx);
+          flashNotice(STAGE_ACTS[idx].number);
+        }
+      } else if (!e.shiftKey && e.key >= '1' && e.key <= '9') {
         const idx = Number(e.key) - 1;
         if (idx >= 0 && idx < STAGE_ACTS.length) {
           e.preventDefault();
@@ -186,7 +220,7 @@ export function StageMode({ onExit }: StageModeProps) {
           setActIndex(idx);
           flashNotice(STAGE_ACTS[idx].number);
         }
-      } else if (e.key === '0' && STAGE_ACTS.length >= 10) {
+      } else if (!e.shiftKey && e.key === '0' && STAGE_ACTS.length >= 10) {
         e.preventDefault();
         elapsedRef.current = 0;
         setElapsedTick(0);
@@ -248,6 +282,7 @@ export function StageMode({ onExit }: StageModeProps) {
   }, [elapsedTick]);
 
   const showNeuralPhase = act.id === 'neural-wave' && elapsedTick >= 10;
+  const showLiquidPythagoras = act.id === 'kinetic-proofs' && elapsedTick >= 11;
   const showClosingAurea = act.id === 'finale' && elapsedTick >= 10;
 
   return (
@@ -770,7 +805,143 @@ export function StageMode({ onExit }: StageModeProps) {
             );
           })()}
 
-          {/* ACT XII: LORENZ CHAOS FINALE & CLOSING AUREA */}
+          {/* ACT XII–XV: V3 KINETIC & 3D SHADER SHOWCASE */}
+          {(act.id === 'fourier-epicycles' ||
+            act.id === 'lorenz-chaos-3d' ||
+            act.id === 'matrix-transform-3d' ||
+            act.id === 'surface-revolution-3d') && (() => {
+            const v3Id = act.id as V3StageActId;
+            const note = V3_STAGE_NOTES[v3Id];
+            return (
+              <motion.div
+                key={`act-${v3Id}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.28 }}
+                className="my-auto w-full max-w-6xl min-w-0 space-y-3"
+              >
+                <div
+                  className="aurea-glass-card px-4 py-3 flex flex-col lg:flex-row lg:items-center justify-between gap-3 min-w-0"
+                  style={{ borderLeft: `3px solid ${act.accent}` }}
+                >
+                  <div className="space-y-1 min-w-0">
+                    <span
+                      className="font-mono-data text-[10.5px] uppercase tracking-[0.18em] block"
+                      style={{ color: act.accent }}
+                    >
+                      {note.courseBridge}
+                    </span>
+                    <p className="text-xs sm:text-sm text-[#A8B2C6] leading-relaxed">
+                      {note.takeaway}
+                    </p>
+                  </div>
+                  <div className="rounded-xl bg-[#060609]/95 border border-[#F4C46C]/22 px-3 py-2 overflow-x-auto max-w-full shrink-0">
+                    <MathTex tex={note.tex} className="text-xs sm:text-sm text-[#FFE29E]" />
+                  </div>
+                </div>
+
+                <div className="min-w-0">
+                  {v3Id === 'fourier-epicycles' && (
+                    <FourierEpicyclesEngine compact heightClass="h-[270px] sm:h-[345px]" />
+                  )}
+                  {v3Id === 'lorenz-chaos-3d' && (
+                    <Suspense
+                      fallback={
+                        <div className="instrument-frame h-[340px] flex items-center justify-center font-mono-data text-xs text-[#A8B2C6]">
+                          Initializing 3D Lorenz Chaos Butterfly…
+                        </div>
+                      }
+                    >
+                      <LazyLorenzAttractor3D compact heightClass="h-[270px] sm:h-[345px]" />
+                    </Suspense>
+                  )}
+                  {v3Id === 'matrix-transform-3d' && (
+                    <Suspense
+                      fallback={
+                        <div className="instrument-frame h-[340px] flex items-center justify-center font-mono-data text-xs text-[#A8B2C6]">
+                          Initializing 3D Matrix Space Warp…
+                        </div>
+                      }
+                    >
+                      <LazyMatrixTransform3D compact heightClass="h-[270px] sm:h-[345px]" />
+                    </Suspense>
+                  )}
+                  {v3Id === 'surface-revolution-3d' && (
+                    <Suspense
+                      fallback={
+                        <div className="instrument-frame h-[340px] flex items-center justify-center font-mono-data text-xs text-[#A8B2C6]">
+                          Initializing 360° Solid of Revolution…
+                        </div>
+                      }
+                    >
+                      <LazySurfaceRevolution3D compact heightClass="h-[270px] sm:h-[345px]" />
+                    </Suspense>
+                  )}
+                </div>
+              </motion.div>
+            );
+          })()}
+
+          {/* ACT XVI: KINETIC FORMULA MORPH & LIQUID PYTHAGORAS */}
+          {act.id === 'kinetic-proofs' && (
+            <motion.div
+              key="act-kinetic-proofs"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.28 }}
+              className="my-auto w-full max-w-6xl min-w-0 space-y-3"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2 px-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => seekToSecond(0)}
+                    className={`px-3 py-1 rounded-full font-mono-data text-[11px] border transition-all ${
+                      !showLiquidPythagoras
+                        ? 'bg-[#F4C46C] text-[#060609] border-[#FFE29E] font-semibold'
+                        : 'bg-[#0B0C12] text-[#A8B2C6] border-[rgba(244,196,108,0.18)]'
+                    }`}
+                  >
+                    Phase A · Kinetic Formula Morph
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => seekToSecond(11)}
+                    className={`px-3 py-1 rounded-full font-mono-data text-[11px] border transition-all ${
+                      showLiquidPythagoras
+                        ? 'bg-[#45E6A6] text-[#060609] border-[#45E6A6] font-semibold'
+                        : 'bg-[#0B0C12] text-[#A8B2C6] border-[rgba(244,196,108,0.18)]'
+                    }`}
+                  >
+                    Phase B · Liquid Pythagoras Proof
+                  </button>
+                </div>
+
+                <div className="overflow-x-auto max-w-full">
+                  <MathTex
+                    tex={
+                      !showLiquidPythagoras
+                        ? 'ax^2 + bx + c = 0 \\;\\Longrightarrow\\; x = \\dfrac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}'
+                        : 'a^2 + b^2 = c^2'
+                    }
+                    className="text-xs text-[#FFE29E]"
+                  />
+                </div>
+              </div>
+
+              <div className="min-w-0">
+                {!showLiquidPythagoras ? (
+                  <FormulaMorphEngine compact initialPreset="quadratic" />
+                ) : (
+                  <PythagorasFluidProof compact heightClass="h-[270px] sm:h-[345px]" />
+                )}
+              </div>
+            </motion.div>
+          )}
+
+          {/* ACT XVII: LORENZ CHAOS FINALE & CLOSING AUREA */}
           {act.id === 'finale' && (
             <motion.div
               key="act-finale"
@@ -832,8 +1003,8 @@ export function StageMode({ onExit }: StageModeProps) {
       </div>
 
       {/* Crisp Always-Accessible Bottom Control Dock */}
-      <div className="px-3 sm:px-8 pb-3 pt-2 border-t border-[rgba(244,196,108,0.16)] bg-[#060609]/95 backdrop-blur-md flex flex-wrap items-center justify-between gap-2 sm:gap-3">
-        <div className="flex items-center gap-1.5">
+      <div className="px-3 sm:px-8 pb-3 pt-2 border-t border-[rgba(244,196,108,0.16)] bg-[#060609]/95 backdrop-blur-md flex flex-wrap items-center justify-between gap-2 sm:gap-3 min-w-0 max-w-full">
+        <div className="flex items-center gap-1.5 shrink-0">
           <button
             type="button"
             onClick={() => jumpToAct(actIndex - 1)}
@@ -867,20 +1038,31 @@ export function StageMode({ onExit }: StageModeProps) {
           </span>
         </div>
 
-        {/* Act Selector Pills (I - XII) */}
-        <div className="flex flex-wrap items-center gap-1" role="tablist" aria-label="Presentation acts">
+        {/* Act Selector Pills (I - XVII, touch-scrollable on narrow mobile so 0px horizontal overflow) */}
+        <div
+          className="order-3 lg:order-none w-full lg:w-auto lg:max-w-[54%] xl:max-w-none flex items-center lg:flex-wrap gap-1 overflow-x-auto lg:overflow-visible no-scrollbar py-0.5 min-w-0"
+          role="tablist"
+          aria-label="Presentation acts"
+        >
           {STAGE_ACTS.map((item, idx) => {
             const active = idx === actIndex;
             const numeral = item.number.replace('ACT ', '');
+            const keyHint =
+              idx < 9
+                ? `Key ${idx + 1}`
+                : idx === 9
+                  ? 'Key 0'
+                  : `Shift+${idx - 9}`;
             return (
               <button
                 key={item.id}
+                ref={active ? activePillRef : undefined}
                 type="button"
                 role="tab"
                 aria-selected={active}
                 onClick={() => jumpToAct(idx)}
-                title={`${item.number}: ${item.title}${idx < 9 ? ` (Key ${idx + 1})` : ''}`}
-                className="px-2 py-1 rounded-full font-mono-data text-[10.5px] sm:text-[11px] border transition-all"
+                title={`${item.number}: ${item.title} (${keyHint})`}
+                className="px-2 py-1 rounded-full font-mono-data text-[10.5px] sm:text-[11px] border transition-all shrink-0"
                 style={{
                   borderColor: active ? item.accent : 'rgba(244,196,108,0.18)',
                   backgroundColor: active ? `${item.accent}26` : '#0B0C12',
@@ -893,7 +1075,7 @@ export function StageMode({ onExit }: StageModeProps) {
           })}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             type="button"
             onClick={() => setShowIndex((s) => !s)}
@@ -935,42 +1117,51 @@ export function StageMode({ onExit }: StageModeProps) {
 
       {/* Toggleable Mini-Index Drawer */}
       {showIndex && (
-        <div className="fixed bottom-20 right-4 sm:right-8 z-50 w-80 max-w-[calc(100vw-2rem)] max-h-[68vh] overflow-y-auto p-3 rounded-xl bg-[#0B0C12]/95 backdrop-blur-md border border-[rgba(244,196,108,0.28)] space-y-2 shadow-2xl">
-          <div className="flex items-center justify-between pb-1.5 border-b border-[rgba(244,196,108,0.16)]">
-            <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#F4C46C]">
-              Stage Index (1–0 · Space · ←/→ · F · Esc)
+        <div className="fixed bottom-24 sm:bottom-20 right-4 sm:right-8 z-50 w-80 max-w-[calc(100vw-2rem)] max-h-[68vh] overflow-y-auto p-3 rounded-xl bg-[#0B0C12]/95 backdrop-blur-md border border-[rgba(244,196,108,0.28)] space-y-2 shadow-2xl">
+          <div className="flex items-center justify-between pb-1.5 border-b border-[rgba(244,196,108,0.16)] gap-2">
+            <span className="font-mono-data text-[10px] uppercase tracking-wider text-[#F4C46C] truncate">
+              {STAGE_ACTS.length} Acts (1–0 · ⇧1–7 · ←/→ · Esc)
             </span>
             <button
               type="button"
               onClick={() => setShowIndex(false)}
               aria-label="Close index drawer"
-              className="p-1 rounded hover:bg-[#171A26] text-[#A8B2C6]"
+              className="p-1 rounded hover:bg-[#171A26] text-[#A8B2C6] shrink-0"
             >
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
 
           <div className="space-y-1">
-            {STAGE_ACTS.map((item, idx) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => {
-                  jumpToAct(idx);
-                  setShowIndex(false);
-                }}
-                className="w-full text-left px-2.5 py-1.5 rounded text-xs flex items-center justify-between transition-colors"
-                style={{
-                  backgroundColor: idx === actIndex ? '#171A26' : 'transparent',
-                  color: idx === actIndex ? item.accent : '#A8B2C6',
-                }}
-              >
-                <span className="truncate pr-2">
-                  {item.number} · {item.title.split('·')[0]}
-                </span>
-                <span className="font-mono-data text-[10px] shrink-0">{item.durationSec}s</span>
-              </button>
-            ))}
+            {STAGE_ACTS.map((item, idx) => {
+              const shortcut =
+                idx < 9 ? `${idx + 1}` : idx === 9 ? '0' : `⇧${idx - 9}`;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => {
+                    jumpToAct(idx);
+                    setShowIndex(false);
+                  }}
+                  className="w-full text-left px-2.5 py-1.5 rounded text-xs flex items-center justify-between gap-2 transition-colors"
+                  style={{
+                    backgroundColor: idx === actIndex ? '#171A26' : 'transparent',
+                    color: idx === actIndex ? item.accent : '#A8B2C6',
+                  }}
+                >
+                  <span className="truncate pr-1">
+                    {item.number} · {item.title.split('·')[0]}
+                  </span>
+                  <span className="flex items-center gap-1.5 font-mono-data text-[10px] shrink-0">
+                    <kbd className="px-1.5 py-0.5 rounded bg-[#060609] border border-[rgba(244,196,108,0.18)] text-[#727D94]">
+                      {shortcut}
+                    </kbd>
+                    <span>{item.durationSec}s</span>
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
       )}

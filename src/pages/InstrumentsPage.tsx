@@ -1,4 +1,4 @@
-import { Suspense, lazy, useMemo, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   Activity,
@@ -9,6 +9,7 @@ import {
   Box,
   Compass,
   Cone,
+  Droplets,
   FunctionSquare,
   GitBranch,
   Infinity as InfinityIcon,
@@ -33,6 +34,9 @@ import { PolarHarmonicRingEngine } from '../visuals/drive/PolarHarmonicRingEngin
 import { CalabiYauManifold3D } from '../visuals/frontier/CalabiYauManifold3D';
 import { OrbitalSignalTorus3D } from '../visuals/frontier/OrbitalSignalTorus3D';
 import { GoldenHarmonicSpine } from '../visuals/harmony/GoldenHarmonicSpine';
+import { FourierEpicyclesEngine } from '../visuals/kinetic/FourierEpicyclesEngine';
+import { FormulaMorphEngine } from '../visuals/kinetic/FormulaMorphEngine';
+import { PythagorasFluidProof } from '../visuals/kinetic/PythagorasFluidProof';
 import { LogarithmLab } from '../visuals/logarithms/LogarithmLab';
 import { NeuralMathEngine } from '../visuals/neural/NeuralMathEngine';
 import { ApolloniusCone3D } from '../visuals/solids/ApolloniusCone3D';
@@ -42,6 +46,10 @@ import { VectorParallelogramCanvas } from '../visuals/trig/VectorParallelogramCa
 import { MathVortexCanvas } from '../visuals/vortex/MathVortexCanvas';
 
 const LazyTensorRiemann3D = lazy(() => import('../visuals/drive/TensorRiemann3D'));
+const LazyVectorFlowField3D = lazy(() => import('../visuals/cinema3d/VectorFlowField3D'));
+const LazyLorenzAttractor3D = lazy(() => import('../visuals/cinema3d/LorenzAttractor3D'));
+const LazyMatrixTransform3D = lazy(() => import('../visuals/cinema3d/MatrixTransform3D'));
+const LazySurfaceRevolution3D = lazy(() => import('../visuals/cinema3d/SurfaceRevolution3D'));
 
 type LabCategory = 'all' | 'frontier' | CourseId;
 
@@ -49,6 +57,13 @@ type LabId =
   | 'orbital-torus'
   | 'calabi-yau'
   | 'tensor-riemann'
+  | 'vector-flow-3d'
+  | 'lorenz-chaos-3d'
+  | 'matrix-transform-3d'
+  | 'surface-revolution-3d'
+  | 'fourier-epicycles'
+  | 'formula-morph'
+  | 'pythagoras-fluid'
   | 'apollonius-cone'
   | 'harmonic-spine'
   | 'solids'
@@ -122,6 +137,95 @@ const LAB_ITEMS: LabMeta[] = [
     companionRoute: '/neural',
     companionLabel: 'Open Neural & Tensor Studio',
     icon: Box,
+  },
+  {
+    id: 'vector-flow-3d',
+    label: '3D Vector Flow Field',
+    category: 'frontier',
+    accent: '#46D6E8',
+    tag: 'THREE.JS SHADER · CURL VORTEX, DIPOLE & GRAVITY SINK',
+    description:
+      'Fly 1,800 glowing particles and 3D velocity arrows through swirling vortices, magnetic dipole arcs, saddle curls, and spiral sinks.',
+    companionRoute: '/neural',
+    companionLabel: 'Open Vector & Neural Studio',
+    icon: Compass,
+  },
+  {
+    id: 'lorenz-chaos-3d',
+    label: '3D Lorenz Chaos Butterfly',
+    category: 'frontier',
+    accent: '#FF8563',
+    tag: 'THREE.JS SHADER · STRANGE ATTRACTOR & Δ₀ = 0.01 SPLIT',
+    description:
+      'Launch two nearly identical orbits (Δ₀ = 0.01) across twin glowing 3D attractor wings and watch deterministic chaos diverge live.',
+    companionRoute: '/presentation',
+    companionLabel: 'Watch in Keynote Stage',
+    icon: Orbit,
+  },
+  {
+    id: 'matrix-transform-3d',
+    label: '3D Matrix Space Warp',
+    category: 'algebra-2',
+    course: 'algebra-2',
+    accent: '#FFE29E',
+    tag: 'ALGEBRA 2 · THREE.JS 3×3 BASIS & DETERMINANT VOLUME',
+    description:
+      'Stretch, shear, rotate, and mirror-flip a 3D lattice and unit cube while tracking basis vectors (î, ĵ, k̂) and signed volume det(A).',
+    companionRoute: '/neural',
+    companionLabel: 'Open Neural Matrix Studio',
+    icon: Layers,
+  },
+  {
+    id: 'surface-revolution-3d',
+    label: '360° Solid of Revolution',
+    category: 'geometry',
+    course: 'geometry',
+    accent: '#46D6E8',
+    tag: 'GEOMETRY & CALCULUS · THREE.JS LATHE & DISK VOLUME',
+    description:
+      'Spin 2D curves 360° into crystal 3D bowls, vases, and cones while sliding a glowing circular cross-section disk along the axis.',
+    companionRoute: '/lesson/solids-3d',
+    companionLabel: 'Open 3D Solids Lesson',
+    icon: Box,
+  },
+  {
+    id: 'fourier-epicycles',
+    label: 'Fourier Epicycles Engine',
+    category: 'precalculus',
+    course: 'precalculus',
+    accent: '#F4C46C',
+    tag: 'PRECALCULUS · 3B1B PHASOR CIRCLES & DFT CONTOURS',
+    description:
+      'Link rotating circles tip-to-tail to draw square waves, sawtooth ramps, hearts, 5-point stars, and figure-8 infinity loops live.',
+    companionRoute: '/lesson/pc-polar',
+    companionLabel: 'Open Polar & Harmonics Lesson',
+    icon: Waypoints,
+  },
+  {
+    id: 'formula-morph',
+    label: 'Kinetic Formula Morph',
+    category: 'algebra-1',
+    course: 'algebra-1',
+    accent: '#45E6A6',
+    tag: 'ALGEBRA 1 & 2 · 3B1B ANIMATED DERIVATIONS',
+    description:
+      'Watch algebraic symbols glide smoothly step-by-step from ax² + bx + c = 0 to the Quadratic Formula, slope-intercept, and log inverses.',
+    companionRoute: '/lesson/quadratics',
+    companionLabel: 'Open Quadratics Lesson',
+    icon: GitBranch,
+  },
+  {
+    id: 'pythagoras-fluid',
+    label: 'Pythagoras Fluid Proof',
+    category: 'geometry',
+    course: 'geometry',
+    accent: '#45E6A6',
+    tag: 'GEOMETRY · 3B1B HYDRAULIC a² + b² = c² CONSERVATION',
+    description:
+      'Pour luminous golden and cyan liquid from both leg squares into the tilted hypotenuse square—proving a² + b² = c² with zero spills.',
+    companionRoute: '/lesson/g-right-trig',
+    companionLabel: 'Open Right Triangles Lesson',
+    icon: Droplets,
   },
   {
     id: 'apollonius-cone',
@@ -424,12 +528,12 @@ const LAB_ITEMS: LabMeta[] = [
 ];
 
 const CATEGORY_FILTERS: { id: LabCategory; label: string; accent: string }[] = [
-  { id: 'all', label: 'All 26 Labs', accent: '#F4C46C' },
-  { id: 'frontier', label: '3D & String Frontier (4)', accent: '#FFE29E' },
-  { id: 'algebra-1', label: 'Algebra 1 (6)', accent: '#F5C25B' },
-  { id: 'geometry', label: 'Geometry (4)', accent: '#46D6E8' },
-  { id: 'algebra-2', label: 'Algebra 2 (6)', accent: '#45E6A6' },
-  { id: 'precalculus', label: 'Precalculus (6)', accent: '#FF8563' },
+  { id: 'all', label: 'All 33 Labs', accent: '#F4C46C' },
+  { id: 'frontier', label: '3D & String Frontier (6)', accent: '#FFE29E' },
+  { id: 'algebra-1', label: 'Algebra 1 (7)', accent: '#F5C25B' },
+  { id: 'geometry', label: 'Geometry (6)', accent: '#46D6E8' },
+  { id: 'algebra-2', label: 'Algebra 2 (7)', accent: '#45E6A6' },
+  { id: 'precalculus', label: 'Precalculus (7)', accent: '#FF8563' },
 ];
 
 function isLabId(val: string | null): val is LabId {
@@ -438,12 +542,17 @@ function isLabId(val: string | null): val is LabId {
 
 export function InstrumentsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialLab = isLabId(searchParams.get('lab'))
-    ? (searchParams.get('lab') as LabId)
-    : 'orbital-torus';
+  const paramLab = searchParams.get('lab');
+  const initialLab = isLabId(paramLab) ? (paramLab as LabId) : 'orbital-torus';
 
   const [activeLab, setActiveLab] = useState<LabId>(initialLab);
   const [categoryFilter, setCategoryFilter] = useState<LabCategory>('all');
+
+  useEffect(() => {
+    if (isLabId(paramLab)) {
+      setActiveLab((prev) => (prev === paramLab ? prev : paramLab));
+    }
+  }, [paramLab]);
 
   const activeMeta = LAB_ITEMS.find((l) => l.id === activeLab) ?? LAB_ITEMS[0];
 
@@ -467,7 +576,7 @@ export function InstrumentsPage() {
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="space-y-1.5 min-w-0">
               <span className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-[#F4C46C]">
-                AUREA Precision Observatory · 26 Standalone Lab Suites (3D + 35 Topic Engines)
+                AUREA Precision Observatory · 33 Standalone Lab Suites (3D Shaders, Kinetic Proofs &amp; 35 Topic Engines)
               </span>
               <h1 className="font-serif-editorial text-3xl sm:text-5xl text-[#F7F4EC]">
                 3D &amp; Mathematical Instruments Workbench
@@ -599,6 +708,53 @@ export function InstrumentsPage() {
               <LazyTensorRiemann3D />
             </Suspense>
           )}
+          {activeLab === 'vector-flow-3d' && (
+            <Suspense
+              fallback={
+                <div className="instrument-frame h-[430px] flex items-center justify-center font-mono-data text-xs text-[#A8B2C6]">
+                  Initializing 3D Vector Flow Field…
+                </div>
+              }
+            >
+              <LazyVectorFlowField3D />
+            </Suspense>
+          )}
+          {activeLab === 'lorenz-chaos-3d' && (
+            <Suspense
+              fallback={
+                <div className="instrument-frame h-[430px] flex items-center justify-center font-mono-data text-xs text-[#A8B2C6]">
+                  Initializing 3D Lorenz Chaos Butterfly…
+                </div>
+              }
+            >
+              <LazyLorenzAttractor3D />
+            </Suspense>
+          )}
+          {activeLab === 'matrix-transform-3d' && (
+            <Suspense
+              fallback={
+                <div className="instrument-frame h-[430px] flex items-center justify-center font-mono-data text-xs text-[#A8B2C6]">
+                  Initializing 3D Matrix Space Warp…
+                </div>
+              }
+            >
+              <LazyMatrixTransform3D />
+            </Suspense>
+          )}
+          {activeLab === 'surface-revolution-3d' && (
+            <Suspense
+              fallback={
+                <div className="instrument-frame h-[430px] flex items-center justify-center font-mono-data text-xs text-[#A8B2C6]">
+                  Initializing 360° Solid of Revolution…
+                </div>
+              }
+            >
+              <LazySurfaceRevolution3D />
+            </Suspense>
+          )}
+          {activeLab === 'fourier-epicycles' && <FourierEpicyclesEngine />}
+          {activeLab === 'formula-morph' && <FormulaMorphEngine />}
+          {activeLab === 'pythagoras-fluid' && <PythagorasFluidProof />}
           {activeLab === 'apollonius-cone' && <ApolloniusCone3D />}
           {activeLab === 'harmonic-spine' && <GoldenHarmonicSpine />}
           {activeLab === 'solids' && <SolidNetLab />}
